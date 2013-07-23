@@ -13,6 +13,14 @@
 # http://www.cut-the-knot.org/pythagoras/RationalTrig/CutTheKnot.shtml
 # http://farside.ph.utexas.edu/euclid.html
 
+#
+# todo
+# simplify code
+# use actual test suite
+# deal with /0 and other problems
+# implement non-implemented stuff
+# add 'quadrance' to objects as well
+
 from fractions import Fraction
 
 def rat( x, y ):
@@ -99,13 +107,13 @@ class triangle:
 
 
 def red_quadrance( p1, p2 ):
-	raise Exception(" not implemented ")
+	return sqr( p2.x-p1.x ) - sqr( p2.y-p1.y )
 
 def green_quadrance( p1, p2 ):
-	raise Exception(" not implemented ")
+	return 2*( p2.x-p1.x ) * ( p2.y-p1.y )
 
 def blue_quadrance( p1, p2 ):
-	return sqr(p2.x - p1.x)+sqr(p2.y-p1.y)
+	return sqr( p2.x-p1.x ) + sqr( p2.y-p1.y )
 
 def quadrance( *args ):
 	p0,p1 = None,None
@@ -121,11 +129,21 @@ def quadrance( *args ):
 	else:
 		return blue_quadrance( p0, p1 )
 
+# fixme - if a1^2 - bq^2 = 0 then l1 = null line
+# both must be non null
 def red_spread( l1, l2 ):
-	raise Exception(" not implemented ")
+	a1,b1,c1 = l1.a, l1.b, l1.c
+	a2,b2,c2 = l2.a, l2.b, l2.c
+	numerator = -1 * sqr(a1*b2-a2*b1)
+	denominator = (a1*a1-b1*b1)*(a2*a2-b2*b2)
+	return Fraction( numerator, denominator )
 
 def green_spread( l1, l2 ):
-	raise Exception(" not implemented ")
+	a1,b1,c1 = l1.a, l1.b, l1.c
+	a2,b2,c2 = l2.a, l2.b, l2.c
+	numerator = -1 * sqr(a1*b2-a2*b1)
+	denominator = 4 * a1 * a2 * b1 * b2
+	return Fraction( numerator, denominator )
 	
 def blue_spread( l1, l2 ):
 	a1,b1,c1 = l1.a, l1.b, l1.c
@@ -194,9 +212,6 @@ def cross_law_rhs( tri ):
 	cross = 1-tri.s2
 	return 4*tri.q0*tri.q1*(cross)
 
-#def triple_spread_lhs( tri ):
-#	return tri.
-
 def spread_law( tri ):
 	a,b,c = tri.s0/tri.q0 , tri.s1/tri.q1 , tri.s2/tri.q2
 	return str(a)+', '+str(b)+', '+str(c)
@@ -207,3 +222,9 @@ def triple_spread_lhs( tri ):
 def triple_spread_rhs( tri ):
 	s0,s1,s2 = tri.s0, tri.s1, tri.s2
 	return 2 * ( s0*s0 + s1*s1 + s2*s2 ) + 4*s0*s1*s2
+
+def pythagoras_lhs( tri ):
+	return tri.q0 + tri.q1
+
+def pythagoras_rhs( tri ):
+	return tri.q2
