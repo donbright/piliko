@@ -15,48 +15,6 @@
 
 from fractions import Fraction
 
-class line:
-	# line formula here is ax + by + c = 0
-	a,b,c=0,0,0
-	def __init__( self, a, b, c ): 
-		if (type(a) is float): raise Exception("Rationals only please")
-		if (type(b) is float): raise Exception("Rationals only please")
-		if (type(c) is float): raise Exception("Rationals only please")
-		self.a,self.b,self.c=a,b,c
-	def __str__( self ):
-		return '<'+str(self.a)+":"+str(self.b)+":"+str(self.c)+'>'
-		
-class triangle:
-	l0,l1,l2=line(0,0,0),line(0,0,0),line(0,0,0)
-	def __init__( self, l0, l1, l2 ):
-		self.l0,self.l1,self.l2 = l0, l1, l2
-	def dump_lineqs( self ):
-		return 'line eqs:'+str(self.l0)+','+str(self.l1)+','+str(self.l2)
-	def __str__( self ):
-		return self.dump_lineqs()
-
-class point:
-	x,y=0,0
-	def __init__(self, x, y):
-		if (type(x) is float): raise Exception("Rationals only please")
-		if (type(y) is float): raise Exception("Rationals only please")
-		self.x,self.y=x,y
-	def dump_coords( self ):
-		return '('+str(self.x)+','+str(self.y)+')'
-	def __str__( self ):
-		return self.dump_coords()
-
-class lineseg:
-	p0,p1=point(0,0),point(0,0)
-	def __init__(self,p0,p1):
-		self.p0,self.p1=p0,p1
-	def dump_pts( self ):
-		return str(self.p0) +'-'+str(self.p1)
-	def dump_eqn( self ):
-		return 'not implemented'
-	def __str__( self ):
-		return self.dump_pts()
-
 def rat( x, y ):
 	return Fraction( x, y )
 
@@ -94,12 +52,12 @@ def blue_spread( l1, l2 ):
 def spread( l1, l2 ):
 	return blue_spread( l1, l2 )
 
-def meet( l1, l2 ):
+def meet( l1, l2 ): # fixme - what if dont meet?
 	a1,b1,c1 = l1.a, l1.b, l1.c
 	a2,b2,c2 = l2.a, l2.b, l2.c
 	x = Fraction()
 	y = Fraction()
-	return x,y
+	return point(x,y)
 
 def intersection( l1, l2 ):
 	return meet( l1, l2 )
@@ -124,6 +82,60 @@ def is_parallel( l1, l2):
 
 
 
+class line:
+	# line formula here is ax + by + c = 0
+	a,b,c=0,0,0
+	def __init__( self, a, b, c ): 
+		if (type(a) is float): raise Exception("Rationals only please")
+		if (type(b) is float): raise Exception("Rationals only please")
+		if (type(c) is float): raise Exception("Rationals only please")
+		self.a,self.b,self.c=a,b,c
+	def __str__( self ):
+		return '<'+str(self.a)+":"+str(self.b)+":"+str(self.c)+'>'
+
+class point:
+	x,y=0,0
+	def __init__(self, x, y):
+		if (type(x) is float): raise Exception("Rationals only please")
+		if (type(y) is float): raise Exception("Rationals only please")
+		self.x,self.y=x,y
+	def dump_coords( self ):
+		return '('+str(self.x)+','+str(self.y)+')'
+	def __str__( self ):
+		return self.dump_coords()
+
+class lineseg:
+	p0,p1=point(0,0),point(0,0)
+	def __init__(self,p0,p1):
+		self.p0,self.p1=p0,p1
+	def dump_pts( self ):
+		return str(self.p0) +'-'+str(self.p1)
+	def dump_eqn( self ):
+		return 'not implemented'
+	def __str__( self ):
+		return self.dump_pts()
+	def quadrance( self ):
+		return quadrance( self.p0, self.p1 )
+
+class triangle:
+	l0,l1,l2=line(0,0,0),line(0,0,0),line(0,0,0)
+	p0,p1,p2=meet(l0,l1),meet(l1,l2),meet(l2,l0)
+	ls0,ls1,ls2=lineseg(p0,p1),lineseg(p1,p2),lineseg(p2,p0)
+	q0,q1,q2=ls0.quadrance(),ls1.quadrance(),ls2.quadrance()
+	def __init__( self, l0, l1, l2 ):
+		self.l0,self.l1,self.l2 = l0, l1, l2
+	def dump_lineqs( self ):
+		return 'line eqs:'+str(self.l0)+','+str(self.l1)+','+str(self.l2)
+	def dump_linesegs( self ):
+		return 'line segs:'+str(self.ls0)+','+str(self.ls1)+','+str(self.ls2)
+	def dump_pts( self ):
+		return 'points:'+str(self.p0)+','+str(self.p1)+','+str(self.p2)
+	def __str__( self ):
+		s = '\n  ' + self.dump_lineqs()
+		s+= '\n  ' + self.dump_linesegs()
+		s+='\n  ' + self.dump_pts()
+		return s
+
 # calculate left hand side and right hand side of various formulas
 
 def triple_quad_lhs( q0, q1, q2 ):
@@ -140,3 +152,8 @@ def quadruple_quad_lhs( q0, q1, q2, q3 ):
 def quadruple_quad_rhs( q0, q1, q2, q3 ):
 	return 64 * q0 * q1 * q2 * q3
 
+def cross_law_lhs( tri ):
+	return sqr(tri.q0+tri.q1-tri.q3)
+	
+def cross_law_rhs( tri ):
+	return 4*tri.q0*tri.q1*(1-tri.s2)
