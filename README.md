@@ -4,7 +4,9 @@ piliko
 Piliko is a very, very, very basic implementation of some formulas from 
 the Rational Trigonmetry and Rational Geometry as described by Norman J 
 Wildberger. This package is not affiliated in any way with Norman J 
-Wildberger.
+Wildberger. 
+
+The computer language used is python.
 
 Current status
 ==============
@@ -15,9 +17,9 @@ Examples
 ========
 
 Basic usage:
-
+     # note ---> we use the line equation ax+by+c = 0
      from piliko import *
-     l0 = line(1,-2,3)       # ax+by+c = 0 is the line equation
+     l0 = line(1,-2,3) 
      l1 = line(4,-3,7)
      s = spread(l0,l1)
      print l0, l1, s
