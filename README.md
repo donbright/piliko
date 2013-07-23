@@ -27,6 +27,7 @@ Examples
 ========
 
 Basic usage:
+
      # note ---> we use the line equation ax+by+c = 0
      from piliko import *
      l0 = line(1,-2,3) 
