@@ -19,7 +19,13 @@
 # use actual test suite
 # deal with /0 and other problems
 # implement non-implemented stuff
-# add 'quadrance' to objects as well
+
+# split out print functions from basic code? sep presentation w data...
+ 
+# add args* based triangle constructor (points or lines)
+#   enable omega triangle
+
+# what is omega inverse?
 
 from fractions import Fraction
 
@@ -243,4 +249,35 @@ def colored_spread_lhs( l0, l1 ):
 
 def colored_spread_rhs( l0, l1 ):
 	return 2
+
+
+def red_orthocenter( tri ):
+	raise Exception(" not implemented ")
+def green_orthocenter( tri ):
+	raise Exception(" not implemented ")
+def blue_orthocenter( tri ):
+	raise Exception(" not implemented ")
+
+
+def red_centroid( tri ):
+	raise Exception(" not implemented ")
+def green_centroid( tri ):
+	raise Exception(" not implemented ")
+def blue_centroid( tri ):
+	raise Exception(" not implemented ")
+
+
+def red_circumcenter( tri ):
+	raise Exception(" not implemented ")
+def green_circumcenter( tri ):
+	raise Exception(" not implemented ")
+def blue_circumcenter( tri ):
+	raise Exception(" not implemented ")
+
+
+def omega_triangle( tri ):
+	o0 = red_orthocenter( tri )
+	o1 = green_orthocenter( tri )
+	o2 = blue_orthocenter( tri )
+	return triangle( o0, o1, o2 )
 
