@@ -1,9 +1,9 @@
 from piliko import *
 
 # line equation -> ax+by+c = 0 
-l1 = line(1,2,1)
-l2 = line(3,2,5)
-l3 = line(4,2,3)
+l1 = line(0,1,0)
+l2 = line(1,0,0)
+l3 = line(1,1,-1)
 
 print 'lines l1, l2, l3:', l1, l2, l3
 
@@ -15,7 +15,15 @@ print 'spreads s12, s23, s13:', s12, s23, s13
 
 t1 = triangle( l1, l2, l3 )
 
-print 'triangle of l1, l2, l3:', t1
+print 'triangle t1 of l1, l2, l3:', t1
+
+print 'cross law lhs for t1: ', cross_law_lhs( t1 )
+print 'cross law rhs for t1: ', cross_law_rhs( t1 )
+print 'spread law for t1:', spread_law( t1 )
+print 'triple spread lhs for t1: ', triple_spread_lhs( t1 )
+print 'triple spread rhs for t1: ', triple_spread_rhs( t1 )
+
+print
 
 p0 = point( 0, 0 )
 p1 = point( 3, 0 )
@@ -35,9 +43,9 @@ q02 = quadrance( p0, p2 )
 
 print 'quadrances between points p0, p1, p2:', q10, q21, q02
 
-qls0 = lsquadrance( ls0 )
-qls1 = lsquadrance( ls1 )
-qls2 = lsquadrance( ls2 )
+qls0 = quadrance( ls0 )
+qls1 = quadrance( ls1 )
+qls2 = quadrance( ls2 )
 
-print 'quadrances of linesegs ls0, ls1, ls2', qls0, qls1, qls2
+print 'quadrances of linesegs ls0, ls1, ls2:', qls0, qls1, qls2
 
