@@ -8,11 +8,15 @@ This package is not affiliated with, nor endorsed in any way by Norman J
 Wildberger, who created Rational Trigonometry. For more info, check these
 websites:
 
-*https://www.youtube.com/user/njwildberger
-*http://web.maths.unsw.edu.au/~norman/
-*http://www.wildegg.com
-*http://www.cut-the-knot.org/pythagoras/RationalTrig/CutTheKnot.shtml
-*http://farside.ph.utexas.edu/euclid.html
+https://www.youtube.com/user/njwildberger
+
+http://web.maths.unsw.edu.au/~norman/
+
+http://www.wildegg.com
+
+http://www.cut-the-knot.org/pythagoras/RationalTrig/CutTheKnot.shtml
+
+http://farside.ph.utexas.edu/euclid.html
 
 Current status
 ==============
