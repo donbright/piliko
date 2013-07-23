@@ -30,10 +30,10 @@ Basic usage:
 
      # note ---> we use the line equation ax+by+c = 0
      from piliko import *
-     l0 = line(1,-2,3) 
-     l1 = line(4,-3,7)
-     s = spread(l0,l1)
-     print l0, l1, s
+     L1 = line(1,-2,3) 
+     L2 = line(4,-3,7)
+     s = spread(L1,L2)
+     print L1, L2, s
 
 Result:
 
