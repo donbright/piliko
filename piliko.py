@@ -228,3 +228,19 @@ def pythagoras_lhs( tri ):
 
 def pythagoras_rhs( tri ):
 	return tri.q2
+
+def colored_quadrance_lhs( p0, p1 ):
+	return sqr(blue_quadrance( p0, p1 ))
+
+def colored_quadrance_rhs( p0, p1 ):
+	return sqr(red_quadrance(p0, p1)) + sqr(green_quadrance(p0, p1))
+
+def colored_spread_lhs( l0, l1 ):
+	bs = blue_spread( l0, l1 )
+	rs = red_spread( l0, l1 )
+	gs = green_spread( l0, l1 )
+	return 1/bs + 1/rs + 1/gs
+
+def colored_spread_rhs( l0, l1 ):
+	return 2
+

@@ -63,7 +63,9 @@ print 'lines l0,l1', l0, l1
 print 'blue spread: ', blue_spread( l0, l1 )
 print 'red spread: ', red_spread( l0, l1 )
 print 'green spread: ', green_spread( l0, l1 )
-
+csl = colored_spread_lhs( l0, l1 )
+csr = colored_spread_rhs( l0, l1 )
+print 'colored spread theorem (1/g+1/b+1/r=2): lhs:', csl, ' rhs: ', csr
 
 print
 print 'example 4'
@@ -74,4 +76,6 @@ rq = red_quadrance( p0, p1 )
 gq = green_quadrance( p0, p1 )
 bq = blue_quadrance( p0, p1 )
 print 'red, green, blue quadrances: ', rq, gq, bq
-print 'redq squared + greenq squared:' , rq*rq + gq*gq , ' blueq squared: ', bq*bq
+cql = colored_quadrance_lhs( p0, p1 )
+cqr = colored_quadrance_rhs( p0, p1 )
+print 'colored quadrance theorem (bq^2=rq^2+gq^2) lhs: ', cql, ' rhs: ', cqr
