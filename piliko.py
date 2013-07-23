@@ -5,13 +5,7 @@
 # we use python's "Fraction" type to represent rationals.
 
 # Rational Geometry is from Norman J Wildberger. This code is not affiliated
-# with him in any way, but you can learn more at these websites:
-#
-# https://www.youtube.com/user/njwildberger
-# http://web.maths.unsw.edu.au/~norman/
-# http://www.wildegg.com
-# http://www.cut-the-knot.org/pythagoras/RationalTrig/CutTheKnot.shtml
-# http://farside.ph.utexas.edu/euclid.html
+# with him nor endorsed by him in any way. See the README for info.
 
 #
 # todo
