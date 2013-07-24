@@ -2,7 +2,7 @@ piliko
 ======
 
 Piliko is a very, very, very basic implementation of some formulas from 
-Rational Trigonmetry in the Python computer language.
+Rational Trigonmetry in a computer language. 
 
 This package is not affiliated with, nor endorsed in any way by Norman J 
 Wildberger, who created Rational Trigonometry. For more info, check these
@@ -17,6 +17,9 @@ http://www.wildegg.com
 http://www.cut-the-knot.org/pythagoras/RationalTrig/CutTheKnot.shtml
 
 http://farside.ph.utexas.edu/euclid.html
+
+The language used is Python, but using features where we break lots of 
+conventions (use of *args and object inspection).
 
 Current status
 ==============

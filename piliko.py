@@ -21,6 +21,12 @@
 
 # what is omega inverse?
 
+
+# philosophia 
+# work backwards from usage to code. what would i want to type?
+# do i have to rememeber tech details or can i type whatever? 
+# (ex triangle from lines, from points, from linesegs)
+
 from fractions import Fraction
 
 def rat( x, y ):
@@ -29,39 +35,60 @@ def rat( x, y ):
 def sqr( x ):
 	return x*x
 
+def checkrationals( *args ):
+	for i in range(0,len(args)):
+		if (type(args[i]) is float): #fixme - is not Fraction/int
+			raise Exception("Rationals only please")
 class point:
-	x,y=0,0
-	def __init__(self, x, y):
-		if (type(x) is float): raise Exception("Rationals only please")
-		if (type(y) is float): raise Exception("Rationals only please")
-		self.x,self.y=x,y
-	def dump_coords( self ):
-		return '('+str(self.x)+','+str(self.y)+')'
+	def __init__(self, *args):
+		checkrationals( args )
+		self.x,self.y=args[0],args[1]
+		if (len(args)==3): self.z=args[2]
 	def __str__( self ):
-		return self.dump_coords()
+		return point_txt(self)
+
+class vector:
+	def __init__( self, *args ):
+		p = point( *args )
+		self.x,self.y=p.x,p.y
+		if hasattr(p,'z'): self.z=p.z
+	def __str__( self ):
+		return vector_txt(self)
+
+	def __add__( self, v):
+		newx = self.x + v.x
+		newy = self.y + v.y
+		if hasattr(v,'z'):
+			newz = self.z + v.z
+			return vector(newx, newy, newz)
+		return vector(newx, newy)
+	def __sub__( self, v ):
+		negv = vector( -v.x, -v.y )
+		if hasattr(v,'z'): negv.z = -v.z
+		return self + negv
+	def __mul__( self, scalar ):
+		newv = vector( self.x * scalar, self.y * scalar )
+		if hasattr(self,'z'): newv.z = self.z * scalar
+		return newv
+	def perpendicular( self, v ):
+		return perpendicular( self, v )
+	def parallel( self, v ):
+		return parallel( self, v )
 
 class line:
 	# line formula here is ax + by + c = 0
-	a,b,c=0,0,0
 	def __init__( self, a, b, c ): 
-		if (type(a) is float): raise Exception("Rationals only please")
-		if (type(b) is float): raise Exception("Rationals only please")
-		if (type(c) is float): raise Exception("Rationals only please")
+		checkrationals( a, b, c )
 		self.a,self.b,self.c=a,b,c
 	def __str__( self ):
-		return '<'+str(self.a)+":"+str(self.b)+":"+str(self.c)+'>'
+		return line_txt( self )
 
 
 class lineseg:
-	p0,p1=point(0,0),point(0,0)
 	def __init__(self,p0,p1):
 		self.p0,self.p1=p0,p1
-	def dump_pts( self ):
-		return str(self.p0) +'-'+str(self.p1)
-	def dump_eqn( self ):
-		return 'not implemented'
 	def __str__( self ):
-		return self.dump_pts()
+		return lineseg_txt( self )
 	def quadrance( self ):
 		return quadrance( self.p0, self.p1 )
 
@@ -86,74 +113,258 @@ class triangle:
 		self.q0,self.q1,self.q2=q0,q1,q2
 		self.s0,self.s1,self.s2=s0,s1,s2
 
-	def dump_spreads( self ):
-		return 'spreads:'+str(self.s0)+','+str(self.s1)+','+str(self.s2)
-	def dump_lineqs( self ):
-		return 'line eqs:'+str(self.l0)+','+str(self.l1)+','+str(self.l2)
-	def dump_linesegs( self ):
-		return 'line segs:'+str(self.ls0)+' '+str(self.ls1)+' '+str(self.ls2)
-	def dump_pts( self ):
-		return 'points:'+str(self.p0)+','+str(self.p1)+','+str(self.p2)
-	def dump_quadrances( self ):
-		return 'quadrances:'+str(self.q0)+','+str(self.q1)+','+str(self.q2)
 	def __str__( self ):
-		s = '\n  ' + self.dump_lineqs()
-		s+= '\n  ' + self.dump_linesegs()
-		s+='\n  ' + self.dump_pts()
-		s+='\n  ' + self.dump_spreads()
-		s+='\n  ' + self.dump_quadrances()
-		return s
+		return triangle_txt( self )
+
+######## formulas, functions, theorems, operations
 
 
 
-def red_quadrance( p1, p2 ):
+###### perpendicular
+
+def red_perpendicular_vectors( v1, v2 ):
+	raise Exception("not implemented ")
+def green_perpendicular_vectors( v1, v2 ):
+	raise Exception("not implemented ")
+def blue_perpendicular_vectors( v1, v2 ):
+	return v1.x*v2.x + v1.y*v2.y == 0
+
+def red_perpendicular_linesegs( v1, v2 ):
+	raise Exception("not implemented ")
+def green_perpendicular_linesegs( v1, v2 ):
+	raise Exception("not implemented ")
+def blue_perpendicular_linesegs( v1, v2 ):
+	raise Exception("not implemented ")
+
+def red_perpendicular_lines( v1, v2 ):
+	raise Exception("not implemented ")
+def green_perpendicular_lines( v1, v2 ):
+	raise Exception("not implemented ")
+def blue_perpendicular_lines( v1, v2 ):
+	raise Exception("not implemented ")
+
+
+def perpendicular( *args, **kwargs ):
+	if 'color' in kwargs.keys(): color=kwargs['color']
+ 	else: color='blue'
+
+	if color=='red':
+		perpendicular_vectors = red_perpendicular_vectors
+		perpendicular_lines = red_perpendicular_lines
+		perpendicular_linesegs = red_perpendicular_linesegs
+	elif color == 'green':
+		perpendicular_vectors = green_perpendicular_vectors
+		perpendicular_lines = green_perpendicular_lines
+		perpendicular_linesegs = green_perpendicular_linesegs
+	elif color == 'blue':
+		perpendicular_vectors = blue_perpendicular_vectors
+		perpendicular_lines = blue_perpendicular_lines
+		perpendicular_linesegs = blue_perpendicular_linesegs
+
+	if isinstance(args[0],point): # and isinstance(args[1],point):
+		raise Exception( "not implemented")
+	if isinstance(args[0],line) and isinstance(args[1],line):
+		return perpendicular_lines( args[0], args[1] )
+	if isinstance(args[0],lineseg) and isinstance(args[1],lineseg):
+		return perpendicular_linesegs( args[0], args[1] )
+	if isinstance(args[0],vector) and isinstance(args[1],vector):
+		return perpendicular_vectors( args[0], args[1] )
+	return None
+
+
+
+
+########## parallel
+
+def red_parallel_vectors( v1, v2 ):
+	raise Exception("not implemented ")
+def green_parallel_vectors( v1, v2 ):
+	raise Exception("not implemented ")
+def blue_parallel_vectors( v1, v2 ):
+	return v1.x*v2.y - v2.x*v1.y == 0
+
+def red_parallel_linesegs( v1, v2 ):
+	raise Exception("not implemented ")
+def green_parallel_linesegs( v1, v2 ):
+	raise Exception("not implemented ")
+def blue_parallel_linesegs( v1, v2 ):
+	raise Exception("not implemented ")
+
+def red_parallel_lines( v1, v2 ):
+	raise Exception("not implemented ")
+def green_parallel_lines( v1, v2 ):
+	raise Exception("not implemented ")
+def blue_parallel_lines( v1, v2 ):
+	raise Exception("not implemented ")
+
+
+def parallel( *args, **kwargs ):
+	if 'color' in kwargs.keys(): color=kwargs['color']
+ 	else: color='blue'
+
+	if color=='red':
+		parallel_vectors = red_parallel_vectors
+		parallel_lines = red_parallel_lines
+		parallel_linesegs = red_parallel_linesegs
+	elif color == 'green':
+		parallel_vectors = green_parallel_vectors
+		parallel_lines = green_parallel_lines
+		parallel_linesegs = green_parallel_linesegs
+	elif color == 'blue':
+		parallel_vectors = blue_parallel_vectors
+		parallel_lines = blue_parallel_lines
+		parallel_linesegs = blue_parallel_linesegs
+
+	if isinstance(args[0],point): # and isinstance(args[1],point):
+		raise Exception( "not implemented")
+	if isinstance(args[0],line) and isinstance(args[1],line):
+		return parallel_lines( args[0], args[1] )
+	if isinstance(args[0],lineseg) and isinstance(args[1],lineseg):
+		return parallel_linesegs( args[0], args[1] )
+	if isinstance(args[0],vector) and isinstance(args[1],vector):
+		return parallel_vectors( args[0], args[1] )
+	return None
+
+
+
+############### qudarance
+
+
+def red_quadrance_pts( p1, p2 ):
+	if hasattr(p2,'z') and hasattr(p1,'z'):
+		raise Exception(" 3d red quadrance not implemented ")
 	return sqr( p2.x-p1.x ) - sqr( p2.y-p1.y )
 
-def green_quadrance( p1, p2 ):
+def green_quadrance_pts( p1, p2 ):
+	if hasattr(p2,'z') and hasattr(p1,'z'):
+		raise Exception(" 3d green quadrance not implemented ")
 	return 2*( p2.x-p1.x ) * ( p2.y-p1.y )
 
-def blue_quadrance( p1, p2 ):
-	return sqr( p2.x-p1.x ) + sqr( p2.y-p1.y )
+def blue_quadrance_pts( p1, p2 ):
+	q = sqr( p2.x-p1.x ) + sqr( p2.y-p1.y )
+	if hasattr(p2,'z') and hasattr(p1,'z'): q += sqr( p2.z-p1.z )
+	return q
 
-def quadrance( *args ):
-	p0,p1 = None,None
-	if len(args)==2:
-		if isinstance(args[0],point) and isinstance(args[1],point):
-			p0,p1 = args[0],args[1]
-	elif len(args)==1:
-		if isinstance(args[0],lineseg):
-			p0,p1 = args[0].p0, args[0].p1
+def red_quadrance_lineseg( ls ):
+	return red_quadrance_pts( ls.p0, ls.p1 )
+def green_quadrance_lineseg( ls ):
+	return green_quadrance_pts( ls.p0, ls.p1 )
+def blue_quadrance_lineseg( ls ):
+	return blue_quadrance_pts( ls.p0, ls.p1 )
 
-	if p0==None and p1==None:
-		raise Exception("unknown type for quadrance() " + str(args))
-	else:
-		return blue_quadrance( p0, p1 )
+def quadrance_vector( v, color='blue' ):
+	p0 = point( 0,0 )
+	p1 = point( v.x, v.y )
+	if hasattr(v,'z'):
+		p0.z = 0
+		p1.z = v.z
+	if color=='red':
+		return red_quadrance_pts( p0, p1 )
+	elif color=='green':
+		return green_quadrance_pts( p0, p1 )
+	elif color=='blue':
+		return blue_quadrance_pts( p0, p1 )
+
+def red_quadrance_vector( v ):
+	quadrance_vector( v, color='red' )
+def green_quadrance_vector( v ):
+	quadrance_vector( v, color='green' )
+def blue_quadrance_vector( v ):
+	quadrance_vector( v, color='blue' )
+
+def red_quadrance( *args ):
+	return quadrance( *args, color='red' )
+def green_quadrance( *args ):
+	return quadrance( *args, color='green' )
+def blue_quadrance( *args ):
+	return quadrance( *args, color='blue' )
+
+def quadrance( *args, **kwargs ):
+	if 'color' in kwargs.keys(): color=kwargs['color']
+ 	else: color='blue'
+
+	if color=='blue':
+		quadrance_pts = blue_quadrance_pts
+		quadrance_lineseg = blue_quadrance_lineseg
+		quadrance_vector = blue_quadrance_vector
+	elif color == 'green':
+		quadrance_pts = green_quadrance_pts
+		quadrance_lineseg = green_quadrance_lineseg
+		quadrance_vector = green_quadrance_vector
+	elif color == 'red':
+		quadrance_pts = red_quadrance_pts
+		quadrance_lineseg = red_quadrance_lineseg
+		quadrance_vector = red_quadrance_vector
+
+	if isinstance(args[0],point) and isinstance(args[1],point):
+		return quadrance_pts( args[0],args[1] )
+	if isinstance(args[0],lineseg):
+		return quadrance_lineseg( args[0] )
+	if isinstance(args[0],vector):
+		return quadrance_vector( args[0] )
+	return None
+
 
 # fixme - if a1^2 - bq^2 = 0 then l1 = null line
 # both must be non null
-def red_spread( l1, l2 ):
+def red_spread_lines( l1, l2 ):
 	a1,b1,c1 = l1.a, l1.b, l1.c
 	a2,b2,c2 = l2.a, l2.b, l2.c
 	numerator = -1 * sqr(a1*b2-a2*b1)
 	denominator = (a1*a1-b1*b1)*(a2*a2-b2*b2)
 	return Fraction( numerator, denominator )
 
-def green_spread( l1, l2 ):
+def green_spread_lines( l1, l2 ):
 	a1,b1,c1 = l1.a, l1.b, l1.c
 	a2,b2,c2 = l2.a, l2.b, l2.c
 	numerator = -1 * sqr(a1*b2-a2*b1)
 	denominator = 4 * a1 * a2 * b1 * b2
 	return Fraction( numerator, denominator )
 	
-def blue_spread( l1, l2 ):
+def blue_spread_lines( l1, l2 ):
 	a1,b1,c1 = l1.a, l1.b, l1.c
 	a2,b2,c2 = l2.a, l2.b, l2.c
 	numerator = sqr(a1*b2-a2*b1)
 	denominator = (a1*a1+b1*b1)*(a2*a2+b2*b2)
 	return Fraction( numerator, denominator )
 
-def spread( l1, l2 ):
-	return blue_spread( l1, l2 )
+def red_spread_vectors( v1, v2 ):
+	raise Exception(" not implemented ")
+
+def green_spread_vectors( v1, v2 ):
+	raise Exception(" not implemented ")
+
+def blue_spread_vectors( v1, v2 ):
+	raise Exception(" not implemented ")
+
+def red_spread( *args ):
+	return spread( *args, color='red' )
+
+def green_spread( *args ):
+	return spread( *args, color='green' )
+
+def blue_spread( *args ):
+	return spread( *args, color='blue' )
+
+def spread( *args, **kwargs ):
+	if 'color' in kwargs.keys(): color=kwargs['color']
+ 	else: color='blue'
+
+	if color=='blue':
+		spread_lines = blue_spread_lines
+		spread_vectors = blue_spread_vectors
+	elif color == 'green':
+		spread_lines = green_spread_lines
+		spread_vectors = green_spread_vectors
+	elif color == 'red':
+		spread_lines = red_spread_lines
+		spread_vectors = red_spread_vectors
+
+	if isinstance(args[0],line) and isinstance(args[1],line):
+		return spread_lines( args[0], args[1] )
+	if isinstance(args[0],vector) and isinstance(args[1],vector):
+		return spread_vectors( args[0], args[1] )
+
 
 # fixme - what if dont meet? what if same line?
 # what if a,b,c all 0?
@@ -179,11 +390,8 @@ def is_blue_perpendicular( l1, l2 ):
 def is_perpendicular( l1, l2):
 	return is_blue_perpendicular( l1, l2 )
 
-def is_paralell( l1, l2):
-	return spread( l1, l2 ) == 0
-
 def is_parallel( l1, l2):
-	return paralell( l1, l2 )
+	return spread( l1, l2 ) == 0
 
 
 
@@ -229,6 +437,9 @@ def pythagoras_lhs( tri ):
 def pythagoras_rhs( tri ):
 	return tri.q2
 
+
+###### formulas, functions, theorems - chromogeometry
+
 def colored_quadrance_lhs( p0, p1 ):
 	return sqr(blue_quadrance( p0, p1 ))
 
@@ -236,9 +447,9 @@ def colored_quadrance_rhs( p0, p1 ):
 	return sqr(red_quadrance(p0, p1)) + sqr(green_quadrance(p0, p1))
 
 def colored_spread_lhs( l0, l1 ):
-	bs = blue_spread( l0, l1 )
-	rs = red_spread( l0, l1 )
-	gs = green_spread( l0, l1 )
+	bs = blue_spread_lines( l0, l1 )
+	rs = red_spread_lines( l0, l1 )
+	gs = green_spread_lines( l0, l1 )
 	return 1/bs + 1/rs + 1/gs
 
 def colored_spread_rhs( l0, l1 ):
@@ -274,4 +485,53 @@ def omega_triangle( tri ):
 	o1 = green_orthocenter( tri )
 	o2 = blue_orthocenter( tri )
 	return triangle( o0, o1, o2 )
+
+
+
+
+
+
+
+##################### render objects into text
+
+def point_txt( p ):
+	s = '['+str(p.x)+','+str(p.y)
+	if hasattr(p,'z'): s += ',' + str(p.z)
+	s += ']'
+	return s
+
+def vector_txt( v ):
+	s = '('+str(v.x)+','+str(v.y)
+	if hasattr(v,'z'): s += ',' + str(v.z)
+	s += ')'
+	return s
+
+def line_txt( l ):
+	s = '<'+str(l.a)+":"+str(l.b)+":"+str(l.c)
+	s += '>'
+	return s
+
+def lineseg_txt( l ):
+	s = str(l.p0) +'-'+str(l.p1)
+	return s
+
+def triangle_txt( tri ):
+	spreads = 'spreads:'+str(tri.s0)+','+str(tri.s1)+','+str(tri.s2)
+	line_eqns = str(tri.l0)+','+str(tri.l1)+','+str(tri.l2)
+	linesegs = str(tri.ls0)+' '+str(tri.ls1)+' '+str(tri.ls2)
+	points = str(tri.p0)+','+str(tri.p1)+','+str(tri.p2)
+	quadrances = str(tri.q0)+','+str(tri.q1)+','+str(tri.q2)
+	s ='\n line eqns: ' + line_eqns
+	s+='\n line segs: ' + linesegs
+	s+='\n points: ' + points
+	s+='\n quadrances: ' + quadrances
+	s+='\n spreads: ' + spreads
+	return s
+
+
+
+###### convenience - bad spelling, forgetful, etc
+
+def is_paralell( l1, l2):
+	return is_parallel( l1, l2 )
 
