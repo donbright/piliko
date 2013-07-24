@@ -126,7 +126,34 @@ class triangle:
 
 ######## formulas, functions, theorems, operations
 
+#### determinant of vectors
+## assume rows of matrix = vectors
+## note there is no matrix definition here
 
+def determinant( *args ):
+	for i in range(len(args)):
+		if not isinstance(args[i],vector):
+			raise Exception('this determinant() needs vector input as rows')
+	result = None
+
+	if len(args)<=1: raise Exception('not implemented')
+
+	if len(args)==2:
+		v1,v2 = args[0],args[1]
+		x1,y1,x2,y2 = v1.x,v1.y,v2.x,v2.y
+		result = x1*y2 - x2*y1
+
+	if len(args)==3:
+		v1,v2,v3 = args[0],args[1],args[2]
+		a,b,c = v1.x, v1.y, v1.z
+		d,e,f = v2.x, v2.y, v2.z
+		g,h,i = v3.x, v3.y, v3.z
+		result = a*e*i - a*f*h + b*f*g - b*d*i + c*d*h - c*e*g
+
+	if len(args)>3: raise Exception('not implemented')
+
+	return result
+	
 
 ###### perpendicular
 
@@ -313,6 +340,11 @@ def quadrance( *args, **kwargs ):
 	return None
 
 
+
+############### spreads
+
+
+
 # fixme - if a1^2 - bq^2 = 0 then l1 = null line
 # both must be non null
 def red_spread_lines( l1, l2 ):
@@ -343,6 +375,7 @@ def green_spread_vectors( v1, v2 ):
 	raise Exception(" not implemented ")
 
 def blue_spread_vectors( v1, v2 ):
+	# assume 2d
 	# fixme - if quadrance of either = 0 then its undefined
 	numerator = sqr(v2.dot(v1)) 
 	denominator = blue_quadrance_vector( v1 ) * blue_quadrance_vector( v2 )
@@ -376,6 +409,37 @@ def spread( *args, **kwargs ):
 	if isinstance(args[0],vector) and isinstance(args[1],vector):
 		return spread_vectors( args[0], args[1] )
 
+
+
+def red_solid_spread( v1, v2, v3 ):
+	raise Exception('not implemented')
+def green_solid_spread( v1, v2, v3 ):
+	raise Exception('not implemented')
+def blue_solid_spread( v1, v2, v3 ):
+	Q = quadrance
+	numerator = sqr( determinant( v1, v2, v3 ) )
+	denominator = Q( v1 ) * Q( v2 ) * Q( v3 ) 
+	return Fraction( numerator, denominator )
+
+def solid_spread( *args, **kwargs ):
+	for i in range(len(args)):
+		if not isinstance(args[i],vector):
+			raise Exception('solid spread needs vector input')
+	if len(args)!=3: raise Exception('solid spread needs 3d vectors')
+
+	if 'color' in kwargs.keys(): color=kwargs['color']
+ 	else: color='blue'
+
+	if color=='red':
+		solid_spread = red_solid_spread
+	elif color == 'green':
+		solid_spread = green_solid_spread
+	elif color == 'blue':
+		solid_spread = blue_solid_spread
+
+	return solid_spread( args[0], args[1], args[2] )
+
+#################### other stuff
 
 # fixme - what if dont meet? what if same line?
 # what if a,b,c all 0?
