@@ -13,9 +13,9 @@
 # use actual test suite
 # deal with /0 and other problems
 # implement non-implemented stuff
-
+# get the subscripts to match NJW's books/lectures (not 0 indexed, 1 indexed)
 # split out print functions from basic code? sep presentation w data...
- 
+# make function pointers shorter code, better code 
 # add args* based triangle constructor (points or lines)
 #   enable omega triangle
 

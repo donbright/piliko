@@ -117,10 +117,15 @@ def example5():
 	print ' triplequad for v4,v5,v6 : lhs:', lhs, 'rhs:',rhs
 
 	print 'spread( v1, v1 ):', spread( v1, v1 )
+	print 'spread( v2, v1 ):', spread( v2, v1 )
+	print 'spread( v2, 5*v1 ):', spread( v2, 5*v1 )
 	print 'spread( v1, v2 ):', spread( v1, v2 )
 	print 'spread( v1, v3 ):', spread( v1, v3 )
+	print 'spread( v1, 5*v3 ):', spread( v1, 5*v3 )
 	print 'spread( v2, v3 ):', spread( v2, v3 )
+	print 'spread( 100*v2, -20*v2 ):', spread( 100*v2, -20*v2 )
  
+	print 'quadrance v1 == v1 dot v1?', quadrance(v1), '=?=', v1.dot(v1)
 example1()
 example2()
 example3()
