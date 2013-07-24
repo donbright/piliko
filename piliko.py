@@ -70,6 +70,14 @@ class vector:
 		newv = vector( self.x * scalar, self.y * scalar )
 		if hasattr(self,'z'): newv.z = self.z * scalar
 		return newv
+	def __rmul__( self, scalar ):
+		return self * scalar
+	def dot( self, v ):
+		x1,y1,x2,y2 = self.x,self.y,v.x,v.y
+		p = x1*x2+y1*y2
+		if hasattr(v,'z'): raise Exception( 'not implemented' )
+		if hasattr(self,'z'): raise Exception( 'not implemented' )
+		return p
 	def perpendicular( self, v ):
 		return perpendicular( self, v )
 	def parallel( self, v ):
@@ -227,7 +235,7 @@ def parallel( *args, **kwargs ):
 
 
 
-############### qudarance
+############### quadrance
 
 
 def red_quadrance_pts( p1, p2 ):
@@ -266,11 +274,11 @@ def quadrance_vector( v, color='blue' ):
 		return blue_quadrance_pts( p0, p1 )
 
 def red_quadrance_vector( v ):
-	quadrance_vector( v, color='red' )
+	return quadrance_vector( v, color='red' )
 def green_quadrance_vector( v ):
-	quadrance_vector( v, color='green' )
+	return quadrance_vector( v, color='green' )
 def blue_quadrance_vector( v ):
-	quadrance_vector( v, color='blue' )
+	return quadrance_vector( v, color='blue' )
 
 def red_quadrance( *args ):
 	return quadrance( *args, color='red' )
@@ -335,7 +343,10 @@ def green_spread_vectors( v1, v2 ):
 	raise Exception(" not implemented ")
 
 def blue_spread_vectors( v1, v2 ):
-	raise Exception(" not implemented ")
+	# fixme - if quadrance of either = 0 then its undefined
+	numerator = sqr(v2.dot(v1)) 
+	denominator = blue_quadrance_vector( v1 ) * blue_quadrance_vector( v2 )
+	return 1 - Fraction( numerator, denominator )
 
 def red_spread( *args ):
 	return spread( *args, color='red' )
