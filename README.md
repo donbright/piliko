@@ -45,11 +45,11 @@ Example 2:
 	q1 = quadrance( v1 )
 	q2 = quadrance( v2 )
 	s = spread( v1, v2 )
-	print v1, v1, q1, q2, s
+	print v1, v2, q1, q2, s
 
 Result:
 
-	(3,0) (3,0) 9 16 1
+	(3,0) (0,4) 9 16 1
 
 More examples can be found in test.py. To run it:
 

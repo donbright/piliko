@@ -126,6 +126,7 @@ def example5():
 	print 'spread( 100*v2, -20*v2 ):', spread( 100*v2, -20*v2 )
  
 	print 'quadrance v1 == v1 dot v1?', quadrance(v1), '=?=', v1.dot(v1)
+
 example1()
 example2()
 example3()
