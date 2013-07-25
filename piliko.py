@@ -22,10 +22,12 @@
 # what is omega inverse?
 
 
-# philosophia 
+# code design philosophia 
 # work backwards from usage to code. what would i want to type?
 # do i have to rememeber tech details or can i type whatever? 
-# (ex triangle from lines, from points, from linesegs)
+# (example: triangle from lines, from points, from linesegs)
+# (example: spread( x, y ) ---> allow x to be lines, vectors, etc.  
+# the code can determine which is appropriate by itself. 
 
 from fractions import Fraction
 
@@ -34,6 +36,11 @@ def rat( x, y ):
 
 def sqr( x ):
 	return x*x
+
+def checktypes( typename, *args ): # are all args of a given type? 
+	for i in range(len(args)):
+		if not isinstance(args[i],typename): return False
+	return True
 
 def checkrationals( *args ):
 	for i in range(0,len(args)):
@@ -85,12 +92,19 @@ class vector:
 
 class line:
 	# line formula here is ax + by + c = 0
-	def __init__( self, a, b, c ): 
-		checkrationals( a, b, c )
+	def __init__( self, *args ):
+		if len(args)==2 and isinstance(args[0],point) and isinstance(args[1],point):
+			x1,y1,x2,y2=args[0].x,args[0].y,args[1].x,args[1].y
+			a,b,c=y1-y2,x2-x1,x1*y2-x2*y1
+		elif len(args)==3 and type(args[0])==int and type(args[1])==int and type(args[2])==int:
+			a,b,c=args[0],args[1],args[2]
+		elif len(args)==3 and instanceof(args[0],Fraction) and instanceof(args[1],Fraction) and instanceof(args[2],Fraction):
+			a,b,c=args[0],args[1],args[2]
+		else:
+			raise Exception('not implemented. line needs pts or rationals a,b,c')
 		self.a,self.b,self.c=a,b,c
 	def __str__( self ):
 		return line_txt( self )
-
 
 class lineseg:
 	def __init__(self,p0,p1):
@@ -341,6 +355,14 @@ def quadrance( *args, **kwargs ):
 
 
 
+def quadria( *args ):
+	if checktypes(point,*args):
+		Q1=quadrance(args[0],args[1])
+		Q2=quadrance(args[1],args[2])
+		Q3=quadrance(args[2],args[0])
+		return sqr(Q1+Q2+Q3)-2*(Q1*Q1+Q2*Q2+Q3*Q3)
+	raise Exception('not implemented')
+
 ############### spreads
 
 
@@ -439,39 +461,70 @@ def solid_spread( *args, **kwargs ):
 
 	return solid_spread( args[0], args[1], args[2] )
 
-#################### other stuff
+
+
+
+#################### miscellaneous stuff
 
 # fixme - what if dont meet? what if same line?
 # what if a,b,c all 0?
-def meet( l1, l2 ):
+def meet_lines( l1, l2 ):
 	a1,b1,c1 = l1.a, l1.b, l1.c
 	a2,b2,c2 = l2.a, l2.b, l2.c
 	x = Fraction( b2*c1-b1*c2, a2*b1-a1*b2 )
 	y = Fraction( a2*c1-a1*c2, b2*a1-b1*a2 )
 	return point( x, y )
 
-def intersection( l1, l2 ):
-	return meet( l1, l2 )
+def meet_line_and_point( l, p ):
+	if l.a*p.x + l.b*p.y + l.c == 0: return p
+	else: return None
 
-def is_green_perpendicular( l1, l2 ):
-	raise Exception(" not implemented ")
-	
-def is_red_perpendicular( l1, l2 ):
-	raise Exception(" not implemented ")
-	
-def is_blue_perpendicular( l1, l2 ):
-	return spread( l1, l2 ) == 1
+def meet( *args ):
+	if isinstance(args[0],line) and isinstance(args[1],line):
+		return meet_lines( args[0], args[1] )
+	if isinstance(args[0],line) and isinstance(args[1],point):
+		return meet_line_and_point( args[0], args[1] )
+	if isinstance(args[0],point) and isinstance(args[1],line):
+		return meet_line_and_point( args[1], args[0] )
+	raise Exception(' not implemented' + str(args) )
 
-def is_perpendicular( l1, l2):
-	return is_blue_perpendicular( l1, l2 )
+def collinear( *args ):
+	for i in range(len(args)):
+		if not isinstance(args[i],point):
+			raise Exception('coolinear() requires points')
+	if len(args)<3: raise Exception('collinear() needs 3 pts or more')
+	l = line(args[0],args[1])
+	for i in range(2,len(args)):
+		tmp_point = args[i]
+		if meet( l, tmp_point ) == None: return False 
+	return True
 
-def is_parallel( l1, l2):
-	return spread( l1, l2 ) == 0
+def cross( l0, l1 ):
+	checktypes( line, [l0,l1] )
+	return 1 - spread( l0, l1 )
+
+def squared_cross_ratio( p0,p1,p2,p3 ):
+	a,b,c,d=p0,p1,p2,p3
+	if not collinear(a,b,c,d): raise Exception("input pts must be collinear")
+	numerator = Fraction ( quadrance(a,c), quadrance(a,d) )
+	denominator = Fraction ( quadrance(b,c), quadrance(b,d) )
+	return Fraction( numerator, denominator )
+
+	# fun fact - you can calculate squared-cross-ratio using only 
+	#     one of the coordinates, except for horiz/vertical lines.
+	#     uncomment this alternative implementation if you want to try it
+	#if a.x-d.x==0:
+	#	top=Fraction(sqr(a.y-c.y),sqr(a.y-d.y))
+	#	bottom=Fraction(sqr(b.y-c.y),sqr(b.y-d.y))
+	#	return Fraction( top, bottom )
+	#else:
+	#	top=Fraction(sqr(a.x-c.x),sqr(a.x-d.x))
+	#	bottom=Fraction(sqr(b.x-c.x),sqr(b.x-d.x))
+	#	return Fraction( top, bottom )
 
 
 
-
-# calculate left hand side and right hand side of various formulas
+####### calculate left hand side and right hand side of various formulas
 
 
 def triple_quad_lhs( q0, q1, q2 ):
@@ -511,6 +564,7 @@ def pythagoras_lhs( tri ):
 
 def pythagoras_rhs( tri ):
 	return tri.q2
+
 
 
 ###### formulas, functions, theorems - chromogeometry
@@ -605,8 +659,28 @@ def triangle_txt( tri ):
 
 
 
-###### convenience - bad spelling, forgetful, etc
+###### convenience - for bad spelling, or just grammatical variatinos
 
 def is_paralell( l1, l2):
 	return is_parallel( l1, l2 )
+
+def is_green_perpendicular( l1, l2 ):
+	raise Exception(" not implemented ")
+	
+def is_red_perpendicular( l1, l2 ):
+	raise Exception(" not implemented ")
+	
+def is_blue_perpendicular( l1, l2 ):
+	return spread( l1, l2 ) == 1
+
+def is_perpendicular( l1, l2):
+	return is_blue_perpendicular( l1, l2 )
+
+def is_parallel( l1, l2):
+	return spread( l1, l2 ) == 0
+
+def intersection( l1, l2 ):
+	return meet( l1, l2 )
+
+
 
