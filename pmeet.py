@@ -1,20 +1,27 @@
 from fractions import Fraction
 
 # assume - input polys are clockwise-ordered set of 3 or more points
-# assume - points are using rational numbers for coordinates
+# assume - points are using rational numbers for coordinates (Fractions)
 # assume - polygons are simple
-# design - dont use angles
 
+# design - dont use angles
 # point = [x,y]
 # line = [a,b,c] where ax+by+c = 0
 # vector = [x,y]
 # triangle = [point,point,point]
 # polygon = [point,point,...]
 
+# notes
+# http://math.stackexchange.com/questions/74307/two-2d-vector-angle-clockwise-predicate
+# http://stackoverflow.com/questions/243945/calculating-a-2d-vectors-cross-product
+# https://www.youtube.com/watch?v=6XghF70fqkY&list=PL01A21B9E302D50C1
+
 import sys
 
-# -> determinant of 2x2 if vectors = columns, or...
-# -> cross product if you assume z=0 and return magnitude
+# -> determinant of 2x2 if vectors = columns
+# -> also cross product if you add a z=0 and return magnitude
+# -> also area of paralellogram formed by v1, v2
+# -> also is the 'multiple' by which all Grossman bi-vectors are related
 def crosshack( v1, v2 ):
 	x1,y1,x2,y2 = v1[0],v1[1],v2[0],v2[1]
 	return x1*y2-x2*y1
