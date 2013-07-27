@@ -18,6 +18,7 @@
 # make function pointers shorter code, better code 
 # add args* based triangle constructor (points or lines)
 #   enable omega triangle
+# put 'of' in func names
 
 # what is omega inverse?
 
@@ -137,6 +138,10 @@ class triangle:
 
 	def __str__( self ):
 		return triangle_txt( self )
+
+class quaternion:
+	def __init__(self,t,v):
+		self.t,self.v=t,v
 
 ######## formulas, functions, theorems, operations
 
@@ -363,6 +368,14 @@ def quadria( *args ):
 		return sqr(Q1+Q2+Q3)-2*(Q1*Q1+Q2*Q2+Q3*Q3)
 	raise Exception('not implemented')
 
+def blue_quadrance_quaternion( q ):
+	# checktype( quaternion, q )
+	t,x,y,z=q.t,q.x,q.y,q.z
+	return t*t+x*x+y*y+z*z
+
+def quadrance_quaternion( q ):
+	return blue_quadrance_quaternion( q )
+
 ############### spreads
 
 
@@ -464,7 +477,7 @@ def solid_spread( *args, **kwargs ):
 
 
 
-#################### miscellaneous stuff
+#################### meet
 
 # fixme - what if dont meet? what if same line?
 # what if a,b,c all 0?
@@ -488,6 +501,11 @@ def meet( *args ):
 		return meet_line_and_point( args[1], args[0] )
 	raise Exception(' not implemented' + str(args) )
 
+
+
+############################## misc stuff
+
+
 def collinear( *args ):
 	for i in range(len(args)):
 		if not isinstance(args[i],point):
@@ -503,7 +521,31 @@ def cross( l0, l1 ):
 	checktypes( line, [l0,l1] )
 	return 1 - spread( l0, l1 )
 
-def squared_cross_ratio( p0,p1,p2,p3 ):
+
+
+def is_harmonic_pencil_lines( l0, l1, l2, l3 ):
+	# see WildTrig39
+	raise Exception('not implemented')
+
+def is_harmonic_range_points( p0, p1, p2, p3 ):
+	# per WildTrig39, Cross-Ratio can never be 1, therefore
+	# squared-cross-ratio can only be one when cross-ratio = -1,
+	# therefore you can determine whether points are a 'harmonic range'
+	# using the squared cross ratio. 
+	return squared_cross_ratio_points( p0, p1, p2, p3 ) == 1
+
+def squared_cross_ratio_lines( l0, l1, l2, l3 ):
+	# lines must meet at a single point. see WildTrig39
+	raise Exception('not implemented')
+
+def squared_cross_ratio_vectors( v0,v1,v2,v3 ):
+	# see WildTrig39
+	raise Exception('not implemented')
+	
+def squared_cross_ratio_points( p0,p1,p2,p3 ):
+	# fixme - points must be distinct....
+	# fixme - if b is midpoint of c,d, a might be 'at infinity', see
+	# wildtrig39 5:05
 	a,b,c,d=p0,p1,p2,p3
 	if not collinear(a,b,c,d): raise Exception("input pts must be collinear")
 	numerator = Fraction ( quadrance(a,c), quadrance(a,d) )
@@ -512,17 +554,22 @@ def squared_cross_ratio( p0,p1,p2,p3 ):
 
 	# fun fact - you can calculate squared-cross-ratio using only 
 	#     one of the coordinates, except for horiz/vertical lines.
-	#     uncomment this alternative implementation if you want to try it
-	#if a.x-d.x==0:
-	#	top=Fraction(sqr(a.y-c.y),sqr(a.y-d.y))
-	#	bottom=Fraction(sqr(b.y-c.y),sqr(b.y-d.y))
-	#	return Fraction( top, bottom )
-	#else:
-	#	top=Fraction(sqr(a.x-c.x),sqr(a.x-d.x))
-	#	bottom=Fraction(sqr(b.x-c.x),sqr(b.x-d.x))
-	#	return Fraction( top, bottom )
+
+def squared_cross_ratio( *args ):
+	if checktypes( point, *args ):
+		if len(args)==4:
+			a,b,c,d=args[0],args[1],args[2],args[3]
+			return squared_cross_ratio_points(a,b,c,d)
 
 
+def is_pythagorean_triple( a, b, c ):
+	return a*a+b*b==c*c
+
+def is_pythagorean_triple_permutation( a, b, c )
+	if a*a+c*c == b*b return True
+	if c*c+b*b == a*a return True
+	if a*a+b*b == c*c return True
+	return False
 
 ####### calculate left hand side and right hand side of various formulas
 

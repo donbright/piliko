@@ -19,7 +19,24 @@ The computer language used is Python.
 Current status
 ==============
 
-alpha level, currently does very little and/or nothing. 
+Alpha level, currently can do basic calculations, but types are not 
+checked well and many functions are partially or wholly unimplemented.
+
+But I don't know the computer language Python
+=============================================
+
+You don't need to know Python to do basic calculations. The syntax is
+designed to be somewhat simple. Please see the examples. As long as you can
+start up a python interpreter on your machine, you should be OK. See
+http://www.python.org to download a python interpreter for your computer. 
+Once you can get to the screen where you type 
+	
+	print 'hello world'
+
+then you will be ready to use piliko. Just put piliko.py in the proper
+folder and you can load it with this command:
+
+	from piliko import *
 
 Examples
 ========
@@ -28,28 +45,46 @@ Example 1:
 
 	from piliko import *
 
-	# note ---> we use the line equation ax+by+c = 0
-	L1 = line(1,-2,3) 
-	L2 = line(4,-3,7)
-	s = spread(L1,L2)
-	print L1, L2, s
+	p1 = point(0,0)
+	p2 = point(3,0)
+	p3 = point(0,4)
+	print p1,p2,p3
+
+	L1 = line( p1, p2 )
+	L2 = line( p1, p3 )
+	s = spread( L1, L2 )
+	print s
 
 Result:
 
-	<1:-2:3> <4:-3:7> 1/5
+	[0,0] [3,0] [0,4]
+	1
 
 Example 2:
 
+	from piliko import *
+
 	v1 = vector(3,0)
 	v2 = vector(0,4)
+	print v1, v2
+
 	q1 = quadrance( v1 )
 	q2 = quadrance( v2 )
+	print q1, q2
+
 	s = spread( v1, v2 )
-	print v1, v2, q1, q2, s
+	print s
 
 Result:
 
-	(3,0) (0,4) 9 16 1
+	(3,0) (0,4)
+	9 16
+	1
+
+Example 3:
+
+	p1,p2,p3,p4 = point(0,0),point(25,0),point(50,0),point(100)
+	print is_harmonic_range( p1, p2, p3, p4 )
 
 More examples can be found in test.py. To run it:
 
