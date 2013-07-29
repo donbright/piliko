@@ -89,7 +89,7 @@ Result:
 
 Example 3:
 
-	p1,p2,p3,p4 = point(0,0),point(25,0),point(50,0),point(100)
+	p1,p2,p3,p4 = point(0,0),point(25,0),point(50,0),point(100,0)
 	print is_harmonic_range( p1, p2, p3, p4 )
 
 More examples can be found in test.py. To run it:
