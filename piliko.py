@@ -38,10 +38,15 @@ def rat( x, y ):
 def sqr( x ):
 	return x*x
 
+def checktype( typename, arg ):
+	return not isinstance( arg, typename )
+
 def checktypes( typename, *args ): # are all args of a given type? 
 	for i in range(len(args)):
-		if not isinstance(args[i],typename): return False
+		#if not checktype( typename, args[i] ): return False
+		if not isinstance( args[i], typename ): return False		
 	return True
+
 
 def checkrationals( *args ):
 	for i in range(0,len(args)):
@@ -80,6 +85,8 @@ class vector:
 		return newv
 	def __rmul__( self, scalar ):
 		return self * scalar
+	def __neg__( self ):
+		return self * -1
 	def dot( self, v ):
 		x1,y1,x2,y2 = self.x,self.y,v.x,v.y
 		p = x1*x2+y1*y2
@@ -90,6 +97,32 @@ class vector:
 		return perpendicular( self, v )
 	def parallel( self, v ):
 		return parallel( self, v )
+
+class bivector:
+	def __init__( self, *args ):
+		if checktypes( vector, *args ):
+			self.v1,self.v2=args[0], args[1]
+		else: raise Exception('not implemented')
+	def __str__( self ):
+		return bivector_txt(self)
+	def __add__( self, bv ):
+		return 
+	def __sub__( self, bv ):
+		raise Exception('not implemented')
+	def __mul__( self, scalar ):
+		return bivector( self.v1 * scalar , self.v2 )
+		# could use self.v1, self.v2 * scalar
+	def __rmul__( self, scalar ):
+		return self.__mul__(scalar)
+	def dot( self, v ):
+		raise Exception('not implemented')
+	def perpendicular( self, bv ):
+		raise Exception('not implemented')
+	def parallel( self, bv ):
+		raise Exception('not implemented')
+	def value( self ):
+		# note, det v2, v2 = -1 * det v1, v2
+		return determinant( self.v1, self.v2 )
 
 class line:
 	# line formula here is ax + by + c = 0
@@ -505,7 +538,6 @@ def meet( *args ):
 
 ############################## misc stuff
 
-
 def collinear( *args ):
 	for i in range(len(args)):
 		if not isinstance(args[i],point):
@@ -565,10 +597,10 @@ def squared_cross_ratio( *args ):
 def is_pythagorean_triple( a, b, c ):
 	return a*a+b*b==c*c
 
-def is_pythagorean_triple_permutation( a, b, c )
-	if a*a+c*c == b*b return True
-	if c*c+b*b == a*a return True
-	if a*a+b*b == c*c return True
+def is_pythagorean_triple_permutation( a, b, c ):
+	if a*a+c*c == b*b: return True
+	if c*c+b*b == a*a: return True
+	if a*a+b*b == c*c: return True
 	return False
 
 ####### calculate left hand side and right hand side of various formulas
@@ -675,6 +707,9 @@ def point_txt( p ):
 	if hasattr(p,'z'): s += ',' + str(p.z)
 	s += ']'
 	return s
+
+def bivector_txt( bv ):
+	return vector_txt( bv.v1 ) + 'V' + vector_txt( bv.v2 ) + ' value: ' + str(bv.value())
 
 def vector_txt( v ):
 	s = '('+str(v.x)+','+str(v.y)

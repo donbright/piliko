@@ -18,11 +18,11 @@ from fractions import Fraction
 
 import sys
 
-# -> determinant of 2x2 if vectors = columns
-# -> also cross product if you add a z=0 and return magnitude
+# -> determinant of 2x2 matrix of 2 2-d vectors
+	# -> also cross product if you add a z=0 and return magnitude
 # -> also area of paralellogram formed by v1, v2
 # -> also is the 'multiple' by which all Grossman bi-vectors are related
-def crosshack( v1, v2 ):
+def determinant( v1, v2 ):
 	x1,y1,x2,y2 = v1[0],v1[1],v2[0],v2[1]
 	return x1*y2-x2*y1
 

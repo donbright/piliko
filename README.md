@@ -4,6 +4,17 @@ piliko
 Piliko is a very, very, very basic implementation of some formulas from 
 Rational Trigonmetry in a computer language. 
 
+Current status
+==============
+
+Alpha level, currently can do basic calculations, but types are not 
+checked well and many functions are partially or wholly unimplemented.
+Also design is messy currently and some bugs are undoubtedly present.
+
+
+Disclaimer 
+==========
+
 This package is not affiliated with, nor endorsed in any way by Norman J 
 Wildberger, who developed Rational Trigonometry. For more info, check these
 websites:
@@ -16,11 +27,6 @@ websites:
 
 The computer language used is Python.
 
-Current status
-==============
-
-Alpha level, currently can do basic calculations, but types are not 
-checked well and many functions are partially or wholly unimplemented.
 
 But I don't know the computer language Python
 =============================================
