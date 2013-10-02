@@ -96,6 +96,38 @@ More examples can be found in test.py. To run it:
 
 	python test.py
 
+Basic principle
+===============
+
+The Rational numbers are closed under addition, subtraction, 
+multiplication, and division. Any rational can be transformed into two 
+integers. This makes them uniquely suited to geometry, as many geometry
+packages have proven. Why? Because many of the basic geometry operations,
+including scale, translate, boolean, intersection, etc, are doable in
+algebra using only plus, minus, multiply, and divide. 
+
+In fact it is possible to develop a geometry that does not use 
+transcendental functions at all. There are rational analogues for 
+rotation. Any conic curve can be approximated very well by rational 
+parameterization (rational points on the curve). Bezier curves can be 
+approximated by rational points. And thus, truetype fonts. 
+By 'approximate' here I mean not just 'pretty close', I mean 'to an arbitrary
+precision', which means that the approximations will be just as good as 
+if we used cosine, sine, etc, to get decimal approximations. The difference
+is that with a rational approximation, we dont lose information when we
+rotate, scale, etc. With decimal approx, you cant even do "shrink it by 
+1/3" without losing information. 
+
+It may be even possible to create anlogues of geometry algorithms (like 
+catmull clark subdivision) using rational points and rational functions.
+
+The downside is that you lose some old things, like the notion of distance,
+or the intersection of any line with any circle. Even the length of the
+side of a 45-45-90 triangle is lost. However... do you need it? 
+
+The other downside is it's slow. Computers were optimized for floating point
+for 50 years. Hardware doesnt generally deal with rationals. 
+
 Copyright License
 =================
 
