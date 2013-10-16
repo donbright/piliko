@@ -1,6 +1,18 @@
 from fractions import Fraction
 import sys
 
+# this program explores patterns of pythagorean triples 
+# in the stern brocot tree... or more specifically,
+# the stern diamotic sequence, aka the 'denominators' of the
+# stern brocot sequence aka, the farey sequence denominators
+# aka 2*sqrt(radius) of the ford circles
+
+# it looks for 'adjacent' triple numbers, such as 3,4,5 which all 'touch'
+# if you draw the stern diamotic sequence as a tree. 
+#
+# 5,12,13 touch, so do others. 
+#
+
 def pyth():
 	for i in range(1,100):
 		for j in range(1,100):

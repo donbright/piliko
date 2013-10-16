@@ -15,7 +15,7 @@ import sys
 # as with pythpattern12, this is not symmetrical. its easy to see this
 # by looking at the 'crowding' near the middle (on the top-bottom axis)
 #
-# and also as with pythpattern 12, if you try to 'make' it symmetrical
+# also, as with pythpattern 12, if you try to 'make' it symmetrical
 # by inserting y,x for every x,y point, you get a sort of messy
 # tessellation with lots of tiny bits... and its not really symmetrical
 # either along every axis. 
