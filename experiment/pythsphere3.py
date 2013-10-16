@@ -18,7 +18,7 @@ def blueq(p1,p2): return sqr(p2[0]-p1[0])+sqr(p2[1]-p1[1])+sqr(p2[2]-p1[2])
 xs,ys,zs=[],[],[]
 
 blueqlimit=Fraction(1,8*8*8)
-depth=7
+depth=6
 for m in range(0,depth):
 	for n in range(0,depth):
 		for m1 in range(0,depth):
