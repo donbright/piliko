@@ -1,23 +1,23 @@
 from fractions import Fraction
 import sys
 
-# rational approximation of a unit circle
+# strange patterns by looking at pythagorean triples
 
 def sqr(x): return x*x
 def greenq(x,y,x2,y2): return 2*(x2-x)*(y2-y)
 def redq(x,y,x2,y2): return sqr(x2-x)-sqr(y2-y)
 def blueq(x,y,x2,y2): return sqr(x2-x)+sqr(y2-y)
-blueqlimit=100000
+blueqlimit=1000000
 xs,ys=[],[]
 for m in range(-20,20):
 	for n in range(-20,20):
 		x = redq(0,0,m,n)
 		y = greenq(0,0,m,n)
-		#if blueq(0,0,x,y)<blueqlimit:
-		xs += [x]
-		ys += [y]
-		xs += [y]
-		ys += [x]
+		if True: #blueq(0,0,x,y)blueqlimit:
+			xs += [x]
+			ys += [y]
+			xs += [y]
+			ys += [x]
 
 max=max(xs+ys)
 
