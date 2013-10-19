@@ -9,6 +9,10 @@ import sys
 # sort of rational approximation of a 'regularly divided' circle as 
 # formed by a geographer's latitude lines 
 
+# but its not actually 'symmetrical' the way a regular polygon would be
+# there are small discrepancies between the side lengths if you were to
+# measure them closely
+
 def sqr(x): return x*x
 def blueq(x,y,x2,y2): return sqr(x2-x)+sqr(y2-y)
 
