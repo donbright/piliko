@@ -73,3 +73,6 @@ ax.set_ylim([-1.2,1.2])
 ax.set_xlim([-1.2,1.2])
 ax.scatter(xs,ys)
 plt.show()
+
+for p in range(len(xs)):
+	print xs[p],ys[p]
