@@ -14,30 +14,47 @@ import sys,math
 ## result
 #
 # when using standard python ASCII output for floats: rationals can be 
-# much smaller, up until you get into bigger numbers... when the python 
-# ASCII roundoff of floats comes into play and filesizes become roughly 
-# equal. for example compare a run with ringcount set to 40 vs ringcount 
-# set to 220
+# 1/2 smaller at first. however when numbers grow... then the constant 
+# width python ASCII roundoff of floats comes into play and filesizes 
+# become roughly equal. for example compare a run with ringcount set to 
+# 40 vs ringcount set to 220. for example '2003/23403' is about the same 
+# as '0.03030303'
 
 # interestingly, running compression, like 'zip' or 'xz', on the .txt 
 # files shows the ASCII transcendental to be more 'compressible' than 
 # ascii rationals?
 
-# in binary: well, rationals are bigger than 32 bit floats. 
+# in binary, not ASCII: well, rationals are often going to use more 
+# space than 32 bit floats. 
 
-# however, if you assume there is a mythical utf8-style storage format for
+# First off note that each rational is a ratio of two ints, which means
+# each x,y coordinate is 'double' the space of the int size. in other words,
+# 132/403, 4903/2903 is four ints. If the ints being used are 32 bits, that is
+# a total of 4*32 or 128 bits for integers. you have to double stuff.
+
+# now in a lot of cases, say you use 24 bits for integers to store 
+# binary rationals. that means each x is 48 bits and each y is 48 bits. 
+# more than 32.
+
+# but note that in some cases rationals will be smaller than 64 bit floats. 
+# for example, if you use 24 bit ints, you have 48 bytes for x, 48 for y, 
+# smaller than 64 for x and 64 for y. 
+
+# also if you assume there is a mythical utf8-style storage format for 
 # rationals, that allows variable-width numbers (1 byte, 2 bytes, etc) 
-# rationals size becomes smaller than 64 bit floats. 
-
-# but nothing crazily smaller, its all very dependent on the situation. 
+# rationals size can become even smaller. consider 34/230 for example. 
+# that is an 8 bit number divided by a 8 bit number. x could be 16 bits,
+# and so could y. in this example, this mythical format often produces 
+# byte size smaller than 64 bit floats or fixed-width int rationals. 
 
 # in conclusion its all quite dependent on the situation. 
 
 # there is no automatic guarantee of space saving by using rationals.... 
 # on the flip side, there is no automatic space saving by using floats 
-# either. 
+# either. it depends. will your output be ASCII? how much rounding?
+# does your program have time to use some funky compression? or not?
 
-ringcount=60 # how many 'rings' will the circles tessellation have?
+ringcount=90 # how many 'rings' will the circles tessellation have?
 filenametr='comprtest.transcdntl.txt'
 filenamerat='comprtest.ratl.txt'
 
