@@ -13,40 +13,39 @@ import sys,math
 #####
 ## result
 #
-# when using standard python ASCII output for floats:
-#
-# the .txt ascii files are much smaller for rationals
-# for small number of points. as the number of points grows,
-# the sizes become similar
-#
-# interesting: a plain .zip of the .txt files results in the rationals
-# being larger after zip than the transcendentals! interesting. 
+# when using standard python ASCII output for floats: rationals can be 
+# much smaller, up until you get into bigger numbers... when the python 
+# ASCII roundoff of floats comes into play and filesizes become roughly 
+# equal. for example compare a run with ringcount set to 40 vs ringcount 
+# set to 220
 
-# 
-# mythical binary format:
-#
-# assuming you could create a UTF8 style reader/writer for rationals
-# that would put numbers like 23/129 into 16 bits, (two 8-bit #s)
-# but larger digits like 12003/47304 into 32 bits, (two 16-bit #s)
-# you could theoretically store rationals with 1/3 the size of 32-bit floats
-# or 1/3 the size of 64-bit floats, roughly. (make depth=200 for example to see)
-# of course you need to invent such a reader/writer... shall we assume
-# 3 bits of each byte is 'control bits'?
-#
-#
+# interestingly, running compression, like 'zip' or 'xz', on the .txt 
+# files shows the ASCII transcendental to be more 'compressible' than 
+# ascii rationals?
 
+# in binary: well, rationals are bigger than 32 bit floats. 
 
+# however, if you assume there is a mythical utf8-style storage format for
+# rationals, that allows variable-width numbers (1 byte, 2 bytes, etc) 
+# rationals size becomes smaller than 64 bit floats. 
 
-# note - blue, red, and green quadrance are from Norman Wildberger's 
-# Chromogeometry
+# but nothing crazily smaller, its all very dependent on the situation. 
 
+# in conclusion its all quite dependent on the situation. 
 
+# there is no automatic guarantee of space saving by using rationals.... 
+# on the flip side, there is no automatic space saving by using floats 
+# either. 
+
+ringcount=60 # how many 'rings' will the circles tessellation have?
 filenametr='comprtest.transcdntl.txt'
 filenamerat='comprtest.ratl.txt'
 
 
 # part 1: rational coordinates (integer/integer)
 
+# note - blue, red, and green quadrance are from Norman Wildberger's 
+# Chromogeometry
 def sqr(x): return x*x
 def greenq(x,y,x2,y2): return 2*(x2-x)*(y2-y)
 def redq(x,y,x2,y2): return sqr(x2-x)-sqr(y2-y)
@@ -54,9 +53,8 @@ def blueq(x,y,x2,y2): return sqr(x2-x)+sqr(y2-y)
 xs,ys=[],[]
 xs2,ys2=[],[]
 
-depth=50
 layers=[[]]
-for j in range(0,depth):
+for j in range(0,ringcount):
 	layer=layers[j]
 	layers+=[[]]
 	for i in range(2*j):
@@ -103,7 +101,7 @@ layers=[]
 layers=[[]]
 txs=[]
 tys=[]
-for nn in range(1,depth): # layers[0:4]:
+for nn in range(1,ringcount): # layers[0:4]:
 	angle = 0
 	for t in range(0,4*nn+1):
 		#angle += 360/len(layer)
@@ -136,17 +134,44 @@ print 'files written',filenamerat, filenametr
 # Rational - assume some format like UTF8 where size is related to data stored
 # with 3 bits per number being used up as 'control bits' (8-3, 16-3, 32-3, ...)
 bytecount=0
+biggest=0
+biggestval=0
 for p in xs+ys:
 	for dig in p.numerator,p.denominator:
-		if dig.numerator>2**109: print 'overflow > 2**(112-3)'
-		elif dig.numerator>2**93: bytecount+=6
-		elif dig.numerator>2**77: bytecount+=5
-		elif dig.numerator>2**61: bytecount+=4
-		elif dig.numerator>2**29: bytecount+=3
-		elif dig.numerator>2**12: bytecount+=2
-		elif dig.numerator>2**5: bytecount+=1 
+		if biggestval<dig: biggestval=dig
+		if dig>2**77:
+			print 'overflow > 2**(77)'
+		elif dig>2**61:
+			if biggest<72: biggest=72
+			bytecount+=9
+		elif dig>2**53:
+			if biggest<64: biggest=64
+			bytecount+=8
+		elif dig>2**45:
+			if biggest<56: biggest=56
+			bytecount+=7
+		elif dig>2**37:
+			if biggest<48: biggest=48
+			bytecount+=6
+		elif dig>2**29:
+			if biggest<40: biggest=40
+			bytecount+=5
+		elif dig>2**21:
+			if biggest<32: biggest=32
+			bytecount+=4
+		elif dig>2**12:
+			if biggest<24: biggest=24
+			bytecount+=3
+		elif dig>2**5:
+			if biggest<16: biggest=16
+			bytecount+=2
+		elif dig<2**5:
+			bytecount+=1
+			if biggest<8: biggest=8
 
 floatcount32 = (len(txs)+len(tys))*4 # assume 32bit float x, 32 bit float y
 floatcount64 = (len(txs)+len(tys))*8 # assume 64bit float x, 64bit float y
-
-print 'bytecounts: ratl, transdtl 32bit, transdtl 64bit', bytecount, floatcount32,floatcount64
+biggestcount = (len(xs)+len(ys))*(biggest/8)*2 # assume constant width of bytes
+print 'bytecounts: ratl, transdtl 32bit, transdtl 64bit:', biggestcount, floatcount32,floatcount64
+print 'biggest rational numerator or denominator:', biggestval, ',', biggest, 'bits'
+print 'mythical utf-8ish ratl:', bytecount, 'bytes'
