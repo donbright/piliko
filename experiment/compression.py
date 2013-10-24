@@ -6,7 +6,35 @@ import sys,math
 # trascendental vs rational coordinates
 # (aka cos/sin vs integer/integer)
 
+# roughly equal density and number of points
+
 # which is more compressible in data size?
+
+#####
+## result
+#
+# when using standard python ASCII output for floats:
+#
+# the .txt ascii files are much smaller for rationals
+# for small number of points. as the number of points grows,
+# the sizes become similar
+#
+# interesting: a plain .zip of the .txt files results in the rationals
+# being larger after zip than the transcendentals! interesting. 
+
+# 
+# mythical binary format:
+#
+# assuming you could create a UTF8 style reader/writer for rationals
+# that would put numbers like 23/129 into 16 bits, (two 8-bit #s)
+# but larger digits like 12003/47304 into 32 bits, (two 16-bit #s)
+# you could theoretically store rationals with 1/3 the size of 32-bit floats
+# or 1/3 the size of 64-bit floats, roughly. (make depth=200 for example to see)
+# of course you need to invent such a reader/writer... shall we assume
+# 3 bits of each byte is 'control bits'?
+#
+#
+
 
 
 # note - blue, red, and green quadrance are from Norman Wildberger's 
@@ -26,7 +54,7 @@ def blueq(x,y,x2,y2): return sqr(x2-x)+sqr(y2-y)
 xs,ys=[],[]
 xs2,ys2=[],[]
 
-depth=200
+depth=50
 layers=[[]]
 for j in range(0,depth):
 	layer=layers[j]
@@ -104,15 +132,21 @@ f.close()
 print 'files written',filenamerat, filenametr
 
 # calc binary size
+
+# Rational - assume some format like UTF8 where size is related to data stored
+# with 3 bits per number being used up as 'control bits' (8-3, 16-3, 32-3, ...)
 bytecount=0
 for p in xs+ys:
 	for dig in p.numerator,p.denominator:
-		if dig.numerator>256*256*256*256*256: bytecount+=5
-		elif dig.numerator>256*256*256*256: bytecount+=4
-		elif dig.numerator>256*256*256: bytecount+=3
-		elif dig.numerator>256*256: bytecount+=2
-		elif dig.numerator>256: bytecount+=1 
+		if dig.numerator>2**109: print 'overflow > 2**(112-3)'
+		elif dig.numerator>2**93: bytecount+=6
+		elif dig.numerator>2**77: bytecount+=5
+		elif dig.numerator>2**61: bytecount+=4
+		elif dig.numerator>2**29: bytecount+=3
+		elif dig.numerator>2**12: bytecount+=2
+		elif dig.numerator>2**5: bytecount+=1 
 
-floatcount = len(txs)*4*4 # assume 32bit float x, 32 bit float y
+floatcount32 = (len(txs)+len(tys))*4 # assume 32bit float x, 32 bit float y
+floatcount64 = (len(txs)+len(tys))*8 # assume 64bit float x, 64bit float y
 
-print 'bytecounts: ratl, transdtl', bytecount, floatcount
+print 'bytecounts: ratl, transdtl 32bit, transdtl 64bit', bytecount, floatcount32,floatcount64
