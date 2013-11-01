@@ -1,5 +1,7 @@
-# very, very basic implementation of some Rational Geometry formulas
-# in two dimensions.
+# very, very 'rought draft' implementation of some Rational Geometry 
+# formulas. the type system has not been thought out carefully at all.
+
+# most of this is for 2-dimensional space, some of it is for 1-dimensional space
 
 # Rational Geometry tries to stick to Rational numbers, here
 # we use python's "Fraction" type to represent rationals.
@@ -9,6 +11,7 @@
 
 #
 # todo
+
 # simplify code
 # use actual test suite
 # deal with /0 and other problems
@@ -23,7 +26,7 @@
 # what is omega inverse?
 
 
-# code design philosophia 
+# code design philosophy
 # work backwards from usage to code. what would i want to type?
 # do i have to rememeber tech details or can i type whatever? 
 # (example: triangle from lines, from points, from linesegs)
@@ -39,14 +42,13 @@ def sqr( x ):
 	return x*x
 
 def checktype( typename, arg ):
-	return not isinstance( arg, typename )
+	return isinstance( arg, typename )
 
 def checktypes( typename, *args ): # are all args of a given type? 
 	for i in range(len(args)):
 		#if not checktype( typename, args[i] ): return False
 		if not isinstance( args[i], typename ): return False		
 	return True
-
 
 def checkrationals( *args ):
 	for i in range(0,len(args)):
@@ -62,7 +64,10 @@ class point:
 
 class vector:
 	def __init__( self, *args ):
-		p = point( *args )
+		if checktype( point,args[0] ):
+			p=args[0]
+		else:
+			p = point( *args )
 		self.x,self.y=p.x,p.y
 		if hasattr(p,'z'): self.z=p.z
 	def __str__( self ):
@@ -316,6 +321,11 @@ def parallel( *args, **kwargs ):
 
 ############### quadrance
 
+def archimedes_function( *args ):
+	checkrationals( *args )
+	if not len(args)==3:
+		raise Exception("Archimede's function requires 3 numbers")
+	return sqr(a+b+c) - 2*(a*a+b*b+c*c)
 
 def red_quadrance_pts( p1, p2 ):
 	if hasattr(p2,'z') and hasattr(p1,'z'):
@@ -383,11 +393,13 @@ def quadrance( *args, **kwargs ):
 		quadrance_lineseg = red_quadrance_lineseg
 		quadrance_vector = red_quadrance_vector
 
-	if isinstance(args[0],point) and isinstance(args[1],point):
+	if isinstance(args[0],point) and len(args)>1 and isinstance(args[1],point):
 		return quadrance_pts( args[0],args[1] )
-	if isinstance(args[0],lineseg):
+	elif isinstance(args[0],point) and len(args)==1:
+		return quadrance_pts( point(0,0),args[0] )
+	elif isinstance(args[0],lineseg):
 		return quadrance_lineseg( args[0] )
-	if isinstance(args[0],vector):
+	elif isinstance(args[0],vector):
 		return quadrance_vector( args[0] )
 	return None
 
@@ -508,13 +520,21 @@ def solid_spread( *args, **kwargs ):
 	return solid_spread( args[0], args[1], args[2] )
 
 
-
+def spread_polynomial( n, s ):
+	checkrationals( n, s )
+	if n==0: return 0
+	if n==1: return s
+	sn_minus_1 = spread_polynomial(n-1,s)
+	sn_minus_2 = spread_polynomial(n-2,s)
+	sn = 2*(1-2*s)*sn_minus_1 - sn_minus_2 + 2*s
+	return sn
 
 #################### meet
 
 # fixme - what if dont meet? what if same line?
 # what if a,b,c all 0?
 def meet_lines( l1, l2 ):
+	if spread( l1, l2 ) == 0: return None
 	a1,b1,c1 = l1.a, l1.b, l1.c
 	a2,b2,c2 = l2.a, l2.b, l2.c
 	x = Fraction( b2*c1-b1*c2, a2*b1-a1*b2 )
@@ -534,7 +554,88 @@ def meet( *args ):
 		return meet_line_and_point( args[1], args[0] )
 	raise Exception(' not implemented' + str(args) )
 
+############################## 1-dimensional projective geometry
 
+# see NJW's paper, arxiv.org/pdf/math/0701338v1.pdf
+
+class projective_form:
+	def __init__(self, *args):
+		checkrationals( args )
+		self.d,self.e,self.f=args[0],args[1],args[2]
+	def __str__( self ):
+		return projective_form_txt(self)
+	def discriminant( self ):
+		return self.d*self.f-sqr(self.e)
+
+blue_projective_form = projective_form(1,0,1)
+red_projective_form = projective_form(1,0,-1)
+green_projective_form = projective_form(0,1,0)
+
+def ppoint_nullcheck( ppoint, pform ):
+	x,y=ppoint.x,ppoint.y
+	d,e,f=pform.d,pform.e,pform.f
+	return d*sqr(x)+2*e*x*y+f*sqr(y)
+
+def projective_point( *args ):
+	if args[0]==0 and args[1]==0:
+		raise Exception('projective point cannot have x & y as 0 ')
+	return point(args[0],args[1])
+
+def ppoint_perpendicular( *args, **kwargs ):
+	if 'color' in kwargs.keys(): color=kwargs['color']
+ 	else: color='blue'
+	if not checktype( point, args[0] ):
+		raise Exception ('ppoint perp needs a projective point')
+	x,y=args[0].x,args[0].y
+	p = projective_point(x,y)
+	if color=='blue': p=projective_point( -y, x )
+	elif color == 'red': p=projective_point( y, x )
+	elif color == 'green': p=projective_point( x, -y )
+	return p
+
+def projective_quadrance_blue( *args ):
+	return projective_quadrance( *args, color='blue' )
+def projective_quadrance_red( *args ):
+	return projective_quadrance( *args, color='red' )
+def projective_quadrance_green( *args ):
+	return projective_quadrance( *args, color='green' )
+
+def projective_quadrance( *args, **kwargs ):
+	if 'color' in kwargs.keys(): color=kwargs['color']
+ 	else: color='blue'
+
+	if color=='blue': form=blue_projective_form
+	elif color == 'green': form=green_projective_form
+	elif color == 'red': form=red_projective_form
+
+	for arg in args:
+		if isinstance( arg, projective_form ):
+			form = arg
+
+	return projective_quadrance_wform( args[0], args[1], form )
+
+def projective_quadrance_wform( *args ):
+	if not checktype(point, args[0]):
+		raise Exception('arg 0-projective_quadrance() needs point,point,form')
+	if not checktype(point, args[1]):
+		raise Exception('arg 1-projective_quadrance() needs point,point,form')
+	if not checktype(projective_form, args[2]):
+		raise Exception('arg 2-projective_quadrance() needs point,point,form')
+	p1=args[0]
+	p2=args[1]
+	form=args[2]
+	v1,v2=vector(p1),vector(p2)
+	if form.discriminant()==0:
+		raise Exception('form ',str(form),' is degenerate')
+	numerator = form.discriminant() * sqr(determinant(v1,v2))
+	denominator = ppoint_nullcheck( p1, form ) * ppoint_nullcheck ( p2, form )
+	return Fraction( numerator, denominator )
+
+def projective_triple_spread( *args ):
+	checkrationals( *args )
+	if not len(args)==3:
+		raise Exception( 'proj trip spread requires 3 numbers')
+	return sqr(a+b+c) - 2*(a*a+b*b+c*c) - 4*a*b*c
 
 ############################## misc stuff
 
@@ -564,7 +665,15 @@ def is_harmonic_range_points( p0, p1, p2, p3 ):
 	# squared-cross-ratio can only be one when cross-ratio = -1,
 	# therefore you can determine whether points are a 'harmonic range'
 	# using the squared cross ratio. 
+	if p0 == None or p1 == None or p2 == None or p3 == None: return False
 	return squared_cross_ratio_points( p0, p1, p2, p3 ) == 1
+
+def is_harmonic_range( *args ):
+	if not checktypes( point, *args ):
+		raise Exception ('harmonic range expects 4 points')
+	if not len(args)==4:
+		raise Exception ('harmonic range expects 4 points')
+	return is_harmonic_range_points( args[0],args[1],args[2],args[3] )
 
 def squared_cross_ratio_lines( l0, l1, l2, l3 ):
 	# lines must meet at a single point. see WildTrig39
@@ -726,6 +835,14 @@ def lineseg_txt( l ):
 	s = str(l.p0) +'-'+str(l.p1)
 	return s
 
+def projective_form_txt( pf ):
+	s = str('['+ str(pf.d)+':'+str(pf.e)+':'+str(pf.f)+']')
+	if pf.d==1 and pf.e==0 and pf.f == 1: s += ' (blue)'
+	elif pf.d==1 and pf.e==0 and pf.f == -1: s += ' (red)'
+	elif pf.d==0 and pf.e==1 and pf.f == 0: s += ' (green)'
+	else: s += ' (unknown)'
+	return s
+
 def triangle_txt( tri ):
 	spreads = 'spreads:'+str(tri.s0)+','+str(tri.s1)+','+str(tri.s2)
 	line_eqns = str(tri.l0)+','+str(tri.l1)+','+str(tri.l2)
@@ -738,7 +855,6 @@ def triangle_txt( tri ):
 	s+='\n quadrances: ' + quadrances
 	s+='\n spreads: ' + spreads
 	return s
-
 
 
 ###### convenience - for bad spelling, or just grammatical variatinos

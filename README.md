@@ -1,16 +1,16 @@
 piliko
 ======
 
-Piliko is a very, very, very basic implementation of some formulas from 
+Piliko is a very, very, very rough implementation of some formulas from 
 Rational Trigonmetry in a computer language. 
 
 Current status
 ==============
 
-Alpha level, currently can do basic calculations, but types are not 
-checked well and many functions are partially or wholly unimplemented.
-Also design is messy currently and some bugs are undoubtedly present.
-
+This code is 'alpha' level. It is highly experimental. It can do basic 
+calculations, but the whole type system has not been thought out very 
+carefully and many functions are partially or wholly unimplemented. 
+Tests have not been created.
 
 Disclaimer 
 ==========
@@ -89,8 +89,22 @@ Result:
 
 Example 3:
 
-	p1,p2,p3,p4 = point(0,0),point(25,0),point(50,0),point(100,0)
+	p1,p2,p3,p4 = point(0,0),point(3,0),point(2,0),point(6,0)
 	print is_harmonic_range( p1, p2, p3, p4 )
+
+Result:
+
+	True
+
+Example 4:
+
+	p=point(3,4)
+	bq,rq,gq=blue_quadrance(p),red_quadrance(p),green_quadrance(p)
+	print p,' ',bq,rq,gq,' ',sqr(bq),sqr(rq),sqr(gq)
+
+Result:
+
+	[3,4]   25 -7 24   625 49 576
 
 More examples can be found in test.py. To run it:
 
@@ -99,18 +113,25 @@ More examples can be found in test.py. To run it:
 Basic principle
 ===============
 
-The Rational numbers are closed under addition, subtraction, 
-multiplication, and division. Any rational can be transformed into two 
-integers. This makes them uniquely suited to geometry, as many geometry
-packages have proven. Why? Because many of the basic geometry operations,
-including scale, translate, boolean, intersection, etc, are doable in
-algebra using only plus, minus, multiply, and divide. 
+The Rational numbers, unlike finite floating point numbers, are closed 
+under addition, subtraction, multiplication, and division. This makes 
+them uniquely suited to geometry, as many geometry packages have proven. 
+Why? Because many of the basic geometry operations, including scale, 
+translate, boolean, intersection, etc, are doable in algebra using only 
+plus, minus, multiply, and divide. 
+
+Therefore no approximation is required to perform these basic 
+operations, which means the issue of floating-point error disappears.
 
 In fact it is possible to develop a geometry that does not use 
 transcendental functions at all. There are rational analogues for 
 rotation. Any conic curve can be approximated very well by rational 
 parameterization (rational points on the curve). Bezier curves can be 
-approximated by rational points. And thus, truetype fonts. 
+approximated by rational points. And thus, truetype fonts. Also a large 
+number of polynomial curves can be parameterized by rational points. 
+There are even people working algorithms to create rational 
+paramterizations automatically.
+
 By 'approximate' here I mean not just 'pretty close', I mean 'to an arbitrary
 precision', which means that the approximations will be just as good as 
 if we used cosine, sine, etc, to get decimal approximations. The difference
@@ -123,10 +144,19 @@ catmull clark subdivision) using rational points and rational functions.
 
 The downside is that you lose some old things, like the notion of distance,
 or the intersection of any line with any circle. Even the length of the
-side of a 45-45-90 triangle is lost. However... do you need it? 
+side of a 45-45-90 triangle is lost. 
 
-The other downside is it's slow. Computers were optimized for floating point
-for 50 years. Hardware doesnt generally deal with rationals. 
+Another huge loss is that you can't add two angles together with simple 
+addition. You have to use 'spread polynomials' which are immensly 
+complicated compared to addition.
+
+The other downside is it's slow. Computers were optimized for floating 
+point for 50 years. Hardware doesnt generally deal with rationals. You 
+also have to worry about overflowing your integers. Typically rational 
+number software uses 'big int', which can expand the integer past the 
+size native to the machine. For example on a 32-bit computer 'big int' 
+allows the use of integers larger than the maximum expressable in 32 
+bits, which is around ~4 billion. This makes it slow though.
 
 Copyright License
 =================

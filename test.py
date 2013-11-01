@@ -145,13 +145,19 @@ def example6():
 
 def example7():
 	print '\nexample7'
-	p0,p1,p2 = point(1,0),point(4,0),point(1,4)
+	print 'lines: ax+by+c = 0, so <a:b:c> = line notation'
+	p0,p1,p2,p3 = point(1,0),point(4,0),point(1,4),point(5,4)
+	print 'points p0,p1,p2,p3:',p0,p1,p2,p3
+	print 'p0,p1,p2 collinear?',collinear(p0,p1,p2)
 	line0 = line( p0, p1 )
 	line1 = line( p0, p2 )
-	print 'p0,p1,p2',p0,p1,p2,'collinear?',collinear(p0,p1,p2)
-	print 'line eqn meeting p0, p1', line0
-	print 'line eqn meeting p0, p2', line1
-	print 'meet of line and p0?', meet( line0, p0 ), "p1?", meet( line0, p1 )
+	line2 = line( p2, p3 )
+	print 'line, l0, meeting p0, p1:', line0
+	print 'line, l1, meeting p0, p2:', line1
+	print 'line, l2, meeting p2, p3:', line2
+	print 'meet l0,l1:', meet( line0, line1 )
+	print 'meet l0,l2:', meet( line0, line2 )
+	print 'meet of l0 and p0?', meet( line0, p0 ), "p1?", meet( line0, p1 )
 	p4, p5, p6 = point(3,3), point(4,5), point(5,7)
 	print 'p4, p5, p6:', p4, p5, p6, 'collinear?', collinear(p4,p5,p6)
 	
@@ -226,9 +232,87 @@ def example9():
 	multiple = bv.value() / e.value()
 	print 'bv.value = ', multiple, ' * e.value '
 
-examples = [example1,example2,example3,example4,example5,example6,example7,
-	example8, example9 ]
+def example10():
+	print '\n\nexample 10'
+        a1=projective_point(1,0)
+        a2=projective_point(2,3)
+        a3=projective_point(4,-1)
+        a4=projective_point(3,5)
+        
+        f=blue_projective_form
+        q12=projective_quadrance(a1,a2,f)
+        q23=projective_quadrance(a2,a3,f)
+        q34=projective_quadrance(a3,a4,f)
+        q14=projective_quadrance(a1,a4,f)
+        
+        print 'projective points a1, a2, a3, a4:',a1,a2,a3,a4
+        print 'projective form: ', f
+        print 'projective quadrances:',q12,q23,q34,q14
 
+	print 'blue, red, and green projective quadrance between a2 and a3:'
+	qb = projective_quadrance(a2,a3,blue_projective_form)
+	qg = projective_quadrance(a2,a3,green_projective_form)
+	qr = projective_quadrance(a2,a3,red_projective_form)
+	print 'qb, qg, qr', qb, qg, qr
+	print 'colored projective quadrance theorem 1/qb+1/qg+1/qr=2'
+	print 'lhs,rhs: ',Fraction(1,qb)+Fraction(1,qg)+Fraction(1,qr),',',2
+	print ''
+	print 'projective point perpendiculars for a1. blue, red, green'
+	a1pb = ppoint_perpendicular( a1, color='blue' )
+	a1pr = ppoint_perpendicular( a1, color='red' )
+	a1pg = ppoint_perpendicular( a1, color='green' )
+	print a1pb, a1pr, a1pg
+	print 'projective point perpendiculars for a2. blue, red, green'
+	a2pb = ppoint_perpendicular( a2, color='blue' )
+	a2pr = ppoint_perpendicular( a2, color='red' )
+	a2pg = ppoint_perpendicular( a2, color='green' )
+	print a2pb, a2pr, a2pg
+	print 'theorem: colored p-quadrance of colored ppoint perpendiculars'
+	print ' qblue(  ppoint_red_perp,   ppoint_green_perp ) = 1'
+	print ' qred(   ppoint_green_perp, ppoint_blue_perp  ) = 1'
+	print ' qgreen( ppoint_blue_perp,  ppoint_red_perp   ) = 1'
+	print ' test with a2', a2, ' and a2 perps', a2pb, a2pr, a2pg, ':',
+	print projective_quadrance_blue( a2pg, a2pr ),
+	print projective_quadrance_red( a2pb, a2pg ),
+	print projective_quadrance_green( a2pb, a2pr )
+
+def example11():
+	print '\n\nexample 11'
+
+	print 'spread_polynomials'
+	sp=spread_polynomial
+	maxn = 8
+
+	print 's=0, n=0,1,2,...'
+	for n in range(0,maxn): print sp(n,0),
+	print
+
+	print 's=1, n=0,1,2,...'
+	for n in range(0,maxn): print sp(n,1),
+	print
+
+	print 's=1/2, n=0,1,2,...'
+	for n in range(0,maxn): print sp(n,Fraction(1,2)),
+	print
+
+	print 's=1/4, n=0,1,2,...'
+	for n in range(0,maxn): print sp(n,Fraction(1,4)),
+	print
+
+	print 's=3/4, n=0,1,2,...'
+	for n in range(0,maxn): print sp(n,Fraction(3,4)),
+	print
+
+	print 's=1/3, n=0,1,2,...'
+	for n in range(0,maxn): print sp(n,Fraction(1,3)),
+	print
+
+	print 's=16/25, n=0,1,2,...'
+	for n in range(0,maxn): print sp(n,Fraction(16,25)),
+	print
+
+examples = [example1,example2,example3,example4,example5,example6,example7,
+	example8, example9, example10,example11 ]
 
 for i in examples:
 	i()
