@@ -1,3 +1,7 @@
+# find pythagorean triples in adjacent numbers in the 
+# stern diatomic sequence (denominators of stern brocot tree... farey sequence
+# sqrt ford circle radiuses, etc etc etc)
+
 def pyth():
 	for i in range(1,100):
 		for j in range(1,100):
