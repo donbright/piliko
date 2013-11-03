@@ -17,7 +17,7 @@ from fractions import Fraction
 
 ## consider a basic unit hyperbolic sheet thing
 #
-# x^2 + y^2 - z^2 = radius = 1^2
+# x^2 + y^2 - z^2 = radius^2 = 1^2
 #
 #   x^2 + y^2 = l^2
 #   l^2 - z^2 = radius^2
@@ -129,7 +129,7 @@ for m in range(0,depth):
 				x = l * Fraction( qred(m1,n1), qblue(m1,n1) )
 				y = l * Fraction( qgreen(m1,n1), qblue(m1,n1) )
 				z = Fraction( qgreen(m,n), qred(m,n) )
-				print x,y,z,' sq sum: ',x*x+y*y+z*z
+				print x,y,z,' sq sum: ',x*x+y*y-z*z
 
 				xs += [x]
 				ys += [y]
