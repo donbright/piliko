@@ -72,13 +72,14 @@ for m in range(0,depth):
 	for n in range(0,depth):
 		for m1 in range(0,depth):
 			for n1 in range(0,depth):
-				if blueq(m1,n1)==0: continue
-				if blueq(m,n)==0: continue
-				if blueq(m1,n1)==0: continue
-				l = Fraction( redq(m,n) , blueq(m,n) )
-				z = Fraction( greenq(m,n) , blueq(m,n) )
-				x = l * Fraction( redq(m1,n1), blueq(m1,n1) )
-				y = l * Fraction( greenq(m1,n1), blueq(m1,n1) )
+				if m+n==0: continue
+				if m1+n1==0: continue
+				blue,red,green=blueq(m,n),redq(m,n),greenq(m,n)
+				blue1,red1,green1=blueq(m,n),redq(m,n),greenq(m,n)
+				l = Fraction( red , blue )
+				z = Fraction( green , blue )
+				x = l * Fraction( red1, blue1 )
+				y = l * Fraction( green1, blue1 )
 				print x,y,z,' sq sum: ',x*x+y*y+z*z
 				xs += [x]
 				ys += [y]

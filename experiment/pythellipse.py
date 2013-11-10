@@ -15,7 +15,7 @@ depth = 5
 for m in range(-depth,depth):
 	for n in range(-depth,depth):
 		if blueq(0,0,m,n)==0: continue
-		x = Fraction(redq(0,0,m,n),blueq(-n,0,m,n))
+		x = Fraction(redq(-n,0,m,n),blueq(0,0,m,n))
 		y = Fraction(greenq(0,0,m,n),blueq(0,0,m,n))
 		xs += [x]
 		ys += [y]

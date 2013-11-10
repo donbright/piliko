@@ -67,36 +67,36 @@ def sqr(x): return x*x
 def blueq(x,y): return sqr(x)+sqr(y)
 def redq(x,y): return sqr(x)-sqr(y)
 def greenq(x,y): return 2*x*y
-depth=8
-for m in range(0,depth):
-	for n in range(0,depth):
-		for m1 in range(0,depth):
-			for n1 in range(0,depth):
-				if blueq(m1,n1)==0: continue
-				if blueq(m,n)==0: continue
-				if blueq(m1,n1)==0: continue
-				l = Fraction( redq(m,n) , blueq(m,n) )
-				z = Fraction( greenq(m,n) , blueq(m,n) )
-				x = l * Fraction( redq(m1,n1), blueq(m1,n1) )
-				y = l * Fraction( greenq(m1,n1), blueq(m1,n1) )
-				print x,y,z,' sq sum: ',x*x+y*y+z*z
-				xs += [x]
-				ys += [y]
-				xs += [y]
-				ys += [x]
-				zs += [z]
-				zs += [-z]
+depth=7
+def spherept( m,n,m1,n1):
+	if blueq(m1,n1)==0: return 0,0,0
+	if blueq(m,n)==0: return 0,0,0
+	if blueq(m1,n1)==0: return 0,0,0
+	l = Fraction( redq(m,n) , blueq(m,n) )
+	z = Fraction( greenq(m,n) , blueq(m,n) )
+	x = l * Fraction( redq(m1,n1), blueq(m1,n1) )
+	y = l * Fraction( greenq(m1,n1), blueq(m1,n1) )
+	return float(x),float(y),float(z)
 
-print len(xs)
-import numpy as np
-import matplotlib.pylab as plt
-fig,ax = plt.subplots(figsize=(8,8))
+print 'solid Chromogeometry_model\n'
+for m in range(-depth,depth):
+	for n in range(-depth,depth):
+		for m1 in range(-depth,depth):
+			for n1 in range(-depth,depth):
+				s = ''
+				s += '\nfacet normal 0 0 1'
+				s += '\n outer loop'
+				x,y,z = spherept( m,n,m1,n1 )
+				if x==0 and y==0 and z==0: continue
+				s += '\n  vertex ' + str(x) + ' ' + str(y) + ' ' + str(z)
+				x,y,z = spherept( m,n,m1+1,n1 )
+				if x==0 and y==0 and z==0: continue
+				s += '\n  vertex ' + str(x) + ' ' + str(y) + ' ' + str(z)
+				x,y,z = spherept( m,n,m1,n1+1 )
+				if x==0 and y==0 and z==0: continue
+				s += '\n  vertex ' + str(x) + ' ' + str(y) + ' ' + str(z)
+				s += '\n  endloop'
+				s += '\n endfacet'
+				print s	
 
-ax.set_ylim([-1.2,1.2])
-ax.set_xlim([-1.2,1.2])
-for i in range(0,len(xs)):
-	xs[i]=xs[i]+zs[i]/4
-	ys[i]=ys[i]+zs[i]/4
-ax.scatter(xs,ys)
-plt.show()
-
+print '\nendsolid Chromogeometry_model'
