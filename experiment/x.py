@@ -1,42 +1,46 @@
 import sys
-
-# very simple rational paramterization / approximation of blue circle
-# (x^2+y^2=1) useful as base for building other ideas
-
-xs,ys=[],[]
-x,y=-12.1568,2.5989
-xs+=[x]
-ys+=[y]
-x,y=-21.4749,2.5989
-xs+=[x]
-ys+=[y]
-x,y=-21.6506,2.65144e-15
-xs+=[x]
-ys+=[y]
-x,y=-21.6506,1.32572e-15
-xs+=[x]
-ys+=[y]
-x,y=-12.4315,7.61211e-16
-xs+=[x]
-ys+=[y]
-x,y=-12.4315,1.30661
-xs+=[x]
-ys+=[y]
-
-
-
-
-maxx=max(xs)
-minx=min(xs)
-maxy=max(ys)
-miny=min(ys)
-print xs
-print ys
-print len(xs), 'points'
 import numpy as np
 import matplotlib.pylab as plt
-fig,ax = plt.subplots(figsize=(8,8))
-ax.set_ylim([-5,5])
-ax.set_xlim([-25,5])
-ax.scatter(xs,ys)
-plt.show()
+
+
+def plot(xs, ys):
+	maxx=max(xs)
+	minx=min(xs)
+	maxy=max(ys)
+	miny=min(ys)
+	fig,ax = plt.subplots(figsize=(5,5))
+	ax.set_ylim([-50,50])
+	ax.set_xlim([-50,50])
+	ax.scatter(xs,ys)
+	ax.plot(xs,ys)
+	plt.show()
+
+lines=open('/tmp/pfile').readlines()
+i = 0
+trip = False
+for l in lines:
+	if l[0:len('pdata=')]=='pdata=':
+		data=l[len('pdata='):]
+		xs,ys=[],[]
+		for x,y in eval(data):
+			xs+=[x]
+			ys+=[y]
+		print len(xs), 'points read'
+		xs+=[xs[0]]
+		ys+=[ys[0]]
+		if len(xs)<25:
+			plot(xs,ys)
+			trip=True
+
+	if l[0:len('edata=')]=='edata=':
+		data=l[len('edata='):]
+		xs,ys=[],[]
+		for x,y in eval(data):
+			xs+=[x]
+			ys+=[y]
+		for i in range(len(xs)): print xs[i],ys[i],' ',
+		print len(xs), ' <ear points read'
+		xs+=[xs[0]]
+		ys+=[ys[0]]
+		if trip: plot(xs,ys)
+		

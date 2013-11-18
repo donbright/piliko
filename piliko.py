@@ -342,6 +342,14 @@ def blue_quadrance_pts( p1, p2 ):
 	if hasattr(p2,'z') and hasattr(p1,'z'): q += sqr( p2.z-p1.z )
 	return q
 
+def blue_quadrance_coords(x1,y1,x2,y2):
+	return sqr(x1-x2)+sqr(y2-y1)
+def red_quadrance_coords(x1,y1,x2,y2):
+	return sqr(x1-x2)-sqr(y2-y1)
+def green_quadrance_coords(x1,y1,x2,y2):
+	return 2*sqr(x1-x2)*sqr(y2-y1)
+
+
 def red_quadrance_lineseg( ls ):
 	return red_quadrance_pts( ls.p0, ls.p1 )
 def green_quadrance_lineseg( ls ):
@@ -880,5 +888,10 @@ def is_parallel( l1, l2):
 def intersection( l1, l2 ):
 	return meet( l1, l2 )
 
-
+def blue_quadrance_coordinates(x1,y1,x2,y2):
+	return blue_quadrance_coords(x1,y1,x2,y2)
+def red_quadrance_coordinates(x1,y1,x2,y2):
+	return red_quadrance_coords(x1,y1,x2,y2)
+def green_quadrance_coordinates(x1,y1,x2,y2):
+	return green_quadrance_coords(x1,y1,x2,y2)
 
