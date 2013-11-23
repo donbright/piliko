@@ -49,10 +49,22 @@ def checktypes( typename, *args ): # are all args of a given type?
 		if not isinstance( args[i], typename ): return False		
 	return True
 
+# return true if all arguments are either int or Fraction
 def checkrationals( *args ):
-	for i in range(0,len(args)):
-		if (type(args[i]) is float): #fixme - is not Fraction/int
-			raise Exception("Rationals only please")
+	for i in range(len(args)):
+		if checktypes( Fraction, args[i]) or checktypes( int, args[i] ):
+			pass
+		elif checktypes( tuple, args[i] ):
+			for a in args[i]:
+				if not checkrationals( a ): return False
+		else:
+			return False
+	return True
+
+def crash_if_nonrationals( *args ):
+	if not checkrationals( *args ):
+		raise Exception("Rationals only please")
+
 class point:
 	def __init__(self, *args):
 		if checktypes(vector,*args):
@@ -60,7 +72,7 @@ class point:
 			self.y=args[0][1]
 			if (len(args)==3): self.z=args[0][2]
 		else:
-			checkrationals( args )
+			crash_if_nonrationals( args )
 			self.x,self.y=args[0],args[1]
 			if (len(args)==3): self.z=args[2]
 	def __str__( self ):
@@ -231,6 +243,26 @@ class triangle:
 		if i==0: self.p0 = value
 		if i==1: self.p1 = value
 		if i==2: self.p2 = value
+
+class circle:
+	def __init__(self, *args):
+		if (len(args)<2): raise Exception('need center x,y and radius')
+		if checkrationals(*args) and len(args)>=3:
+			p = point(args[0],args[1])
+			self.init_from_point_and_radius( p, args[2] )
+		elif checktypes(point,args[0]) and checktypes(int,args[1]):
+			self.init_from_point_and_radius( args[0], args[1] )
+		elif checktypes(int,args[0]) and checktypes(point,args[1]):
+			self.init_from_point_and_radius( args[1], args[0] )
+		elif checktypes(point,args[0]) and checktypes(Fraction,args[1]):
+			self.init_from_point_and_radius( args[0], args[1] )
+		elif checktypes(Fraction,args[0]) and checktypes(point,args[1]):
+			self.init_from_point_and_radius( args[1], args[0] )
+	def init_from_point_and_radius( self, p, r ):
+		self.center = p
+		self.radius = r
+	def __str__( self ):
+		return circle_txt(self)
 
 class quaternion:
 	def __init__(self,t,v):
@@ -479,7 +511,7 @@ def archimedes_function_3numbers(a,b,c):
 	return sqr(a+b+c) - 2*(a*a+b*b+c*c)
 
 def archimedes_function( *args ):
-	checkrationals( *args )
+	crash_if_nonrationals( *args )
 	if not len(args)==3:
 		raise Exception("Archimede's function requires 3 numbers")
 	a=args[0]
@@ -684,7 +716,7 @@ def solid_spread( *args, **kwargs ):
 
 
 def spread_polynomial( n, s ):
-	checkrationals( n, s )
+	crash_if_nonrationals( n, s )
 	if n==0: return 0
 	if n==1: return s
 	sn_minus_1 = spread_polynomial(n-1,s)
@@ -723,7 +755,7 @@ def meet( *args ):
 
 class projective_form:
 	def __init__(self, *args):
-		checkrationals( args )
+		crash_if_nonrationals( args )
 		self.d,self.e,self.f=args[0],args[1],args[2]
 	def __str__( self ):
 		return projective_form_txt(self)
@@ -795,7 +827,7 @@ def projective_quadrance_wform( *args ):
 	return Fraction( numerator, denominator )
 
 def projective_triple_spread( *args ):
-	checkrationals( *args )
+	crash_if_nonrationals( *args )
 	if not len(args)==3:
 		raise Exception( 'proj trip spread requires 3 numbers')
 	return sqr(a+b+c) - 2*(a*a+b*b+c*c) - 4*a*b*c
@@ -1503,6 +1535,10 @@ def projective_form_txt( pf ):
 	else: s += ' (unknown)'
 	return s
 
+def circle_txt( c ):
+	s = str('['+str(c.center)+','+str(c.radius)+']')
+	return s
+
 def triangle_txt( tri ):
 	spreads = str(tri.s0)+','+str(tri.s1)+','+str(tri.s2)
 	line_eqns = str(tri.l0)+','+str(tri.l1)+','+str(tri.l2)
@@ -1588,3 +1624,65 @@ def plot_triangles( triangles ):
 		ax.plot(xs,ys)
 	plt.show()
 
+
+def plot_circles( circles ):
+	print len(circles), 'circles'
+	import numpy as np
+	import matplotlib.pylab as plt
+	fig,ax = plt.subplots(figsize=(8,8))
+	xs,ys=[],[]
+	depth=10
+	# rational paramterization. only have to convert to floats for
+	# the plotter.
+	minx,miny=circles[0].center.x,circles[0].center.y
+	maxx,maxy=minx,miny
+	for c in circles:
+		xs,ys=[],[]
+		pdic={}
+		cx,cy,cr=c.center.x,c.center.y,c.radius
+		for m in range(0,depth):
+			for n in range(0,depth):
+				if (blueq(m,n)==0): continue
+				x = cr*Fraction(redq(m,n),blueq(m,n))
+				y = cr*Fraction(greenq(m,n),blueq(m,n))
+				pdic[x]=y
+		sortkeys = pdic.keys()
+		sortkeys.sort()
+		# top half
+		for key in sortkeys:
+			x,y=key,pdic[key]
+			xs += [float(cx+x)]
+			ys += [float(cy+y)]
+		sortkeys.reverse()
+		# bottom half
+		for key in sortkeys:
+			x,y=key,pdic[key]
+			xs += [float(cx+x)]
+			ys += [float(cy-y)]
+		ax.plot(xs,ys)
+		minx=min(min(xs),minx)
+		miny=min(min(ys),miny)
+		maxx=max(max(xs),maxx)
+		maxy=max(max(ys),maxy)
+	wx = maxx-minx
+	hy = maxy-miny
+	ax.set_xlim([minx-wx*0.05,maxx+wx*0.05])
+	ax.set_ylim([miny-hy*0.05,maxy+hy*0.05])
+	ax.set_aspect(1)
+	print ax.__doc__
+	plt.show()
+
+
+def plotcircles(circs): plot_circles(circs)
+def plotcircle(circ): plot_circles([circ])
+def plot_circle(circ): plot_circles([circ])
+def plottriangles(tris): plot_triangles(tris)
+def plottriangle(tri): plot_triangles([tri])
+def plot_triangle(tri): plot_triangles([tri])
+
+def drawcircles(circs): plot_circles(circs)
+def drawcircle(circ): plot_circles([circ])
+def draw_circle(circ): plot_circles([circ])
+def drawtriangles(tris): plot_triangles(tris)
+def drawtriangle(tri): plot_triangles([tri])
+def draw_triangle(tri): plot_triangles([tri])

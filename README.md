@@ -2,7 +2,7 @@ piliko
 ======
 
 Piliko is a very, very, very rough implementation of some formulas from 
-Rational Trigonmetry in a computer language. 
+Rational Trigonmetry in the computer language called Python. 
 
 Current status
 ==============
@@ -108,8 +108,6 @@ Example D:
 Result:
 
 	[3,4]   25 -7 24   625 49 576
-
-Example E:
 
 More examples can be found in the files named example01.py, example02.py, etc
 To run them:

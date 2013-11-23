@@ -1,5 +1,8 @@
 from fractions import Fraction as F
 
+# exploring the sides of the triangles formed by the centers of 
+# ford circles
+
 def sqr(x): return x*x
 
 def f2s(x):
