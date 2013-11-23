@@ -72,6 +72,9 @@ class point:
 	def __add__( self, p):
 		v=vector(self)+vector(p)
 		return point(v)
+	def __sub__( self, p):
+		v=vector(self)-vector(p)
+		return point(v)
 
 class vector:
 	def __init__( self, *args ):
@@ -168,8 +171,15 @@ class line:
 		if i==2: return self.c
 
 class lineseg:
-	def __init__(self,p0,p1):
-		self.p0,self.p1=p0,p1
+	def __init__( self, *args ):
+		if checktypes(point,*args):
+			self.p0,self.p1=args[0],args[1]
+		if checktypes(Fraction,*args):
+			self.p0 = point(args[0],args[1])
+			self.p1 = point(args[2],args[3])
+		if checktypes(int,*args):
+			self.p0 = point(args[0],args[1])
+			self.p1 = point(args[2],args[3])
 	def __str__( self ):
 		return lineseg_txt( self )
 	def quadrance( self ):
@@ -189,6 +199,11 @@ class triangle:
 			self.init_from_lines( args[0],args[1],args[2] )
 		if checktypes( point, *args ) and len(args)==3:
 			self.init_from_points( args[0],args[1],args[2] )
+		if checktypes( int, *args ) and len(args)==6:
+			p1=point(args[0],args[1])
+			p2=point(args[2],args[3])
+			p3=point(args[4],args[5])
+			self.init_from_points( p1, p2, p3 )
 
 	def init_from_lines( self, l0, l1, l2 ):
 		p0,p1,p2 = meet(l1,l2),meet(l0,l2),meet(l0,l1)
@@ -212,6 +227,10 @@ class triangle:
 		if i==0: return self.p0
 		if i==1: return self.p1
 		if i==2: return self.p2
+	def __setitem__( self, i, value ):
+		if i==0: self.p0 = value
+		if i==1: self.p1 = value
+		if i==2: self.p2 = value
 
 class quaternion:
 	def __init__(self,t,v):
@@ -304,35 +323,48 @@ def is_null( *args ):
 			return is_null_line_from_points( args[0], args[1] )
 
 ################# altitudes
+# note, line is 3 Rationals: [a:b:c] where ax + by + c = 0
 
-# note, line is just 3 Rationals: [a:b:c] where ax + by + c = 0
-
-def blue_altitude( linel, pointA ):
-	if checktype( point, linel) and checktype( line, pointA ):
-		tmp = pointA
-		pointA = linel
-		linel = tmp
-	a,b,c = linel.a,linel.b,linel.c
-	x0,y0 = pointA.x,pointA.y
+def blue_altitude_line_point( l, A ):
+	a,b,c = l.a,l.b,l.c
+	x0,y0 = A.x,A.y
 	return line(b,-a,-b*x0+a*y0)
-
-def red_altitude( linel, pointA ):
-	if checktype( point, linel) and checktype( line, pointA ):
-		tmp = pointA
-		pointA = linel
-		linel = tmp
-	a,b,c = linel.a,linel.b,linel.c
-	x0,y0 = pointA.x,pointA.y
+def red_altitude_line_point( l, A ):
+	a,b,c = l.a,l.b,l.c
+	x0,y0 = A.x,A.y
 	return line(b,a,-b*x0-a*y0)
-
-def green_altitude( linel, pointA ):
-	if checktype( point, linel) and checktype( line, pointA ):
-		tmp = pointA
-		pointA = linel
-		linel = tmp
-	a,b,c = linel.a,linel.b,linel.c
-	x0,y0 = pointA.x,pointA.y
+def green_altitude_line_point( l, A ):
+	a,b,c = l.a,l.b,l.c
+	x0,y0 = A.x,A.y
 	return line(a,-b,-a*x0+b*y0)
+
+def blue_altitude( *args ):
+	if len(args<2): raise Exception('need line and point')
+	if checktypes(line, args[0]) and checktypes(point, args[1]):
+		l,A = args[0],args[1]
+	elif checktypes(point, args[0]) and checktypes(line, args[1]):
+		l,A = args[1],args[0]
+	return blue_altitude( l, A )
+
+def red_altitude( *args ):
+	if len(args<2): raise Exception('need line and point')
+	if checktypes(line, args[0]) and checktypes(point, args[1]):
+		l,A = args[0],args[1]
+	elif checktypes(point, args[0]) and checktypes(line, args[1]):
+		l,A = args[1],args[0]
+	else:
+		raise Exception('need line and point')
+	return red_altitude( l, A )
+
+def green_altitude( *args ):
+	if len(args<2): raise Exception('need line and point')
+	if checktypes(line, args[0]) and checktypes(point, args[1]):
+		l,A = args[0],args[1]
+	elif checktypes(point, args[0]) and checktypes(line, args[1]):
+		l,A = args[1],args[0]
+	else:
+		raise Exception('need line and point')
+	return green_altitude( l, A )
 
 ###### perpendicular
 
@@ -455,17 +487,17 @@ def archimedes_function( *args ):
 	c=args[2]
 	return archimedes_function_3numbers( a, b, c )
 
-def red_quadrance_pts( p1, p2 ):
+def red_quadrance_points( p1, p2 ):
 	if hasattr(p2,'z') and hasattr(p1,'z'):
 		raise Exception(" 3d red quadrance not implemented ")
 	return sqr( p2.x-p1.x ) - sqr( p2.y-p1.y )
 
-def green_quadrance_pts( p1, p2 ):
+def green_quadrance_points( p1, p2 ):
 	if hasattr(p2,'z') and hasattr(p1,'z'):
 		raise Exception(" 3d green quadrance not implemented ")
 	return 2*( p2.x-p1.x ) * ( p2.y-p1.y )
 
-def blue_quadrance_pts( p1, p2 ):
+def blue_quadrance_points( p1, p2 ):
 	q = sqr( p2.x-p1.x ) + sqr( p2.y-p1.y )
 	if hasattr(p2,'z') and hasattr(p1,'z'): q += sqr( p2.z-p1.z )
 	return q
@@ -479,11 +511,11 @@ def green_quadrance_coords(x1,y1,x2,y2):
 
 
 def red_quadrance_lineseg( ls ):
-	return red_quadrance_pts( ls.p0, ls.p1 )
+	return red_quadrance_points( ls.p0, ls.p1 )
 def green_quadrance_lineseg( ls ):
-	return green_quadrance_pts( ls.p0, ls.p1 )
+	return green_quadrance_points( ls.p0, ls.p1 )
 def blue_quadrance_lineseg( ls ):
-	return blue_quadrance_pts( ls.p0, ls.p1 )
+	return blue_quadrance_points( ls.p0, ls.p1 )
 
 def quadrance_vector( v, color='blue' ):
 	p0 = point( 0,0 )
@@ -492,11 +524,11 @@ def quadrance_vector( v, color='blue' ):
 		p0.z = 0
 		p1.z = v.z
 	if color=='red':
-		return red_quadrance_pts( p0, p1 )
+		return red_quadrance_points( p0, p1 )
 	elif color=='green':
-		return green_quadrance_pts( p0, p1 )
+		return green_quadrance_points( p0, p1 )
 	elif color=='blue':
-		return blue_quadrance_pts( p0, p1 )
+		return blue_quadrance_points( p0, p1 )
 
 def red_quadrance_vector( v ):
 	return quadrance_vector( v, color='red' )
@@ -517,22 +549,22 @@ def quadrance( *args, **kwargs ):
  	else: color='blue'
 
 	if color=='blue':
-		quadrance_pts = blue_quadrance_pts
+		quadrance_points = blue_quadrance_points
 		quadrance_lineseg = blue_quadrance_lineseg
 		quadrance_vector = blue_quadrance_vector
 	elif color == 'green':
-		quadrance_pts = green_quadrance_pts
+		quadrance_points = green_quadrance_points
 		quadrance_lineseg = green_quadrance_lineseg
 		quadrance_vector = green_quadrance_vector
 	elif color == 'red':
-		quadrance_pts = red_quadrance_pts
+		quadrance_points = red_quadrance_points
 		quadrance_lineseg = red_quadrance_lineseg
 		quadrance_vector = red_quadrance_vector
 
 	if isinstance(args[0],point) and len(args)>1 and isinstance(args[1],point):
-		return quadrance_pts( args[0],args[1] )
+		return quadrance_points( args[0],args[1] )
 	elif isinstance(args[0],point) and len(args)==1:
-		return quadrance_pts( point(0,0),args[0] )
+		return quadrance_points( point(0,0),args[0] )
 	elif isinstance(args[0],lineseg):
 		return quadrance_lineseg( args[0] )
 	elif isinstance(args[0],vector):
@@ -768,25 +800,25 @@ def projective_triple_spread( *args ):
 		raise Exception( 'proj trip spread requires 3 numbers')
 	return sqr(a+b+c) - 2*(a*a+b*b+c*c) - 4*a*b*c
 
-############ quadrea. "a measure of the non-collinearity of points"
-### (also equal to 16* area squared.), +/-
-### note that red + green quadrea are equal, and opposite blue quadrea
 
+############ quadrea. "a measure of the non-collinearity of points"
+### (if input is three points, the result is 16*(triangle area squared), signed
+### note that red + green quadrea are equal, and negative of the blue quadrea
 def univ_quadrea( q1, q2, q3 ):
 	# see also archimedes function
 	return sqr(q1+q2+q3)-2*(sqr(q1)+sqr(q2)+sqr(q3))
 
-def blue_quadrea_pts( p1, p2, p3 ):
+def blue_quadrea_points( p1, p2, p3 ):
 	q1 = blue_quadrance(p3,p1)
 	q2 = blue_quadrance(p1,p2)
 	q3 = blue_quadrance(p2,p3)
 	return univ_quadrea( q1, q2, q3 )
-def red_quadrea_pts( p1, p2, p3 ):
+def red_quadrea_points( p1, p2, p3 ):
 	q1 = red_quadrance(p3,p1)
 	q2 = red_quadrance(p1,p2)
 	q3 = red_quadrance(p2,p3)
 	return univ_quadrea( q1, q2, q3 )
-def green_quadrea_pts( p1, p2, p3 ):
+def green_quadrea_points( p1, p2, p3 ):
 	q1 = green_quadrance(p3,p1)
 	q2 = green_quadrance(p1,p2)
 	q3 = green_quadrance(p2,p3)
@@ -811,19 +843,19 @@ def green_quadrea_tri( tri ):
 
 def blue_quadrea( *args ):
 	if checktypes( point, *args ) and len(args)==3:
-		return blue_quadrea_pts( args[0],args[1],args[2] )
+		return blue_quadrea_points( args[0],args[1],args[2] )
 	if checktypes( triangle, *args ) and len(args)==1:
 		return blue_quadrea_tri( args[0] )
 	raise Exception('quadrea only knows 3 pts or one triangle')
 def red_quadrea( *args ):
 	if checktypes( point, *args ) and len(args)==3:
-		return red_quadrea_pts( args[0],args[1],args[2] )
+		return red_quadrea_points( args[0],args[1],args[2] )
 	if checktypes( triangle, *args ) and len(args)==1:
 		return red_quadrea_tri( args[0] )
 	raise Exception('quadrea only knows 3 pts or one triangle')
 def green_quadrea( *args ):
 	if checktypes( point, *args ) and len(args)==3:
-		return green_quadrea_pts( args[0],args[1],args[2] )
+		return green_quadrea_points( args[0],args[1],args[2] )
 	if checktypes( triangle, *args ) and len(args)==1:
 		return green_quadrea_tri( args[0] )
 	raise Exception('quadrea only knows 3 pts or one triangle')
@@ -831,6 +863,35 @@ def green_quadrea( *args ):
 quadrea = blue_quadrea
 
 ############################## misc stuff
+
+# translate a triangle by a vector. example, triangle 0,0 1,0 0,1 by vector 2,0
+# result is 2,0 3,0 2,1
+def translate_triangle_by_vector( t, v ):
+	return triangle( t.p0+v, t.p1+v, t.p2+v )
+def translate( *args ):
+	if len(args)<2: raise Exception( 'need 2 objects for translation' )
+	if checktypes( vector, args[0] ) and checktypes( triangle, args[1] ):
+		return translate_triangle_by_vector( args[1], args[0] )
+	if checktypes( triangle, args[0] ) and checktypes( vector, args[1] ):
+		return translate_triangle_by_vector( args[0], args[1] )
+
+# midpoint, its the half-way point between two points.
+def midpoint_from_points( p1, p2 ):
+	newx = Fraction(p2.x+p1.x,2)
+	newy = Fraction(p2.y+p1.y,2)
+	return point(newx,newy)
+def midpoint_segment( lseg ):
+	return midpoint_from_points(lseg[0],lseg[1])
+def midpoint(*args):
+	if checktypes(point,*args): return midpoint_from_points(args[0],args[1])
+	if checktypes(lineseg,*args): return midpoint_segment(args[0])
+
+# bisect a line segment and return the two resulting smaller segments
+def even_split(lseg):
+	mp=midpoint(lseg)
+	newl1 = lineseg(lseg[0],mp)
+	newl2 = lineseg(mp,lseg[1])
+	return newl1,newl2
 
 # do three lines meet at a single point?
 def concurrent( line1, line2, line3 ):
@@ -843,6 +904,7 @@ def concurrent( line1, line2, line3 ):
 	if result==0: return True
 	return False
 
+# are three points collinear?
 def collinear( *args ):
 	for i in range(len(args)):
 		if not isinstance(args[i],point):
@@ -981,14 +1043,16 @@ def colored_spread_rhs( l0, l1 ):
 	return 2
 
 
-###### antisymmetric polynomials
+###### anti-symmetric polynomials
 
 # special polynomials used in many areas of geometry, especially chromogeometry
 # generated from an 'input monomial'
 #
 # example:
-# input x1y2 returns six terms:
+# input 'x1y2' returns six terms:
 # +x1y2 -x1y3 +x2y3 -x3y2 +x3y1 -x2y1
+#  
+# given 3 points, these six terms are twice the signed area of the triangle. 
 
 # given: a monomial
 #
@@ -1072,7 +1136,7 @@ def eval_asympoly_from_triangle( monomial, tri ):
 	vardict = gen_asymp_dict_from_triangle( tri )
 	return calc_antisymmetric_polynomial( monomial, vardict )
 
-def eval_asympoly_from_pts( monomial, p1, p2, p3 ):
+def eval_asympoly_from_points( monomial, p1, p2, p3 ):
 	vardict = gen_asymp_dict_from_points( p1, p2, p3 )
 	return calc_antisymmetric_polynomial( monomial, vardict )
 
@@ -1080,6 +1144,12 @@ def eval_asympoly_from_rationals( monomial, x1,y1,x2,y2,x3,y3 ):
 	vardict = gen_asymp_dict_from_rationals( x1,y1,x2,y2,x3,y3 )
 	return calc_antisymmetric_polynomial( monomial, vardict )
 
+# easiest version to use. Examples:
+# eval_asympoly('x1*y2',3,4,3,0,1,-2) -> returns 20
+# p1,p2,p3 = point(3,4),point(3,0),point(1,-2) 
+# eval_asympoly('x1*y2',p1,p2,p3) -> returns 20
+# t = triangle(p1,p2,p3)
+# eval_asympoly('x1*y2',t) -> returns 20
 def eval_asympoly( *args ):
 	if len(args)<2: raise Exception('need monomial, pointdata')
 	if not isinstance(args[0],str):
@@ -1090,8 +1160,11 @@ def eval_asympoly( *args ):
 	if checktype(point, args[1]) and checktype(point, args[2]):
 		if checktype(point, args[3]):
 			p1,p2,p3=args[1],args[2],args[3]
-			return eval_asympoly_from_pts( monomial, p1, p2, p3 )
+			return eval_asympoly_from_points( monomial, p1, p2, p3 )
 	if checktype(Rational, args[1]):
+		x1,y1,x2,y2,x3,y3 = args[1],args[2],args[3],args[4],args[5],args[6]
+		return eval_asympoly_from_rationals( monomial, x1,y1,x2,y2,x3,y3 )
+	if checktype(int, args[1]):
 		x1,y1,x2,y2,x3,y3 = args[1],args[2],args[3],args[4],args[5],args[6]
 		return eval_asympoly_from_rationals( monomial, x1,y1,x2,y2,x3,y3 )
 	
@@ -1136,13 +1209,13 @@ def green_orthocenter_from_triangle( t ):
 	y = Fraction( termd - terme, termf )
 	return point(x,y)
 
-def blue_orthocenter_from_pts( p1, p2, p3 ):
+def blue_orthocenter_from_points( p1, p2, p3 ):
 	t = triangle( p1, p2, p3 )
 	blue_orthocenter_from_triangle( t )
-def red_orthocenter_from_pts( p1, p2, p3 ):
+def red_orthocenter_from_points( p1, p2, p3 ):
 	t = triangle( p1, p2, p3 )
 	red_orthocenter_from_triangle( t )
-def green_orthocenter_from_pts( p1, p2, p3 ):
+def green_orthocenter_from_points( p1, p2, p3 ):
 	t = triangle( p1, p2, p3 )
 	green_orthocenter_from_triangle( t )
 
@@ -1153,21 +1226,21 @@ def blue_orthocenter( *args ):
 	if checktype(point, args[0]) and checktype(point, args[1]):
 		if checktype(point, args[2]):
 			p1,p2,p3=args[0],args[1],args[2]
-			return blue_orthocenter_from_pts( p1, p2, p3 )
+			return blue_orthocenter_from_points( p1, p2, p3 )
 def red_orthocenter( *args ):
 	if checktype(triangle, args[0]):
 		return red_orthocenter_from_triangle( args[0] )
 	if checktype(point, args[0]) and checktype(point, args[1]):
 		if checktype(point, args[2]):
 			p1,p2,p3=args[0],args[1],args[2]
-			return red_orthocenter_from_pts( p1, p2, p3 )
+			return red_orthocenter_from_points( p1, p2, p3 )
 def green_orthocenter( *args ):
 	if checktype(triangle, args[0]):
 		return green_orthocenter_from_triangle( args[0] )
 	if checktype(point, args[0]) and checktype(point, args[1]):
 		if checktype(point, args[2]):
 			p1,p2,p3=args[0],args[1],args[2]
-			return green_orthocenter_from_pts( p1, p2, p3 )
+			return green_orthocenter_from_points( p1, p2, p3 )
 
 orthocenter=blue_orthocenter
 
@@ -1218,13 +1291,13 @@ def green_circumcenter_from_triangle( t ):
 	y = Fraction( termd - terme, termf )
 	return point(x,y)
 
-def blue_circumcenter_from_pts( p1, p2, p3 ):
+def blue_circumcenter_from_points( p1, p2, p3 ):
 	t = triangle( p1, p2, p3 )
 	blue_circumcenter_from_triangle( t )
-def red_circumcenter_from_pts( p1, p2, p3 ):
+def red_circumcenter_from_points( p1, p2, p3 ):
 	t = triangle( p1, p2, p3 )
 	red_circumcenter_from_triangle( t )
-def green_circumcenter_from_pts( p1, p2, p3 ):
+def green_circumcenter_from_points( p1, p2, p3 ):
 	t = triangle( p1, p2, p3 )
 	green_circumcenter_from_triangle( t )
 
@@ -1235,24 +1308,140 @@ def blue_circumcenter( *args ):
 	if checktype(point, args[0]) and checktype(point, args[1]):
 		if checktype(point, args[2]):
 			p1,p2,p3=args[0],args[1],args[2]
-			return blue_circumcenter_from_pts( p1, p2, p3 )
+			return blue_circumcenter_from_points( p1, p2, p3 )
 def red_circumcenter( *args ):
 	if checktype(triangle, args[0]):
 		return red_circumcenter_from_triangle( args[0] )
 	if checktype(point, args[0]) and checktype(point, args[1]):
 		if checktype(point, args[2]):
 			p1,p2,p3=args[0],args[1],args[2]
-			return red_circumcenter_from_pts( p1, p2, p3 )
+			return red_circumcenter_from_points( p1, p2, p3 )
 def green_circumcenter( *args ):
 	if checktype(triangle, args[0]):
 		return green_circumcenter_from_triangle( args[0] )
 	if checktype(point, args[0]) and checktype(point, args[1]):
 		if checktype(point, args[2]):
 			p1,p2,p3=args[0],args[1],args[2]
-			return green_circumcenter_from_pts( p1, p2, p3 )
+			return green_circumcenter_from_points( p1, p2, p3 )
 
 circumcenter=blue_circumcenter
 
+
+
+# circumquadrance -> basiclly the square of circumradius.
+# whats circumradius? the radius of a circle that has all 3 points of the
+# triangle lying exactly on the circle
+def blue_circum_quadrance( tri ):
+	p1 = blue_circumcenter( tri )
+	p2 = tri.p0
+	return blue_quadrance_points( p1, p2 )
+def red_circum_quadrance( tri ):
+	p1 = red_circumcenter( tri )
+	p2 = tri.p0
+	return red_quadrance_points( p1, p2 )
+def green_circum_quadrance( tri ):
+	p1 = green_circumcenter( tri )
+	p2 = tri.p0
+	return green_quadrance_points( p1, p2 )
+
+circum_quadrance=blue_circum_quadrance
+
+
+
+######################## nine point centers
+
+def blue_ninepointcenter_from_triangle( t ):
+	if not checktype(triangle,t): raise Exception('need triangle')
+	p1 = red_circumcenter_from_triangle( t )
+	p2 = green_circumcenter_from_triangle( t )
+	return midpoint_from_points( p1, p2 )
+
+def red_ninepointcenter_from_triangle( t ):
+	if not checktype(triangle,t): raise Exception('need triangle')
+	p1 = blue_circumcenter_from_triangle( t )
+	p2 = green_circumcenter_from_triangle( t )
+	return midpoint_from_points( p1, p2 )
+
+def green_ninepointcenter_from_triangle( t ):
+	if not checktype(triangle,t): raise Exception('need triangle')
+	p1 = blue_circumcenter_from_triangle( t )
+	p2 = red_circumcenter_from_triangle( t )
+	return midpoint_from_points( p1, p2 )
+
+def blue_ninepointcenter_from_points( p1, p2, p3 ):
+	t = triangle( p1, p2, p3 )
+	blue_ninepointcenter_from_triangle( t )
+def red_ninepointcenter_from_points( p1, p2, p3 ):
+	t = triangle( p1, p2, p3 )
+	red_ninepointcenter_from_triangle( t )
+def green_ninepointcenter_from_points( p1, p2, p3 ):
+	t = triangle( p1, p2, p3 )
+	green_ninepointcenter_from_triangle( t )
+
+def blue_ninepointcenter( *args ):
+	if checktype(triangle, args[0]):
+		return blue_ninepointcenter_from_triangle( args[0] )
+	if checktype(point, args[0]) and checktype(point, args[1]):
+		if checktype(point, args[2]):
+			p1,p2,p3=args[0],args[1],args[2]
+			return blue_ninepointcenter_from_points( p1, p2, p3 )
+def red_ninepointcenter( *args ):
+	if checktype(triangle, args[0]):
+		return red_ninepointcenter_from_triangle( args[0] )
+	if checktype(point, args[0]) and checktype(point, args[1]):
+		if checktype(point, args[2]):
+			p1,p2,p3=args[0],args[1],args[2]
+			return red_ninepointcenter_from_points( p1, p2, p3 )
+def green_ninepointcenter( *args ):
+	if checktype(triangle, args[0]):
+		return green_ninepointcenter_from_triangle( args[0] )
+	if checktype(point, args[0]) and checktype(point, args[1]):
+		if checktype(point, args[2]):
+			p1,p2,p3=args[0],args[1],args[2]
+			return green_ninepointcenter_from_points( p1, p2, p3 )
+
+ninepointcenter=blue_ninepointcenter
+
+
+
+
+##################### triangle measurements
+
+def blue_smallest_quadrance( tri ):
+	q1=blue_quadrance_points( tri.p0, tri.p1 )
+	q2=blue_quadrance_points( tri.p1, tri.p2 )
+	q3=blue_quadrance_points( tri.p2, tri.p0 )
+	return min(q1,q2,q3)
+def red_smallest_quadrance( tri ):
+	q1=red_quadrance_points( tri.p0, tri.p1 )
+	q2=red_quadrance_points( tri.p1, tri.p2 )
+	q3=red_quadrance_points( tri.p2, tri.p0 )
+	return min(q1,q2,q3)
+def green_smallest_quadrance( tri ):
+	q1=green_quadrance_points( tri.p0, tri.p1 )
+	q2=green_quadrance_points( tri.p1, tri.p2 )
+	q3=green_quadrance_points( tri.p2, tri.p0 )
+	return min(q1,q2,q3)
+
+smallest_quadrance=blue_smallest_quadrance
+
+def blue_smallest_spread( tri ):
+	s1=blue_spread_lines( tri.l0, tri.l1 )
+	s2=blue_spread_lines( tri.l1, tri.l2 )
+	s3=blue_spread_lines( tri.l2, tri.l0 )
+	return min(s1,s2,s3)
+def red_smallest_spread( tri ):
+	s1=red_spread_lines( tri.l0, tri.l1 )
+	s2=red_spread_lines( tri.l1, tri.l2 )
+	s3=red_spread_lines( tri.l2, tri.l0 )
+	return min(s1,s2,s3)
+def green_smallest_spread( tri ):
+	s1=green_spread_lines( tri.l0, tri.l1 )
+	s2=green_spread_lines( tri.l1, tri.l2 )
+	s3=green_spread_lines( tri.l2, tri.l0 )
+	return min(s1,s2,s3)
+
+smallest_spread=blue_smallest_spread
 
 ################## omega triangle
 
@@ -1266,6 +1455,12 @@ def circum_triangle( tri ):
 	c0 = red_circumcenter( tri )
 	c1 = green_circumcenter( tri )
 	c2 = blue_circumcenter( tri )
+	return triangle( c0, c1, c2 )
+
+def ninepoint_triangle( tri ):
+	c0 = red_ninepointcenter( tri )
+	c1 = green_ninepointcenter( tri )
+	c2 = blue_ninepointcenter( tri )
 	return triangle( c0, c1, c2 )
 
 

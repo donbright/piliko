@@ -109,10 +109,18 @@ Result:
 
 	[3,4]   25 -7 24   625 49 576
 
+Example E:
+
 More examples can be found in the files named example01.py, example02.py, etc
 To run them:
 
 	python example01.py
+	python example02.py
+	etc etc
+
+Even more examples are under the 'experiment' folder of this bundle. But 
+you will need to install extra python libraries, like matlpotlib, to use 
+some of them.
 
 Basic principle
 ===============
@@ -127,19 +135,38 @@ doable in algebra using only plus, minus, multiply, and divide.
 Therefore no approximation is required to perform these basic 
 operations, which means the issue of floating-point error disappears.
 
-In fact it is possible to develop a geometry that does not use 
+It might even be possible to develop a geometry that does not use 
 transcendental functions at all. There are rational analogues for 
 rotation. Any conic curve can be approximated very well by rational 
 parameterization (rational points on the curve). Bezier curves can be 
-approximated by rational points. And thus, truetype(TM) fonts. Also a large 
+approximated by rational points. And thus, truetype(TM) fonts. 
+Bernoulli's leminscate has a rational paramterization. Also a large 
 number of polynomial curves can be parameterized by rational points. 
 There are even people working algorithms to create rational 
-paramterizations automatically. 
+paramterizations automatically.
 
 There are also rational parameterizations for many of our favorite 3 
 dimensional objects, like spheres, toruses, hyperbolic sheets, 
-non-circle based toruses, and there are even people who have worked out 
-rational parameterizations of 3 dimensional 'knot' shapes.
+non-circle based toruses, dumbbells, and there are even people who have 
+worked out rational parameterizations of 3 dimensional 'knot' shapes.
+
+It may be even possible to create anlogues of geometry algorithms (like 
+catmull clark subdivision or Delaunay triangulation) using rational 
+points and rational functions.
+
+The downside is that you lose some old things, like the notion of 
+distance in any situation (for example, the point 1,1 is sqrt(2) from 
+the origin... a rational circle will not include any such point at 45 
+degrees angle), or the intersection of any line with any circle (this is 
+replaced by the notion of the intersection of a line with the polygon 
+approximation of the circle). Even the length of the side of a 45-45-90 
+or 30-60-90 triangle is lost.
+
+Another huge loss is that you can't add two angles together with simple 
+addition. You have to use 'spread polynomials' instead. Err.. hrm.
+
+What is approximation
+=====================
 
 The term 'approximate' here means that the curves that are usually 
 approximated with floating point approximations of transcendental 
@@ -166,35 +193,35 @@ pythagorean triples, so they have an exact distance from the center, not
 an approximate distance. Like the point 3,4 is exactly 5 from the 
 center.
 
-It may be even possible to create anlogues of geometry algorithms (like 
-catmull clark subdivision or Delaunay triangulation) using rational 
-points and rational functions.
 
-The downside is that you lose some old things, like the notion of 
-distance in any situation (for example, the point 1,1 is sqrt(2) from 
-the origin... a rational circle will not include any such point at 45 
-degrees angle), or the intersection of any line with any circle (this is 
-replaced by the notion of the intersection of a line with the polygon 
-approximation of the circle). Even the length of the side of a 45-45-90 
-or 30-60-90 triangle is lost.
+Slowness
+========
 
-Another huge loss is that you can't add two angles together with simple 
-addition. You have to use 'spread polynomials' instead. Err.. hrm.
+The big downside of any rational number system is that it can be slow. 
+There is the ordinary problem, for example that adding two numbers actually
+takes 3 multiplications and a subtraction.. but that is not the biggest issue.
+The big problem is when you chain several computations together. Your
+Rationals are probably using a form of integer called 'big integer' that cannot
+'overflow'. This means if you have some long fraction like 
 
-The other downside is it's possible a bit slow. Computers were optimized 
-for floating point for 50 years. Hardware doesnt generally deal with 
-rationals. You also have to worry about overflowing your integers. 
-Typically rational number software uses 'big int', which can expand the 
-integer past the size native to the machine. For example on a 32-bit 
-computer 'big int' allows the use of integers larger than the maximum 
-expressable in 32 bits, which is around ~4 billion. This makes it slow 
-though.
+20367846780390904/4908298173897891821
 
-Lastly, any algorithm that re-uses a lot of numbers can generate 
-massively long integers, basically 'overflow' of the ordinary 64-bit 
-integer, creating lots of RAM usage and very very slow arithmetic 
-operations. For example, simulating a space ship with 
-force=g*mass1*mass2/radius^2 can create huge integers very quickly.
+and it cant be simplified, it will be stored as a special sequence of 
+numbers in the machine. This can easily explode, as you can imagine by 
+just thinking about squaring one of these fractions a few times and 
+adding some number such that there is no simplified form. A good example 
+would be simulating a space ship and planet, with 
+force=g*mass1*mass2/radius^2. Re-calculate that a few dozen times and
+you are looking at hundreds of digits for numbers.
+
+To maintain the beautiful 'no approximation' feature, you have to store 
+all these digits.
+
+This is fundamentally different from how finite length floating point 
+numbers worked. Or even ordinary finite length integer arithmetic in old 
+2d graphics libraries. With each step in a finite approximation number 
+system, you throw out vast numbers of digits, but with Big Integer 
+rationals, you 'accumulate' digits.
 
 Copyright License
 =================
