@@ -20,7 +20,6 @@
 # split out print functions from basic code? sep presentation w data...
 # make function pointers shorter code, better code 
 # add args* based triangle constructor (points or lines)
-#   enable omega triangle
 # put 'of' in func names
 
 # what is omega inverse?
@@ -56,11 +55,23 @@ def checkrationals( *args ):
 			raise Exception("Rationals only please")
 class point:
 	def __init__(self, *args):
-		checkrationals( args )
-		self.x,self.y=args[0],args[1]
-		if (len(args)==3): self.z=args[2]
+		if checktypes(vector,*args):
+			self.x=args[0][0]
+			self.y=args[0][1]
+			if (len(args)==3): self.z=args[0][2]
+		else:
+			checkrationals( args )
+			self.x,self.y=args[0],args[1]
+			if (len(args)==3): self.z=args[2]
 	def __str__( self ):
 		return point_txt(self)
+	def __getitem__( self, i ):
+		if i==0: return self.x
+		if i==1: return self.y
+		if i==2: return self.z
+	def __add__( self, p):
+		v=vector(self)+vector(p)
+		return point(v)
 
 class vector:
 	def __init__( self, *args ):
@@ -102,6 +113,10 @@ class vector:
 		return perpendicular( self, v )
 	def parallel( self, v ):
 		return parallel( self, v )
+	def __getitem__( self, i ):
+		if i==0: return self.x
+		if i==1: return self.y
+		if i==2: return self.z
 
 class bivector:
 	def __init__( self, *args ):
@@ -128,6 +143,9 @@ class bivector:
 	def value( self ):
 		# note, det v2, v2 = -1 * det v1, v2
 		return determinant( self.v1, self.v2 )
+	def __getitem__( self, i ):
+		if i==0: return self.v1
+		if i==1: return self.v2
 
 class line:
 	# line formula here is ax + by + c = 0
@@ -144,6 +162,10 @@ class line:
 		self.a,self.b,self.c=a,b,c
 	def __str__( self ):
 		return line_txt( self )
+	def __getitem__( self, i ):
+		if i==0: return self.a
+		if i==1: return self.b
+		if i==2: return self.c
 
 class lineseg:
 	def __init__(self,p0,p1):
@@ -152,18 +174,28 @@ class lineseg:
 		return lineseg_txt( self )
 	def quadrance( self ):
 		return quadrance( self.p0, self.p1 )
+	def __getitem__( self, i ):
+		if i==0: return self.p0
+		if i==1: return self.p1
 
 class triangle:
-	l0,l1,l2=line(0,0,0),line(0,0,0),line(0,0,0)
+	l0,l1,l2=None,None,None
 	p0,p1,p2=None,None,None
 	ls0,ls1,ls2=None,None,None
 	q0,q1,q2=None,None,None
 	s0,s1,s2=[None]*3
-	def __init__( self, l0, l1, l2 ):
-		self.init_from_lines( l0, l1, l2 )
+	def __init__( self, *args ):
+		if checktypes( line, *args ) and len(args)==3:
+			self.init_from_lines( args[0],args[1],args[2] )
+		if checktypes( point, *args ) and len(args)==3:
+			self.init_from_points( args[0],args[1],args[2] )
 
 	def init_from_lines( self, l0, l1, l2 ):
 		p0,p1,p2 = meet(l1,l2),meet(l0,l2),meet(l0,l1)
+		init_from_points( p0, p1, p2 )
+
+	def init_from_points( self, p0, p1, p2 ):
+		l0,l1,l2 = line(p0,p1),line(p1,p2),line(p2,p0)
 		ls0,ls1,ls2 = lineseg(p1,p2),lineseg(p0,p2),lineseg(p0,p1)
 		q0,q1,q2=quadrance(ls0),quadrance(ls1),quadrance(ls2)
 		s0,s1,s2=spread(l1,l2),spread(l0,l2),spread(l0,l1)
@@ -173,9 +205,13 @@ class triangle:
 		self.ls0,self.ls1,self.ls2=ls0,ls1,ls2
 		self.q0,self.q1,self.q2=q0,q1,q2
 		self.s0,self.s1,self.s2=s0,s1,s2
-
+		
 	def __str__( self ):
 		return triangle_txt( self )
+	def __getitem__( self, i ):
+		if i==0: return self.p0
+		if i==1: return self.p1
+		if i==2: return self.p2
 
 class quaternion:
 	def __init__(self,t,v):
@@ -211,6 +247,92 @@ def determinant( *args ):
 
 	return result
 	
+
+################# nullity
+
+def is_null_point( A ):
+	v1 = vector(A.x,A.y)
+	if v1.dot(v1)==0: return True
+	return False
+
+def is_null_vector( v ):
+	if v1.dot(v1)==0: return True
+	return False
+
+def is_null_line_from_points( p1, p2 ):
+	v1 = vector(p1)
+	v2 = vector(p2)
+	if is_null_vector( v2-v1 ): return True
+	return False
+
+def is_null_line( l ):
+	a,b,c=l.a,l.b,l.c
+	# ax+by+c = 0 ---> y = ( -c -ax ) / b
+	# ax+by+c = 0 ---> x = ( -c -by ) / a
+	if b!=0: 
+		p1x = 0
+		p1y = Fraction( -l.c -l.a * p1x , l.b )
+		p2x = 1
+		p2y = Fraction( -l.c -l.a * p2x , l.b )
+	elif a!=0:
+		p1y = 0
+		p1x = Fraction( -l.c -l.b * p1y , l.a )
+		p2y = 1
+		p2x = Fraction( -l.c -l.b * p2y , l.a )
+	else:
+		raise Exception('dont know what to do with line, a&b = 0')
+	A1=point(p1x,p1y)
+	A2=point(p2x,p2y)
+	v1=vector(A1)
+	v2=vector(A2)
+	if is_null_vector( v2-v1 ): return True
+	return False
+
+def is_null_triangle( t ):
+	if is_null_line( t.l0 ): return True
+	if is_null_line( t.l1 ): return True
+	if is_null_line( t.l2 ): return True
+	return False
+
+def is_null( *args ):
+	if checktype( line, args[0] ): return is_null_line( args[0] )
+	if checktype( triangle, args[0] ): return is_null_triangle( args[0] )
+	if checktype( point, args[0] ): return is_null_point( args[0] )
+	if checktype( vector, args[0] ): return is_null_vector( args[0] )
+	if len(args)>1:
+		if checktype( point, args[0] ) and checktype(point,args[1]):
+			return is_null_line_from_points( args[0], args[1] )
+
+################# altitudes
+
+# note, line is just 3 Rationals: [a:b:c] where ax + by + c = 0
+
+def blue_altitude( linel, pointA ):
+	if checktype( point, linel) and checktype( line, pointA ):
+		tmp = pointA
+		pointA = linel
+		linel = tmp
+	a,b,c = linel.a,linel.b,linel.c
+	x0,y0 = pointA.x,pointA.y
+	return line(b,-a,-b*x0+a*y0)
+
+def red_altitude( linel, pointA ):
+	if checktype( point, linel) and checktype( line, pointA ):
+		tmp = pointA
+		pointA = linel
+		linel = tmp
+	a,b,c = linel.a,linel.b,linel.c
+	x0,y0 = pointA.x,pointA.y
+	return line(b,a,-b*x0-a*y0)
+
+def green_altitude( linel, pointA ):
+	if checktype( point, linel) and checktype( line, pointA ):
+		tmp = pointA
+		pointA = linel
+		linel = tmp
+	a,b,c = linel.a,linel.b,linel.c
+	x0,y0 = pointA.x,pointA.y
+	return line(a,-b,-a*x0+b*y0)
 
 ###### perpendicular
 
@@ -321,11 +443,17 @@ def parallel( *args, **kwargs ):
 
 ############### quadrance
 
+def archimedes_function_3numbers(a,b,c): 
+	return sqr(a+b+c) - 2*(a*a+b*b+c*c)
+
 def archimedes_function( *args ):
 	checkrationals( *args )
 	if not len(args)==3:
 		raise Exception("Archimede's function requires 3 numbers")
-	return sqr(a+b+c) - 2*(a*a+b*b+c*c)
+	a=args[0]
+	b=args[1]
+	c=args[2]
+	return archimedes_function_3numbers( a, b, c )
 
 def red_quadrance_pts( p1, p2 ):
 	if hasattr(p2,'z') and hasattr(p1,'z'):
@@ -413,14 +541,6 @@ def quadrance( *args, **kwargs ):
 
 
 
-def quadria( *args ):
-	if checktypes(point,*args):
-		Q1=quadrance(args[0],args[1])
-		Q2=quadrance(args[1],args[2])
-		Q3=quadrance(args[2],args[0])
-		return sqr(Q1+Q2+Q3)-2*(Q1*Q1+Q2*Q2+Q3*Q3)
-	raise Exception('not implemented')
-
 def blue_quadrance_quaternion( q ):
 	# checktype( quaternion, q )
 	t,x,y,z=q.t,q.x,q.y,q.z
@@ -434,12 +554,13 @@ def quadrance_quaternion( q ):
 
 
 # fixme - if a1^2 - bq^2 = 0 then l1 = null line
-# both must be non null
+# both must be non null?
 def red_spread_lines( l1, l2 ):
 	a1,b1,c1 = l1.a, l1.b, l1.c
 	a2,b2,c2 = l2.a, l2.b, l2.c
 	numerator = -1 * sqr(a1*b2-a2*b1)
 	denominator = (a1*a1-b1*b1)*(a2*a2-b2*b2)
+	if denominator==0: return None
 	return Fraction( numerator, denominator )
 
 def green_spread_lines( l1, l2 ):
@@ -447,6 +568,7 @@ def green_spread_lines( l1, l2 ):
 	a2,b2,c2 = l2.a, l2.b, l2.c
 	numerator = -1 * sqr(a1*b2-a2*b1)
 	denominator = 4 * a1 * a2 * b1 * b2
+	if denominator==0: return None
 	return Fraction( numerator, denominator )
 	
 def blue_spread_lines( l1, l2 ):
@@ -454,6 +576,7 @@ def blue_spread_lines( l1, l2 ):
 	a2,b2,c2 = l2.a, l2.b, l2.c
 	numerator = sqr(a1*b2-a2*b1)
 	denominator = (a1*a1+b1*b1)*(a2*a2+b2*b2)
+	if denominator==0: return None
 	return Fraction( numerator, denominator )
 
 def red_spread_vectors( v1, v2 ):
@@ -645,18 +768,95 @@ def projective_triple_spread( *args ):
 		raise Exception( 'proj trip spread requires 3 numbers')
 	return sqr(a+b+c) - 2*(a*a+b*b+c*c) - 4*a*b*c
 
+############ quadrea. "a measure of the non-collinearity of points"
+### (also equal to 16* area squared.), +/-
+### note that red + green quadrea are equal, and opposite blue quadrea
+
+def univ_quadrea( q1, q2, q3 ):
+	# see also archimedes function
+	return sqr(q1+q2+q3)-2*(sqr(q1)+sqr(q2)+sqr(q3))
+
+def blue_quadrea_pts( p1, p2, p3 ):
+	q1 = blue_quadrance(p3,p1)
+	q2 = blue_quadrance(p1,p2)
+	q3 = blue_quadrance(p2,p3)
+	return univ_quadrea( q1, q2, q3 )
+def red_quadrea_pts( p1, p2, p3 ):
+	q1 = red_quadrance(p3,p1)
+	q2 = red_quadrance(p1,p2)
+	q3 = red_quadrance(p2,p3)
+	return univ_quadrea( q1, q2, q3 )
+def green_quadrea_pts( p1, p2, p3 ):
+	q1 = green_quadrance(p3,p1)
+	q2 = green_quadrance(p1,p2)
+	q3 = green_quadrance(p2,p3)
+	return univ_quadrea( q1, q2, q3 )
+
+def blue_quadrea_tri( tri ):
+	q1 = blue_quadrance(tri.p0,tri.p1)
+	q2 = blue_quadrance(tri.p1,tri.p2)
+	q3 = blue_quadrance(tri.p2,tri.p0)
+	return univ_quadrea( q1, q2, q3 )
+def red_quadrea_tri( tri ):
+	q1 = red_quadrance(tri.p0,tri.p1)
+	q2 = red_quadrance(tri.p1,tri.p2)
+	q3 = red_quadrance(tri.p2,tri.p0)
+	return univ_quadrea( q1, q2, q3 )
+def green_quadrea_tri( tri ):
+	q1 = green_quadrance(tri.p0,tri.p1)
+	q2 = green_quadrance(tri.p1,tri.p2)
+	q3 = green_quadrance(tri.p2,tri.p0)
+	return univ_quadrea( q1, q2, q3 )
+
+
+def blue_quadrea( *args ):
+	if checktypes( point, *args ) and len(args)==3:
+		return blue_quadrea_pts( args[0],args[1],args[2] )
+	if checktypes( triangle, *args ) and len(args)==1:
+		return blue_quadrea_tri( args[0] )
+	raise Exception('quadrea only knows 3 pts or one triangle')
+def red_quadrea( *args ):
+	if checktypes( point, *args ) and len(args)==3:
+		return red_quadrea_pts( args[0],args[1],args[2] )
+	if checktypes( triangle, *args ) and len(args)==1:
+		return red_quadrea_tri( args[0] )
+	raise Exception('quadrea only knows 3 pts or one triangle')
+def green_quadrea( *args ):
+	if checktypes( point, *args ) and len(args)==3:
+		return green_quadrea_pts( args[0],args[1],args[2] )
+	if checktypes( triangle, *args ) and len(args)==1:
+		return green_quadrea_tri( args[0] )
+	raise Exception('quadrea only knows 3 pts or one triangle')
+
+quadrea = blue_quadrea
+
 ############################## misc stuff
+
+# do three lines meet at a single point?
+def concurrent( line1, line2, line3 ):
+	monomial = 'a1*b2*c3'
+	asymp = gen_antisymmetric_polynomial_string( monomial )
+	a1,b1,c1 = line1.a,line1.b,line1.c
+	a2,b2,c2 = line2.a,line2.b,line2.c
+	a3,b3,c3 = line3.a,line3.b,line3.c
+	result = eval(asymp)
+	if result==0: return True
+	return False
 
 def collinear( *args ):
 	for i in range(len(args)):
 		if not isinstance(args[i],point):
 			raise Exception('coolinear() requires points')
 	if len(args)<3: raise Exception('collinear() needs 3 pts or more')
-	l = line(args[0],args[1])
-	for i in range(2,len(args)):
-		tmp_point = args[i]
-		if meet( l, tmp_point ) == None: return False 
-	return True
+	p1,p2,p3 = args[0],args[1],args[2]
+	result = eval_asympoly( 'x1*y2', p1,p2,p3 )
+	if result==0: return True
+	return False
+#	l = line(args[0],args[1])
+#	for i in range(2,len(args)):
+#		tmp_point = args[i]
+#		if meet( l, tmp_point ) == None: return False 
+#	return True
 
 def cross( l0, l1 ):
 	checktypes( line, [l0,l1] )
@@ -781,12 +981,195 @@ def colored_spread_rhs( l0, l1 ):
 	return 2
 
 
-def red_orthocenter( tri ):
-	raise Exception(" not implemented ")
-def green_orthocenter( tri ):
-	raise Exception(" not implemented ")
-def blue_orthocenter( tri ):
-	raise Exception(" not implemented ")
+###### antisymmetric polynomials
+
+# special polynomials used in many areas of geometry, especially chromogeometry
+# generated from an 'input monomial'
+#
+# example:
+# input x1y2 returns six terms:
+# +x1y2 -x1y3 +x2y3 -x3y2 +x3y1 -x2y1
+
+# given: a monomial
+#
+# follow the 6 steps to generate the six terms of the antisymmetric 
+# polynomial:
+#
+# start with the subscripts as given. 
+# replace '2' with '3', and vice versa
+# replace '1' with '2', and vice versa
+# replace '2' with '3', and vice versa
+# replace '1' with '2', and vice versa
+# replace '2' with '3', and vice versa
+# now assign positive and negative: like so: + - + - + -
+
+# examples:
+#
+# input x1*x1*x2*y2 returns six terms:
+# +x1*x1*x2*y2 -x1*x1*x3*y3 +x2*x2*x3*y3 -x3*x3*x2*y2 +x3*x3*x1*y1 -x2*x2*x1*y1
+#
+# input x1*x1*x1*y1 returns six terms:
+# +x1*x1*x1*y1 -x1*x1*x1*y1 +x2*x2*x2*y2 -x3*x3*x3*y3 +x3*x3*x3*y3 -x2*x2*x2*y2
+
+
+
+# replace s1 for s2, and vice versa, in the input string s.
+# example: given 'xabx','a','b' return 'xbax'
+def transpose( s, s1, s2 ):
+	s = s.replace(s1,'______term1______').replace(s2,'_____term2_____')
+	s = s.replace('______term1______',s2).replace('_____term2_____',s1)
+	return s
+
+# given string representation of input monomial, generate a string
+# with the six terms of the antisymmetric polynomial
+def gen_antisymmetric_polynomial_string( s ):
+	term1 = s
+	term2 = transpose( term1, '2', '3' )
+	term3 = transpose( term2, '1', '2' )
+	term4 = transpose( term3, '2', '3' )
+	term5 = transpose( term4, '1', '2' )
+	term6 = transpose( term5, '2', '3' )
+	#term1 = '+'+term1
+	term2 = '-'+term2
+	term3 = '+'+term3
+	term4 = '-'+term4
+	term5 = '+'+term5
+	term6 = '-'+term6
+	return term1+term2+term3+term4+term5+term6
+
+# generate and calc the value of an antisymmetric polyonmial, given an 
+# input monomial and some values for the input variables.
+#
+# first input must be a string representing a monomial python expression
+# second input must be a python dictionary mapping strings to Rationals.
+# example:
+# dic = { 'x1': 4, 'y1': 5, 'x2': 3, 'y2': 0, 'x3': 1, 'y3': -2 }
+# calc_antisymmetric_polynomial( 'x1*y2', dic )
+# result: 20
+def calc_antisymmetric_polynomial( monomial, vardict ):
+	asp_str = gen_antisymmetric_polynomial_string( monomial )
+	return eval(asp_str,{},vardict)
+
+#### antisymmetric polynomial convenience functions
+
+def gen_asymp_dict_from_points( p1, p2, p3 ):
+	dic = {}
+	dic['x1'],dic['y1']=p1.x,p1.y
+	dic['x2'],dic['y2']=p2.x,p2.y
+	dic['x3'],dic['y3']=p3.x,p3.y
+	return dic
+
+def gen_asymp_dict_from_triangle( t ):
+	return gen_asymp_dict_from_points( t.p0, t.p1, t.p2 )
+
+def gen_asymp_dict_from_rationals( x1,y1,x2,y2,x3,y3 ):
+	p1 = point(x1,y1)
+	p2 = point(x2,y2)
+	p3 = point(x3,y3)
+	return gen_asymp_dict_from_points( p1, p2, p3 )
+
+def eval_asympoly_from_triangle( monomial, tri ):
+	vardict = gen_asymp_dict_from_triangle( tri )
+	return calc_antisymmetric_polynomial( monomial, vardict )
+
+def eval_asympoly_from_pts( monomial, p1, p2, p3 ):
+	vardict = gen_asymp_dict_from_points( p1, p2, p3 )
+	return calc_antisymmetric_polynomial( monomial, vardict )
+
+def eval_asympoly_from_rationals( monomial, x1,y1,x2,y2,x3,y3 ):
+	vardict = gen_asymp_dict_from_rationals( x1,y1,x2,y2,x3,y3 )
+	return calc_antisymmetric_polynomial( monomial, vardict )
+
+def eval_asympoly( *args ):
+	if len(args)<2: raise Exception('need monomial, pointdata')
+	if not isinstance(args[0],str):
+		raise Exception('arg[0] s/b string')
+	monomial = args[0]
+	if checktype(triangle, args[1]):
+		return eval_asympoly_from_triangle( monomial, args[1] )
+	if checktype(point, args[1]) and checktype(point, args[2]):
+		if checktype(point, args[3]):
+			p1,p2,p3=args[1],args[2],args[3]
+			return eval_asympoly_from_pts( monomial, p1, p2, p3 )
+	if checktype(Rational, args[1]):
+		x1,y1,x2,y2,x3,y3 = args[1],args[2],args[3],args[4],args[5],args[6]
+		return eval_asympoly_from_rationals( monomial, x1,y1,x2,y2,x3,y3 )
+	
+############################### triangle centers
+
+
+############## orthocenters
+
+def blue_orthocenter_from_triangle( t ):
+	if not checktype(triangle,t): raise Exception('need triangle')
+	terma = eval_asympoly( 'x1*x2*y2', t )
+	termb = eval_asympoly( 'y1*y2*y2', t )
+	termc = eval_asympoly( 'x1*y2', t )
+	termd = eval_asympoly( 'x1*y1*y2', t )
+	terme = eval_asympoly( 'x1*x1*x2', t )
+	termf = eval_asympoly( 'x1*y2', t )
+	x = Fraction( terma + termb, termc )
+	y = Fraction( termd + terme, termf )
+	return point(x,y)
+
+def red_orthocenter_from_triangle( t ):
+	if not checktype(triangle,t): raise Exception('need triangle')
+	terma = eval_asympoly( 'x1*x2*y2', t )
+	termb = eval_asympoly( 'y1*y2*y2', t )
+	termc = eval_asympoly( 'x1*y2', t )
+	termd = eval_asympoly( 'x1*y1*y2', t )
+	terme = eval_asympoly( 'x1*x1*x2', t )
+	termf = eval_asympoly( 'x1*y2', t )
+	x = Fraction( terma - termb, termc )
+	y = Fraction( termd - terme, termf )
+	return point(x,y)
+
+def green_orthocenter_from_triangle( t ):
+	if not checktype(triangle,t): raise Exception('need triangle')
+	terma = eval_asympoly( 'x1*x1*y2', t )
+	termb = eval_asympoly( 'x1*x2*y1', t )
+	termc = eval_asympoly( 'x1*y2', t )
+	termd = eval_asympoly( 'x1*y2*y2', t )
+	terme = eval_asympoly( 'x1*y1*y2', t )
+	termf = eval_asympoly( 'x1*y2', t )
+	x = Fraction( terma + termb, termc )
+	y = Fraction( termd - terme, termf )
+	return point(x,y)
+
+def blue_orthocenter_from_pts( p1, p2, p3 ):
+	t = triangle( p1, p2, p3 )
+	blue_orthocenter_from_triangle( t )
+def red_orthocenter_from_pts( p1, p2, p3 ):
+	t = triangle( p1, p2, p3 )
+	red_orthocenter_from_triangle( t )
+def green_orthocenter_from_pts( p1, p2, p3 ):
+	t = triangle( p1, p2, p3 )
+	green_orthocenter_from_triangle( t )
+
+
+def blue_orthocenter( *args ):
+	if checktype(triangle, args[0]):
+		return blue_orthocenter_from_triangle( args[0] )
+	if checktype(point, args[0]) and checktype(point, args[1]):
+		if checktype(point, args[2]):
+			p1,p2,p3=args[0],args[1],args[2]
+			return blue_orthocenter_from_pts( p1, p2, p3 )
+def red_orthocenter( *args ):
+	if checktype(triangle, args[0]):
+		return red_orthocenter_from_triangle( args[0] )
+	if checktype(point, args[0]) and checktype(point, args[1]):
+		if checktype(point, args[2]):
+			p1,p2,p3=args[0],args[1],args[2]
+			return red_orthocenter_from_pts( p1, p2, p3 )
+def green_orthocenter( *args ):
+	if checktype(triangle, args[0]):
+		return green_orthocenter_from_triangle( args[0] )
+	if checktype(point, args[0]) and checktype(point, args[1]):
+		if checktype(point, args[2]):
+			p1,p2,p3=args[0],args[1],args[2]
+			return green_orthocenter_from_pts( p1, p2, p3 )
+
+orthocenter=blue_orthocenter
 
 
 def red_centroid( tri ):
@@ -797,19 +1180,93 @@ def blue_centroid( tri ):
 	raise Exception(" not implemented ")
 
 
-def red_circumcenter( tri ):
-	raise Exception(" not implemented ")
-def green_circumcenter( tri ):
-	raise Exception(" not implemented ")
-def blue_circumcenter( tri ):
-	raise Exception(" not implemented ")
+############ circumcenters
 
+def blue_circumcenter_from_triangle( t ):
+	if not checktype(triangle,t): raise Exception('need triangle')
+	terma = eval_asympoly( 'x1*x1*y2', t )
+	termb = eval_asympoly( 'y1*y1*y2', t )
+	termc = eval_asympoly( 'x1*y2', t )
+	termd = eval_asympoly( 'x1*y2*y2', t )
+	terme = eval_asympoly( 'x1*x2*x2', t )
+	termf = eval_asympoly( 'x1*y2', t )
+	x = Fraction( terma + termb, 2 * termc )
+	y = Fraction( termd + terme, 2 * termf )
+	return point(x,y)
+
+def red_circumcenter_from_triangle( t ):
+	if not checktype(triangle,t): raise Exception('need triangle')
+	terma = eval_asympoly( 'x1*x1*y2', t )
+	termb = eval_asympoly( 'y1*y1*y2', t )
+	termc = eval_asympoly( 'x1*y2', t )
+	termd = eval_asympoly( 'x1*y2*y2', t )
+	terme = eval_asympoly( 'x1*x2*x2', t )
+	termf = eval_asympoly( 'x1*y2', t )
+	x = Fraction( terma - termb, 2 * termc )
+	y = Fraction( termd - terme, 2 * termf )
+	return point(x,y)
+
+def green_circumcenter_from_triangle( t ):
+	if not checktype(triangle,t): raise Exception('need triangle')
+	terma = eval_asympoly( 'x1*x2*y2', t )
+	termb = 0
+	termc = eval_asympoly( 'x1*y2', t )
+	termd = eval_asympoly( 'x1*y1*y2', t )
+	terme = 0
+	termf = eval_asympoly( 'x1*y2', t )
+	x = Fraction( terma + termb, termc )
+	y = Fraction( termd - terme, termf )
+	return point(x,y)
+
+def blue_circumcenter_from_pts( p1, p2, p3 ):
+	t = triangle( p1, p2, p3 )
+	blue_circumcenter_from_triangle( t )
+def red_circumcenter_from_pts( p1, p2, p3 ):
+	t = triangle( p1, p2, p3 )
+	red_circumcenter_from_triangle( t )
+def green_circumcenter_from_pts( p1, p2, p3 ):
+	t = triangle( p1, p2, p3 )
+	green_circumcenter_from_triangle( t )
+
+
+def blue_circumcenter( *args ):
+	if checktype(triangle, args[0]):
+		return blue_circumcenter_from_triangle( args[0] )
+	if checktype(point, args[0]) and checktype(point, args[1]):
+		if checktype(point, args[2]):
+			p1,p2,p3=args[0],args[1],args[2]
+			return blue_circumcenter_from_pts( p1, p2, p3 )
+def red_circumcenter( *args ):
+	if checktype(triangle, args[0]):
+		return red_circumcenter_from_triangle( args[0] )
+	if checktype(point, args[0]) and checktype(point, args[1]):
+		if checktype(point, args[2]):
+			p1,p2,p3=args[0],args[1],args[2]
+			return red_circumcenter_from_pts( p1, p2, p3 )
+def green_circumcenter( *args ):
+	if checktype(triangle, args[0]):
+		return green_circumcenter_from_triangle( args[0] )
+	if checktype(point, args[0]) and checktype(point, args[1]):
+		if checktype(point, args[2]):
+			p1,p2,p3=args[0],args[1],args[2]
+			return green_circumcenter_from_pts( p1, p2, p3 )
+
+circumcenter=blue_circumcenter
+
+
+################## omega triangle
 
 def omega_triangle( tri ):
 	o0 = red_orthocenter( tri )
 	o1 = green_orthocenter( tri )
 	o2 = blue_orthocenter( tri )
 	return triangle( o0, o1, o2 )
+
+def circum_triangle( tri ):
+	c0 = red_circumcenter( tri )
+	c1 = green_circumcenter( tri )
+	c2 = blue_circumcenter( tri )
+	return triangle( c0, c1, c2 )
 
 
 
@@ -852,7 +1309,7 @@ def projective_form_txt( pf ):
 	return s
 
 def triangle_txt( tri ):
-	spreads = 'spreads:'+str(tri.s0)+','+str(tri.s1)+','+str(tri.s2)
+	spreads = str(tri.s0)+','+str(tri.s1)+','+str(tri.s2)
 	line_eqns = str(tri.l0)+','+str(tri.l1)+','+str(tri.l2)
 	linesegs = str(tri.ls0)+' '+str(tri.ls1)+' '+str(tri.ls2)
 	points = str(tri.p0)+','+str(tri.p1)+','+str(tri.p2)
@@ -888,10 +1345,51 @@ def is_parallel( l1, l2):
 def intersection( l1, l2 ):
 	return meet( l1, l2 )
 
+# nice for doing paramterizations
+def blueq( m, n ):
+	return blue_quadrance(point(0,0),point(m,n))
+def redq( m, n ):
+	return red_quadrance(point(0,0),point(m,n))
+def greenq( m, n ):
+	return green_quadrance(point(0,0),point(m,n))
+
 def blue_quadrance_coordinates(x1,y1,x2,y2):
 	return blue_quadrance_coords(x1,y1,x2,y2)
 def red_quadrance_coordinates(x1,y1,x2,y2):
 	return red_quadrance_coords(x1,y1,x2,y2)
 def green_quadrance_coordinates(x1,y1,x2,y2):
 	return green_quadrance_coords(x1,y1,x2,y2)
+
+def blue_quadria(p1,p2,p3):
+	return blue_quadrea(p1,p2,p3)
+def red_quadria(p1,p2,p3):
+	return red_quadrea(p1,p2,p3)
+def green_quadria(p1,p2,p3):
+	return green_quadrea(p1,p2,p3)
+
+
+
+############33 plotting in graphics 
+
+def plot_triangles( triangles ):
+	print len(triangles), 'triangles'
+	import numpy as np
+	import matplotlib.pylab as plt
+	fig,ax = plt.subplots(figsize=(8,8))
+	xs,ys=[],[]
+	for t in triangles:
+		for i in 0,1,2:
+			xs += [float(t[i].x)]
+			ys += [float(t[i].y)]
+	ax.set_xlim([min(xs)-2,max(xs)+2])
+	ax.set_ylim([min(ys)-2,max(ys)+2])
+	for t in triangles:
+		xs,ys=[],[]
+		for i in 0,1,2:
+			xs+=[t[i].x]
+			ys+=[t[i].y]
+		xs += [xs[0]]
+		ys += [ys[0]]
+		ax.plot(xs,ys)
+	plt.show()
 

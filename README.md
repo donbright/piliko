@@ -17,8 +17,8 @@ Disclaimer
 
 Rational Trigonometry was discovered and developed by Norman J 
 Wildberger. He is not affiliated with this package and the use of his 
-terms like Rational Trigonometry, quadrance, spread, etc, doesn't imply 
-that he endorses this package.
+terms here, like Rational Trigonometry, quadrance, spread, etc, doesn't 
+imply that he endorses this package.
 
 * https://www.youtube.com/user/njwildberger
 * http://web.maths.unsw.edu.au/~norman/
@@ -50,7 +50,7 @@ command in python:
 Examples
 ========
 
-Example 1:
+Example A:
 
 	from piliko import *
 
@@ -69,7 +69,7 @@ Result:
 	[0,0] [3,0] [0,4]
 	1
 
-Example 2:
+Example B:
 
 	from piliko import *
 
@@ -90,7 +90,7 @@ Result:
 	9 16
 	1
 
-Example 3:
+Example C:
 
 	p1,p2,p3,p4 = point(0,0),point(3,0),point(2,0),point(6,0)
 	print is_harmonic_range( p1, p2, p3, p4 )
@@ -99,7 +99,7 @@ Result:
 
 	True
 
-Example 4:
+Example D:
 
 	p=point(3,4)
 	bq,rq,gq=blue_quadrance(p),red_quadrance(p),green_quadrance(p)
@@ -109,9 +109,10 @@ Result:
 
 	[3,4]   25 -7 24   625 49 576
 
-More examples can be found in test.py. To run it:
+More examples can be found in the files named example01.py, example02.py, etc
+To run them:
 
-	python test.py
+	python example01.py
 
 Basic principle
 ===============
@@ -160,7 +161,7 @@ choosing between methods of approximation. Rational approximation is
 just another approximation method. However it has some advantages in 
 that, as described, it is closed under division, so you can scale 
 objects without loss of information, inside of your 'engine', before you 
-actually have to output them. And rational points on a circle, form 
+actually have to output them. And rational points on a circle form 
 pythagorean triples, so they have an exact distance from the center, not 
 an approximate distance. Like the point 3,4 is exactly 5 from the 
 center.
