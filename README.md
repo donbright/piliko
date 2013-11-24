@@ -59,6 +59,8 @@ Example A:
 	p3 = point(0,4)
 	print p1,p2,p3
 
+	print quadrance(p1, p2)
+
 	L1 = line( p1, p2 )
 	L2 = line( p1, p3 )
 	s = spread( L1, L2 )
@@ -67,6 +69,7 @@ Example A:
 Result:
 
 	[0,0] [3,0] [0,4]
+	9
 	1
 
 Example B:
@@ -76,18 +79,12 @@ Example B:
 	v1 = vector(3,0)
 	v2 = vector(0,4)
 	print v1, v2
-
-	q1 = quadrance( v1 )
-	q2 = quadrance( v2 )
-	print q1, q2
-
 	s = spread( v1, v2 )
 	print s
 
 Result:
 
 	(3,0) (0,4)
-	9 16
 	1
 
 Example C:
@@ -123,12 +120,13 @@ some of them.
 Basic principle
 ===============
 
-The Rational numbers, unlike finite floating point numbers, are closed 
-under addition, subtraction, multiplication, and division. This makes 
-them uniquely suited to geometry, as many geometry packages have proven 
-(including CGAL and LEDA). Why? Because many of the basic geometry 
-operations, including scale, translate, boolean, intersection, etc, are 
-doable in algebra using only plus, minus, multiply, and divide.
+The Rational numbers implemented with Big Integers, unlike finite 
+floating point numbers, are closed under addition, subtraction, 
+multiplication, and division. This makes them uniquely suited to 
+geometry, as many geometry packages have proven (including CGAL and 
+LEDA). Why? Because many of the basic geometry operations, including 
+scale, translate, boolean, intersection, etc, are doable in algebra 
+using only plus, minus, multiply, and divide.
 
 Therefore no approximation is required to perform these basic 
 operations, which means the issue of floating-point error disappears.
@@ -161,10 +159,20 @@ approximation of the circle). Even the length of the side of a 45-45-90
 or 30-60-90 triangle is lost.
 
 Another huge loss is that you can't add two angles together with simple 
-addition. You have to use 'spread polynomials' instead. Err.. hrm.
+addition. You have to use 'spread polynomials' instead.
 
 What is approximation
 =====================
+
+In the end, there is no 'exact' circle in a computer, so you are just 
+choosing between methods of approximation. Rational approximation is 
+just another approximation method. However it has some advantages in 
+that, as described, it is closed under division, so you can scale 
+objects without loss of information, inside of your 'engine', before you 
+actually have to output them. And rational points on a circle form 
+pythagorean triples, so they have an exact distance from the center, not 
+an approximate distance. Like the point 3,4 is exactly 5 from the 
+center.
 
 The term 'approximate' here means that the curves that are usually 
 approximated with floating point approximations of transcendental 
@@ -181,17 +189,6 @@ are probably going to be either ASCII decimal points, which is simply a series o
 powers of ten (3.125 = 3/10^0 + 1/10^1 + 2/10^2 + 5/10^1000) or some binary
 format, which is just a series of powers of two (11010.1010 = 2^4+2^3+2^1+2^-1+2^-3)
 
-In the end, there is no 'exact' circle in a computer, so you are just 
-choosing between methods of approximation. Rational approximation is 
-just another approximation method. However it has some advantages in 
-that, as described, it is closed under division, so you can scale 
-objects without loss of information, inside of your 'engine', before you 
-actually have to output them. And rational points on a circle form 
-pythagorean triples, so they have an exact distance from the center, not 
-an approximate distance. Like the point 3,4 is exactly 5 from the 
-center.
-
-
 Slowness
 ========
 
@@ -202,18 +199,20 @@ The big problem is when you chain several computations together. Your
 Rationals are probably using a form of integer called 'big integer' that cannot
 'overflow'. This means if you have some long fraction like 
 
-20367846780390904/4908298173897891821
+909039039020367846780390904/493903903938089890308298173897891821
 
 and it cant be simplified, it will be stored as a special sequence of 
-numbers in the machine. This can easily explode, as you can imagine by 
-just thinking about squaring one of these fractions a few times and 
-adding some number such that there is no simplified form. A good example 
-would be simulating a space ship and planet, with 
-force=g*mass1*mass2/radius^2. Re-calculate that a few dozen times and
-you are looking at hundreds of digits for numbers.
+numbers in the machine. This can grow quite fast and slow the computer 
+to a crawl, as you can imagine by just thinking about squaring one of 
+these fractions a few times and adding some number such that there is no 
+simplified form. A good example would be simulating a space ship and 
+planet, with force=g*mass1*mass2/radius^2. Re-calculate that a few dozen 
+times and you are looking at hundreds of digits for numbers. Where the old
+'floating point' number takes 4 bytes to store, the Big Int rational might take
+dozens of bytes, and be dozens of times slower to multiply.
 
-To maintain the beautiful 'no approximation' feature, you have to store 
-all these digits.
+But to maintain the beautiful 'no approximation' feature of Rationals, 
+you have to store all these digits.
 
 This is fundamentally different from how finite length floating point 
 numbers worked. Or even ordinary finite length integer arithmetic in old 
