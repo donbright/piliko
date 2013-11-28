@@ -36,4 +36,4 @@ print 'triangle:',t
 print 'omega triangle:',ot
 
 plot_triangles([t,ot])
-
+plotshow()

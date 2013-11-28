@@ -40,6 +40,16 @@ def rat( x, y ):
 def sqr( x ):
 	return x*x
 
+def avg( *args ):
+	tot = Fraction(0)
+	for arg in args:
+		tot += arg
+	return Fraction(tot,len(args))
+
+def sign( x ):
+	if x<0: return -1
+	return 1
+
 def checktype( typename, arg ):
 	return isinstance( arg, typename )
 
@@ -57,6 +67,9 @@ def checkrationals( *args ):
 		elif checktypes( tuple, args[i] ):
 			for a in args[i]:
 				if not checkrationals( a ): return False
+		elif checktypes( str, args[i] ):
+			for a in args[i]:
+				if not checkrationals( Fraction(a) ): return False
 		else:
 			return False
 	return True
@@ -219,7 +232,7 @@ class triangle:
 
 	def init_from_lines( self, l0, l1, l2 ):
 		p0,p1,p2 = meet(l1,l2),meet(l0,l2),meet(l0,l1)
-		init_from_points( p0, p1, p2 )
+		self.init_from_points( p0, p1, p2 )
 
 	def init_from_points( self, p0, p1, p2 ):
 		l0,l1,l2 = line(p0,p1),line(p1,p2),line(p2,p0)
@@ -258,9 +271,12 @@ class circle:
 			self.init_from_point_and_radius( args[0], args[1] )
 		elif checktypes(Fraction,args[0]) and checktypes(point,args[1]):
 			self.init_from_point_and_radius( args[1], args[0] )
+		else: raise Exception('need center x,y and radius')
 	def init_from_point_and_radius( self, p, r ):
 		self.center = p
 		self.radius = r
+		if (r!=0): self.curvature = Fraction(1,r)
+		else: self.curvature = None
 	def __str__( self ):
 		return circle_txt(self)
 
@@ -917,7 +933,7 @@ def midpoint_segment( lseg ):
 def midpoint(*args):
 	if checktypes(point,*args): return midpoint_from_points(args[0],args[1])
 	if checktypes(lineseg,*args): return midpoint_segment(args[0])
-
+	raise Exception('dont know how to do midpoint of given object')
 # bisect a line segment and return the two resulting smaller segments
 def even_split(lseg):
 	mp=midpoint(lseg)
@@ -936,27 +952,28 @@ def concurrent( line1, line2, line3 ):
 	if result==0: return True
 	return False
 
-# are three points collinear?
+# are points collinear?
 def collinear( *args ):
-	for i in range(len(args)):
-		if not isinstance(args[i],point):
-			raise Exception('coolinear() requires points')
-	if len(args)<3: raise Exception('collinear() needs 3 pts or more')
-	p1,p2,p3 = args[0],args[1],args[2]
-	result = eval_asympoly( 'x1*y2', p1,p2,p3 )
-	if result==0: return True
-	return False
-#	l = line(args[0],args[1])
-#	for i in range(2,len(args)):
-#		tmp_point = args[i]
-#		if meet( l, tmp_point ) == None: return False 
-#	return True
+	if checktypes(line,*args):
+		for i in range(0,len(args)):
+			l1 = args[i]
+			l2 = args[(i+1)%len(args)]
+			test += spread(l1,l2)
+			if test != 0: return False
+		return True
+	if checktypes(point,*args):
+		test = 0
+		for i in range(0,len(args),2):
+			p1 = args[i]
+			p2 = args[(i+1)%len(args)]
+			p3 = args[(i+2)%len(args)]
+			test += eval_asympoly( 'x1*y2', p1, p2, p3 )
+			if test != 0: return False
+		return True
 
 def cross( l0, l1 ):
-	checktypes( line, [l0,l1] )
+	if not checktypes( line, [l0,l1] ): raise Exception('cross() needs lines')
 	return 1 - spread( l0, l1 )
-
-
 
 def is_harmonic_pencil_lines( l0, l1, l2, l3 ):
 	# see WildTrig39
@@ -968,7 +985,8 @@ def is_harmonic_range_points( p0, p1, p2, p3 ):
 	# therefore you can determine whether points are a 'harmonic range'
 	# using the squared cross ratio. 
 	if p0 == None or p1 == None or p2 == None or p3 == None: return False
-	return squared_cross_ratio_points( p0, p1, p2, p3 ) == 1
+	if squared_cross_ratio_points( p0, p1, p2, p3 ) == 1: return True
+	return False
 
 def is_harmonic_range( *args ):
 	if not checktypes( point, *args ):
@@ -1077,14 +1095,22 @@ def colored_spread_rhs( l0, l1 ):
 
 ###### anti-symmetric polynomials
 
-# special polynomials used in many areas of geometry, especially chromogeometry
-# generated from an 'input monomial'
+# special polynomials used in many areas of geometry, especially 
+# chromogeometry generated from an 'input monomial' by transposing 
+# subscripts/indexes of variables
 #
 # example:
-# input 'x1y2' returns six terms:
+# input 'x1y2' returns six terms, by transposing '1' and '2' in a pattern:
 # +x1y2 -x1y3 +x2y3 -x3y2 +x3y1 -x2y1
+# this particular sum is twice the signed area of the triangle of the 3 points
 #  
-# given 3 points, these six terms are twice the signed area of the triangle. 
+#
+# The easiest function to use here is eval_asympoly(): 
+#
+# eval_asympoly( 'x1*y2', 3,4, 3,0, 1,-2 ) -> returns 20
+#
+# The other functions are 'helpers'
+
 
 # given: a monomial
 #
@@ -1100,6 +1126,9 @@ def colored_spread_rhs( l0, l1 ):
 # now assign positive and negative: like so: + - + - + -
 
 # examples:
+#
+# input x1y2 returns six terms:
+# +x1y2 -x1y3 +x2y3 -x3y2 +x3y1 -x2y1
 #
 # input x1*x1*x2*y2 returns six terms:
 # +x1*x1*x2*y2 -x1*x1*x3*y3 +x2*x2*x3*y3 -x3*x3*x2*y2 +x3*x3*x1*y1 -x2*x2*x1*y1
@@ -1193,7 +1222,7 @@ def eval_asympoly( *args ):
 		if checktype(point, args[3]):
 			p1,p2,p3=args[1],args[2],args[3]
 			return eval_asympoly_from_points( monomial, p1, p2, p3 )
-	if checktype(Rational, args[1]):
+	if checktype(Fraction, args[1]):
 		x1,y1,x2,y2,x3,y3 = args[1],args[2],args[3],args[4],args[5],args[6]
 		return eval_asympoly_from_rationals( monomial, x1,y1,x2,y2,x3,y3 )
 	if checktype(int, args[1]):
@@ -1277,13 +1306,127 @@ def green_orthocenter( *args ):
 orthocenter=blue_orthocenter
 
 
-def red_centroid( tri ):
-	raise Exception(" not implemented ")
-def green_centroid( tri ):
-	raise Exception(" not implemented ")
-def blue_centroid( tri ):
-	raise Exception(" not implemented ")
+def blue_centroid( t ):
+	x = avg(t.p0.x,t.p1.x,t.p2.x)	
+	y = avg(t.p0.y,t.p1.y,t.p2.y)	
+	return point(x,y)
+def red_centroid( t ):
+	return blue_centroid(t)
+def green_centroid( t ):
+	return blue_centroid(t)
+centroid=blue_centroid
 
+############## bounding box
+
+def bounding_box_circle( c ):
+	xmin = c.center.x-c.radius
+	xmax = c.center.x+c.radius
+	ymin = c.center.y-c.radius
+	ymax = c.center.y+c.radius
+	return point(xmin,ymin),point(xmax,ymax)
+def bounding_box_triangle( t ):
+	xmin = min(t.p0.x,t.p1.x,t.p2.x)
+	ymin = min(t.p0.y,t.p1.y,t.p2.y)
+	xmax = max(t.p0.x,t.p1.x,t.p2.x)
+	ymax = max(t.p0.y,t.p1.y,t.p2.y)
+	return point(xmin,ymin),point(xmax,ymax)
+def bounding_box_triangles( ts ):
+	minp,maxp = bounding_box_triangle(ts[0])
+	tmpbox = bounding_box(minp,maxp)
+	for t in ts: tmpbox.extend(bounding_box_triangle(t))
+	return tmpbox.min,tmpbox.max
+def bounding_box_circles( cs ):
+	minp,maxp = bounding_box_circle(cs[0])
+	tmpbox = bounding_box(minp,maxp)
+	for c in cs: tmpbox.extend(bounding_box_circle(c))
+	return tmpbox.min,tmpbox.max
+def bounding_box_points( pts ):
+	xmin,ymin,xmax,ymax=pts[0].x,pts[0].y,pts[0].x,pts[0].y
+	for p in pts:
+		xmin = min(xmin,p.x)
+		ymin = min(ymin,p.y)
+		xmax = max(xmax,p.x)
+		ymax = max(ymax,p.y)
+	return point(xmin,ymin),point(xmax,ymax)
+def bounding_box_bboxes( boxes ):
+	tmpbox = bounding_box(boxes[0].min,boxes[0].max);
+	for b in boxes:
+		tmpbox.extend( b.min, b.max )
+	return tmpbox.min,tmpbox.max
+def bounding_width( *args ):
+	if checktypes(triangle,args) and len(args==1):
+		minp,maxp = bbox_triangle( args[0] )
+		return Fraction(minp.x+maxp.x,2)
+def bounding_height( *args ):
+	if checktypes(triangle,args) and len(args==1):
+		minp,maxp = bbox_triangle( args[0] )
+		return Fraction(minp.y+maxp.y,2)
+
+class bounding_box:
+	def __init__(self,*args):
+		testmin,testmax = None,None
+		if checktypes(triangle,*args):
+			testmin,testmax = bounding_box_triangles( args )
+		elif checktypes(point,*args):
+			testmin,testmax = bounding_box_points( args )
+		elif checktypes(bounding_box,*args):
+			testmin,testmax = bounding_box_bboxes( args )
+		elif checktypes(circle,*args):
+			testmin,testmax = bounding_box_circles( args )
+		elif checktypes(list,*args):
+			if len(args)==2 and checkrationals(args[0][0]):
+				xs,ys=args[0],args[1]
+				testmin=point(min(xs),min(ys))
+				testmax=point(max(xs),max(ys))
+			else:
+				for l in args:
+					for item in l:
+						self.extend(item)
+					
+		else:
+			raise Exception('unknown types:'+str(args))
+		self.min,self.max = testmin,testmax
+	def extend(self,*args):
+		testmin,testmax=self.min,self.max
+		if checktypes(triangle,*args):
+			testmin,testmax = bounding_box_triangles( args )
+		elif checktypes(point,*args):
+			testmin,testmax = bounding_box_points( args )
+		elif checktypes(bounding_box,*args):
+			testmin,testmax = bounding_box_bboxes( args )
+		elif checktypes(circle,*args):
+			testmin,testmax = bounding_box_circles( args )
+		elif checktypes(list,*args):
+			if len(args)==2 and checkrationals(args[0][0]):
+				xs,ys=args[0],args[1]
+				testmin=point(min(xs),min(ys))
+				testmax=point(max(xs),max(ys))
+			else:
+				for l in args:
+					for item in l:
+						self.extend(item)
+		elif checktypes(tuple,*args):
+			for l in args:
+				for item in l:
+					self.extend(item)
+		else: raise Exception('cannot extend,unknown type',args)
+		self.min.x = min(testmin.x,self.min.x)
+		self.min.y = min(testmin.y,self.min.y)
+		self.max.x = max(testmax.x,self.max.x)
+		self.max.y = max(testmax.y,self.max.y)
+		return self
+	def __add__( self, p): return self.extend( p )
+	def add( self, p): return self.extend( p )
+	def addto( self, p): return self.extend( p )
+	def __str__(self): return bounding_box_txt(self)
+	def width(self): return self.max.x-self.min.x
+	def height(self): return self.max.y-self.min.y
+	def frame(self): # slightly larger box
+		newminx = self.min.x - self.width() * Fraction(5,100)
+		newmaxx = self.max.x + self.width() * Fraction(5,100)
+		newminy = self.min.y - self.height() * Fraction(5,100)
+		newmaxy = self.max.y + self.height() * Fraction(5,100)
+		return point(newminx,newminy),point(newmaxx,newmaxy)
 
 ############ circumcenters
 
@@ -1360,23 +1503,23 @@ circumcenter=blue_circumcenter
 
 
 
-# circumquadrance -> basiclly the square of circumradius.
+# circumradial quadrance -> basiclly the square of circumradius.
 # whats circumradius? the radius of a circle that has all 3 points of the
 # triangle lying exactly on the circle
-def blue_circum_quadrance( tri ):
+def blue_circumradial_quadrance( tri ):
 	p1 = blue_circumcenter( tri )
 	p2 = tri.p0
 	return blue_quadrance_points( p1, p2 )
-def red_circum_quadrance( tri ):
+def red_circumradial_quadrance( tri ):
 	p1 = red_circumcenter( tri )
 	p2 = tri.p0
 	return red_quadrance_points( p1, p2 )
-def green_circum_quadrance( tri ):
+def green_circumradial_quadrance( tri ):
 	p1 = green_circumcenter( tri )
 	p2 = tri.p0
 	return green_quadrance_points( p1, p2 )
 
-circum_quadrance=blue_circum_quadrance
+circumradial_quadrance=blue_circumradial_quadrance
 
 
 
@@ -1503,6 +1646,10 @@ def ninepoint_triangle( tri ):
 
 ##################### render objects into text
 
+def bounding_box_txt( b ):
+	s = '[ ' + str(b.min) + ' , ' + str(b.max) + ' ]'
+	return s
+
 def point_txt( p ):
 	s = '['+str(p.x)+','+str(p.y)
 	if hasattr(p,'z'): s += ',' + str(p.z)
@@ -1536,7 +1683,7 @@ def projective_form_txt( pf ):
 	return s
 
 def circle_txt( c ):
-	s = str('['+str(c.center)+','+str(c.radius)+']')
+	s = str('['+str(c.center)+','+str(c.radius)+'<->'+str(c.curvature)+']')
 	return s
 
 def triangle_txt( tri ):
@@ -1553,7 +1700,143 @@ def triangle_txt( tri ):
 	return s
 
 
-###### convenience - for bad spelling, or just grammatical variatinos
+############################## draw in graphics
+# everything is done with rationals, except for a few
+# calls to ax. functions that require floats.
+
+plotstarted=False
+fig,ax,plt=None,None,None
+plotbbox=None
+
+# call ax plot function 'func', but convert from rationals to floats first
+# example ax_floatplot( [1],[2],ax.scatter) # < scatter plot point at 1,2
+def ax_floatplot( xs, ys, func ):
+	plotbbox.extend( xs,ys )
+	fxs,fys=[],[]
+	for x in xs: fxs += [float(x)]
+	for y in ys: fys += [float(y)]
+	func( xs, ys )
+
+def plotinit( startitem ):
+	global plotstarted,fig,ax,plt,plotbbox
+	if plotstarted: return
+	import numpy as np
+	import matplotlib.pylab as plt
+	fig,ax = plt.subplots(figsize=(8,8))
+	plotstarted = True
+	plotbbox = bounding_box( startitem )
+
+def plotshow():
+	ax.set_aspect(1)
+	fmin,fmax = plotbbox.frame()
+	ax.set_xlim(float(fmin.x),float(fmax.x))
+	ax.set_ylim(float(fmin.y),float(fmax.y))
+	plt.show()
+	
+def plot_triangles( triangles ):
+	plotinit( triangles[0] )
+	print len(triangles), 'triangles'
+	xs,ys=[],[]
+	for t in triangles:
+		xs,ys=[],[]
+		for i in 0,1,2:
+			xs+=[t[i].x]
+			ys+=[t[i].y]
+		xs += [xs[0]]
+		ys += [ys[0]]
+		ax_floatplot(xs,ys,ax.plot)
+
+def plot_points( points ):
+	plotinit( points[0] )
+	print len(points), 'points'
+	xs,ys=[],[]
+	for p in points:
+		xs += [p.x]
+		ys += [p.y]
+	ax_floatplot(xs,ys,ax.scatter) # scatter plot
+
+
+# rational paramterization. 
+def plot_blue_circles( circles ):
+	print len(circles), 'circles'
+	plotinit( circles[0] )
+	xs,ys=[],[]
+	depth=10
+	for c in circles:
+		print c
+		xs,ys=[],[]
+		pdic={}
+		cx,cy,cr=c.center.x,c.center.y,c.radius
+		for m in range(0,depth):
+			for n in range(0,depth):
+				if (blueq(m,n)==0): continue
+				x = cr*Fraction(redq(m,n),blueq(m,n))
+				y = cr*Fraction(greenq(m,n),blueq(m,n))
+				pdic[x]=y
+		sortedkeys = pdic.keys()
+		sortedkeys.sort()
+		# top half
+		for key in sortedkeys:
+			x,y=key,pdic[key]
+			xs += [cx+x]
+			ys += [cy+y]
+		sortedkeys.reverse()
+		# bottom half
+		for key in sortedkeys:
+			x,y=key,pdic[key]
+			xs += [cx+x]
+			ys += [cy-y]
+		ax_floatplot(xs,ys,ax.plot)
+
+# (red circle = hyperbola)
+# rational paramterization.
+#
+# bug - slow on small circles.
+#
+def plot_red_circles( circles ):
+	print len(circles), 'red circles'
+	plotinit( circles[0] )
+	xs,ys=[],[]
+	minx,miny=circles[0].center.x,circles[0].center.y
+	maxx,maxy=minx,miny
+	for c in circles:
+		# the usage of the 'curvature' (1/radius) allows a better plot, so that 
+		# smaller red circles on the same plot will not be tiny tiny little 'x' 
+		# shapes, but instead fill out the plot the same as the bigger red 
+		# circles.
+		depth=5*(1+int(c.curvature))
+		print c, depth
+		xs,ys=[],[]
+		pdic={}
+		cx,cy,cr=c.center.x,c.center.y,c.radius
+		for m in range(0,depth,1+int(c.curvature)):
+			for n in range(-m,m):
+				if (redq(m,n)==0): continue
+				x = cr*Fraction(blueq(m,n),redq(m,n))
+				y = cr*Fraction(greenq(m,n),redq(m,n))
+				pdic[y]=x
+		sortedkeys = pdic.keys()
+		sortedkeys.sort()
+		# right half
+		for key in sortedkeys:
+			y,x=key,pdic[key]
+			xs += [cx+x]
+			ys += [cy+y]
+		ax_floatplot(xs,ys,ax.plot)
+		# left half
+		xs,ys=[],[]
+		for key in sortedkeys:
+			y,x=key,pdic[key]
+			xs += [cx-x]
+			ys += [cy+y]
+		ax_floatplot(xs,ys,ax.plot)
+
+plot_circles = plot_blue_circles
+
+
+
+####################################3 shortcuts and conveniene functions
+############ for the spelling challenged, frogetful, and inebriated
 
 def is_paralell( l1, l2):
 	return is_parallel( l1, l2 )
@@ -1598,79 +1881,12 @@ def red_quadria(p1,p2,p3):
 def green_quadria(p1,p2,p3):
 	return green_quadrea(p1,p2,p3)
 
-
-
-############33 plotting in graphics 
-
-def plot_triangles( triangles ):
-	print len(triangles), 'triangles'
-	import numpy as np
-	import matplotlib.pylab as plt
-	fig,ax = plt.subplots(figsize=(8,8))
-	xs,ys=[],[]
-	for t in triangles:
-		for i in 0,1,2:
-			xs += [float(t[i].x)]
-			ys += [float(t[i].y)]
-	ax.set_xlim([min(xs)-2,max(xs)+2])
-	ax.set_ylim([min(ys)-2,max(ys)+2])
-	for t in triangles:
-		xs,ys=[],[]
-		for i in 0,1,2:
-			xs+=[t[i].x]
-			ys+=[t[i].y]
-		xs += [xs[0]]
-		ys += [ys[0]]
-		ax.plot(xs,ys)
-	plt.show()
-
-
-def plot_circles( circles ):
-	print len(circles), 'circles'
-	import numpy as np
-	import matplotlib.pylab as plt
-	fig,ax = plt.subplots(figsize=(8,8))
-	xs,ys=[],[]
-	depth=10
-	# rational paramterization. only have to convert to floats for
-	# the plotter.
-	minx,miny=circles[0].center.x,circles[0].center.y
-	maxx,maxy=minx,miny
-	for c in circles:
-		xs,ys=[],[]
-		pdic={}
-		cx,cy,cr=c.center.x,c.center.y,c.radius
-		for m in range(0,depth):
-			for n in range(0,depth):
-				if (blueq(m,n)==0): continue
-				x = cr*Fraction(redq(m,n),blueq(m,n))
-				y = cr*Fraction(greenq(m,n),blueq(m,n))
-				pdic[x]=y
-		sortkeys = pdic.keys()
-		sortkeys.sort()
-		# top half
-		for key in sortkeys:
-			x,y=key,pdic[key]
-			xs += [float(cx+x)]
-			ys += [float(cy+y)]
-		sortkeys.reverse()
-		# bottom half
-		for key in sortkeys:
-			x,y=key,pdic[key]
-			xs += [float(cx+x)]
-			ys += [float(cy-y)]
-		ax.plot(xs,ys)
-		minx=min(min(xs),minx)
-		miny=min(min(ys),miny)
-		maxx=max(max(xs),maxx)
-		maxy=max(max(ys),maxy)
-	wx = maxx-minx
-	hy = maxy-miny
-	ax.set_xlim([minx-wx*0.05,maxx+wx*0.05])
-	ax.set_ylim([miny-hy*0.05,maxy+hy*0.05])
-	ax.set_aspect(1)
-	print ax.__doc__
-	plt.show()
+def blue_circum_center( tri ):
+	return blue_circumcenter( tri )
+def red_circum_center( tri ):
+	return red_circumcenter( tri )
+def green_circum_center( tri ):
+	return green_circumcenter( tri )
 
 
 def plotcircles(circs): plot_circles(circs)
@@ -1686,3 +1902,11 @@ def draw_circle(circ): plot_circles([circ])
 def drawtriangles(tris): plot_triangles(tris)
 def drawtriangle(tri): plot_triangles([tri])
 def draw_triangle(tri): plot_triangles([tri])
+
+def plotpoints(circs): plot_points(circs)
+def plotpoint(circ): plot_points([circ])
+def plot_point(circ): plot_points([circ])
+def drawpoints(circs): plot_points(circs)
+def drawpoint(circ): plot_points([circ])
+def draw_point(circ): plot_points([circ])
+

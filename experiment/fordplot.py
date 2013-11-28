@@ -1,5 +1,8 @@
 from piliko import *
 
+# plot the Ford Circles
+# (Tangent circles to each other and the y axis)
+
 def fordcircle( xcoord ):
 	radius = Fraction(1,2*sqr(xcoord.denominator))
 	xcenter,ycenter = xcoord,radius
@@ -28,3 +31,5 @@ for i in range(0,depth):
 for c in circs:
 	print c
 plot_circles( circs )
+plotshow()
+

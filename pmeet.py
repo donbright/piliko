@@ -1,5 +1,8 @@
 from fractions import Fraction
 
+# polygon intersection.. doesnt work.
+
+
 # assume - input polys are clockwise-ordered set of 3 or more points
 # assume - points are using rational numbers for coordinates (Fractions)
 # assume - polygons are simple

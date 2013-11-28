@@ -33,10 +33,12 @@ l4 = line(random.randint(-10,10),random.randint(-10,10),random.randint(-10,10))
 m0,m1,m2,m3 = meet(l4,l0), meet(l4,l1), meet(l4,l2), meet(l4,l3)
 print 'points m0,m1,m2,m3:',m0,m1,m2,m3
 print 'squared cross ratio ( m0,m1,m2,m3 ):',squared_cross_ratio(m0,m1,m2,m3)
+print 'collinear?',collinear(p1,p2,p3,p4)
 print 'harmonic range?:', is_harmonic_range_points( m0,m1,m2,m3 )
 
 print
 p1,p2,p3,p4 = point(0,0),point(Fraction(1,2),0),point(Fraction(1,3),0),point(1,0)
 print 'p1,p2,p3,p4',p1,p2,p3,p4
 print 'squared cross ratio:', squared_cross_ratio( p1, p2, p3, p4 )
+print 'collinear?',collinear(p1,p2,p3,p4)
 print 'harmonic range?:', is_harmonic_range_points( p1, p2, p3, p4 )
