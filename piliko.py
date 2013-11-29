@@ -257,26 +257,33 @@ class triangle:
 		if i==1: self.p1 = value
 		if i==2: self.p2 = value
 
+# circles are a bit different here. since the radius is not always rational
+# even between two rational points, we instead store the 'radial quadrance',
+# which is always rational between two rational points.
+#
+# in general, the hope is to avoid functions that require the use of radius.
+# but in cases where we do need it, like plotting a graphical represnetation
+# of the circle, please see the sqrt_bounds() function elsewhere in this code
 class circle:
 	def __init__(self, *args):
-		if (len(args)<2): raise Exception('need center x,y and radius')
+		if (len(args)<2): raise Exception('need center x,y and radial quadrance')
 		if checkrationals(*args) and len(args)>=3:
 			p = point(args[0],args[1])
-			self.init_from_point_and_radius( p, args[2] )
+			self.init_from_point_and_radial_q( p, args[2] )
 		elif checktypes(point,args[0]) and checktypes(int,args[1]):
-			self.init_from_point_and_radius( args[0], args[1] )
+			self.init_from_point_and_radial_q( args[0], args[1] )
 		elif checktypes(int,args[0]) and checktypes(point,args[1]):
-			self.init_from_point_and_radius( args[1], args[0] )
+			self.init_from_point_and_radial_q( args[1], args[0] )
 		elif checktypes(point,args[0]) and checktypes(Fraction,args[1]):
-			self.init_from_point_and_radius( args[0], args[1] )
+			self.init_from_point_and_radial_q( args[0], args[1] )
 		elif checktypes(Fraction,args[0]) and checktypes(point,args[1]):
-			self.init_from_point_and_radius( args[1], args[0] )
-		else: raise Exception('need center x,y and radius')
-	def init_from_point_and_radius( self, p, r ):
+			self.init_from_point_and_radial_q( args[1], args[0] )
+		else: raise Exception('need center x,y and radial quadrance')
+	def init_from_point_and_radial_q( self, p, rq ):
 		self.center = p
-		self.radius = r
-		if (r!=0): self.curvature = Fraction(1,r)
-		else: self.curvature = None
+		self.radial_quadrance = rq
+		if (rq!=0): self.curvature_quadrance = Fraction(1,rq)
+		else: self.curvature_quadrance = None
 	def __str__( self ):
 		return circle_txt(self)
 
@@ -910,6 +917,8 @@ def green_quadrea( *args ):
 
 quadrea = blue_quadrea
 
+
+
 ############################## misc stuff
 
 # translate a triangle by a vector. example, triangle 0,0 1,0 0,1 by vector 2,0
@@ -1319,10 +1328,10 @@ centroid=blue_centroid
 ############## bounding box
 
 def bounding_box_circle( c ):
-	xmin = c.center.x-c.radius
-	xmax = c.center.x+c.radius
-	ymin = c.center.y-c.radius
-	ymax = c.center.y+c.radius
+	xmin = c.center.x-sqrt_bounds(c.radial_quadrance)[0]
+	xmax = c.center.x+sqrt_bounds(c.radial_quadrance)[0]
+	ymin = c.center.y-sqrt_bounds(c.radial_quadrance)[0]
+	ymax = c.center.y+sqrt_bounds(c.radial_quadrance)[0]
 	return point(xmin,ymin),point(xmax,ymax)
 def bounding_box_triangle( t ):
 	xmin = min(t.p0.x,t.p1.x,t.p2.x)
@@ -1641,8 +1650,76 @@ def ninepoint_triangle( tri ):
 
 
 
+############## square root bounds
+### the square root of a rational number is often irrational. 
+### these routines provide rational 'bounds' that guarantee the irrational
+### square root is 'between' them, as such. 
+### 
+### there is also a 'is perfect square?' test function
+###
+### we ignore negative roots here.
 
+# return [r1, r2] such that the sqrt(s) is guaranteed to be between them
+def square_root_rough_bounds( s ):
+	bitlength = int(Fraction(s.bit_length(),2))
+	guess = 2
+	for i in range(0,bitlength-1): guess *= 2
+	return guess,guess*2
 
+# return r1 such that int( r1 squared ) = s
+def babylonian_square_root_int( s, maxdepth=10, firstguess=1 ):
+	guesses = [firstguess]
+	for i in range(1,maxdepth):
+		lastguess = guesses[i-1]
+		newguess = avg(lastguess,Fraction(s,lastguess))
+		if sqr(int(newguess))==s:
+			newguess=int(newguess) # perfect sqr
+		if int(sqr(newguess))==int(sqr(lastguess)): break
+		guesses += [newguess]
+	return guesses[-1]
+
+# return [r1, r2] such that the sqrt(s) is guaranteed to be between them
+# annnnd such that int(r1 squared) == int(r2 squared) == s 
+# perfect squares's integer roots are detected and returned exactly.
+def babylonian_square_root_bounds_for_int( s, maxdepth=10 ):
+	# Thanks Wikipedia! Thanks Babylonians!
+	lowerguess, upperguess = square_root_rough_bounds( s )
+	lowerbound = babylonian_square_root_int( s, maxdepth, lowerguess )
+	higherbound = babylonian_square_root_int( s, maxdepth, upperguess )
+	return lowerbound,higherbound
+
+# return [r1, r2] such that the sqrt(s) is guaranteed to be between them.
+# how close is the approximation? i dont know. the numerator and 
+# denominator are approximated separately with 
+# babyloian_square_root_bounds_for_int() and then combined together in a 
+# single fraction. 
+#
+# perfect squares are detected and returned exactly.
+def babylonian_square_root_bounds_for_fraction( s, maxdepth=10 ):
+	boundsn=babylonian_square_root_bounds_for_int( s.numerator, maxdepth )
+	boundsd=babylonian_square_root_bounds_for_int( s.denominator, maxdepth )
+	lower_numer,higher_numer = (boundsn[0]),(boundsn[1])
+	lower_denom,higher_denom = (boundsd[0]),(boundsd[1])
+	if s<1:
+		lowbound = Fraction(lower_numer,lower_denom)
+		highbound = Fraction(higher_numer,higher_denom)
+	elif s>1:
+		lowbound = Fraction(higher_numer,higher_denom)
+		highbound = Fraction(lower_numer,lower_denom)
+	else:
+		lowbound = 1
+		highbound = 1
+	return lowbound,highbound
+
+def is_perfect_square(s):
+	lo,hi = babylonian_square_root_bounds(s)
+	return lo==hi
+
+def babylonian_square_root_bounds( s, maxdepth=10 ):
+	return babylonian_square_root_bounds_for_fraction( Fraction(s) )
+
+def sqrt_bounds( s ):
+	return babylonian_square_root_bounds( s )
 
 ##################### render objects into text
 
@@ -1683,7 +1760,7 @@ def projective_form_txt( pf ):
 	return s
 
 def circle_txt( c ):
-	s = str('['+str(c.center)+','+str(c.radius)+'<->'+str(c.curvature)+']')
+	s = str('['+str(c.center)+','+str(c.radial_quadrance)+'<->'+str(c.curvature_quadrance)+']')
 	return s
 
 def triangle_txt( tri ):
@@ -1766,12 +1843,13 @@ def plot_blue_circles( circles ):
 		print c
 		xs,ys=[],[]
 		pdic={}
-		cx,cy,cr=c.center.x,c.center.y,c.radius
+		cx,cy,cr=c.center.x,c.center.y,sqrt_bounds(c.radial_quadrance)[0]
 		for m in range(0,depth):
 			for n in range(0,depth):
 				if (blueq(m,n)==0): continue
 				x = cr*Fraction(redq(m,n),blueq(m,n))
 				y = cr*Fraction(greenq(m,n),blueq(m,n))
+				#print 'x,y,x^2+y^2',x,y,x*x+y*y
 				pdic[x]=y
 		sortedkeys = pdic.keys()
 		sortedkeys.sort()
@@ -1790,45 +1868,83 @@ def plot_blue_circles( circles ):
 
 # (red circle = hyperbola)
 # rational paramterization.
-#
-# bug - slow on small circles.
-#
+def plot_red_circle_core( cx, cy, cr, depth ):
+	pdic={}
+	xs,ys=[],[]
+	for m in range(0,depth):
+		for n in range(-m,m):
+			if (redq(m,n)==0): continue
+			x = cr*Fraction(blueq(m,n),redq(m,n))
+			y = cr*Fraction(greenq(m,n),redq(m,n))
+			#print 'x,y,x^2-y^2',x,y,x*x-y*y
+			pdic[y]=x
+	sortedkeys = pdic.keys()
+	sortedkeys.sort()
+	# right half
+	for key in sortedkeys:
+		y,x=key,pdic[key]
+		xs += [cx+x]
+		ys += [cy+y]
+	ax_floatplot(xs,ys,ax.plot)
+	# left half
+	xs,ys=[],[]
+	for key in sortedkeys:
+		y,x=key,pdic[key]
+		xs += [cx-x]
+		ys += [cy+y]
+	ax_floatplot(xs,ys,ax.plot)
+
+# (red circle = hyperbola)
 def plot_red_circles( circles ):
 	print len(circles), 'red circles'
 	plotinit( circles[0] )
-	xs,ys=[],[]
-	minx,miny=circles[0].center.x,circles[0].center.y
-	maxx,maxy=minx,miny
 	for c in circles:
-		# the usage of the 'curvature' (1/radius) allows a better plot, so that 
-		# smaller red circles on the same plot will not be tiny tiny little 'x' 
-		# shapes, but instead fill out the plot the same as the bigger red 
-		# circles.
-		depth=5*(1+int(c.curvature))
-		print c, depth
-		xs,ys=[],[]
+		depth=5
+		cx,cy=c.center.x,c.center.y
+		crlo = sqrt_bounds(c.radial_quadrance)[0]
+		crhi = sqrt_bounds(c.radial_quadrance)[1]
+		plot_red_circle_core( cx, cy, crlo, depth )
+		if crlo!=crhi: plot_red_circle_core( cx, cy, crhi, depth )
+			
+
+# (green circle = hyperbola)
+# rational paramterization.
+#
+# bug - slow on small circles.
+#
+def plot_green_circles( circles ):
+	print len(circles), 'green circles'
+	plotinit( circles[0] )
+	xs,ys=[],[]
+	for c in circles:
+		depth=10
 		pdic={}
-		cx,cy,cr=c.center.x,c.center.y,c.radius
-		for m in range(0,depth,1+int(c.curvature)):
-			for n in range(-m,m):
-				if (redq(m,n)==0): continue
-				x = cr*Fraction(blueq(m,n),redq(m,n))
-				y = cr*Fraction(greenq(m,n),redq(m,n))
-				pdic[y]=x
+		cx,cy,cr=c.center.x,c.center.y,sqrt_bounds(c.radial_quadrance)[0]
+		print cx,cy,cr
+		for m in range(0,depth):
+			for n in range(0,2*depth):
+				if (greenq(m,n)==0): continue
+				x = Fraction(m,n)
+				y = Fraction(n,2*m)
+				#print '2xy',x,y,2*x*y
+				x = cr*x
+				y = cr*y
+				pdic[x]=y
 		sortedkeys = pdic.keys()
 		sortedkeys.sort()
 		# right half
+		xs,ys=[],[]
 		for key in sortedkeys:
-			y,x=key,pdic[key]
+			x,y=key,pdic[key]
 			xs += [cx+x]
 			ys += [cy+y]
 		ax_floatplot(xs,ys,ax.plot)
-		# left half
+		# right half
 		xs,ys=[],[]
 		for key in sortedkeys:
-			y,x=key,pdic[key]
+			x,y=key,pdic[key]
 			xs += [cx-x]
-			ys += [cy+y]
+			ys += [cy-y]
 		ax_floatplot(xs,ys,ax.plot)
 
 plot_circles = plot_blue_circles

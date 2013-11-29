@@ -6,7 +6,7 @@ from piliko import *
 def fordcircle( xcoord ):
 	radius = Fraction(1,2*sqr(xcoord.denominator))
 	xcenter,ycenter = xcoord,radius
-	return circle(point(xcenter,ycenter),radius)
+	return circle(point(xcenter,ycenter),sqr(radius))
 
 def nextcircle( circ1, circ2 ):
 	a = circ1.center.x.numerator
