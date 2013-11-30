@@ -1051,6 +1051,25 @@ def triple_quad_lhs( q0, q1, q2 ):
 def triple_quad_rhs( q0, q1, q2 ):
 	return 2*( q0*q0 + q1*q1 + q2*q2 )
 
+
+def quadruple_quad( *args ):
+	if checkrationals(*args):
+		return quadruple_quad_rationals(args[0],args[1],args[2],args[3])
+	elif checktypes(list,*args) and len(args)==1:
+		l = args[0]
+		if len(l)==4:
+			return quadruple_quad_rationals(l[0],l[1],l[2],l[3])
+		else:
+			raise Exception('need 4 rationals or a list of 4 rationals')
+	else: 
+		raise Exception('need 4 rationals or a list of 4 rationals')
+
+def quadruple_quad_rationals( a, b, c, d):
+	term0 = sqr( a + b + c + d )
+	term1 = -2 * ( a*a + b*b + c*c + d*d )
+	term2 = sqr( term0 + term1 ) - 64*a*b*c*d
+	return term2
+
 def quadruple_quad_lhs( q0, q1, q2, q3 ):
 	term0 = sqr( q0 + q1 + q2 + q3 )
 	term1 = q0*q0 + q1*q1 + q2*q2 + q3*q3
@@ -1806,14 +1825,17 @@ def plot_triangles( triangles ):
 		ys += [ys[0]]
 		ax_floatplot(xs,ys,ax.plot)
 
-def plot_points( points ):
-	plotinit( points[0] )
-	print len(points), 'points'
-	xs,ys=[],[]
-	for p in points:
-		xs += [p.x]
-		ys += [p.y]
-	ax_floatplot(xs,ys,ax.scatter) # scatter plot
+def plot_points( *args ):
+	if checktypes(point,*args):
+		plotinit( args[0] )
+		print len( args ), 'points'
+		xs,ys=[],[]
+		for p in args:
+			xs += [p.x]
+			ys += [p.y]
+		ax_floatplot(xs,ys,ax.scatter) # scatter plot
+	elif checktypes(list,*args):
+		plot_points(*args[0])
 
 def plot_blue_circle_w_radius( cx, cy, cr, depth ):
 	pdic={}
