@@ -261,9 +261,10 @@ class triangle:
 # even between two rational points, we instead store the 'radial quadrance',
 # which is always rational between two rational points.
 #
-# in general, the hope is to avoid functions that require the use of radius.
-# but in cases where we do need it, like plotting a graphical represnetation
-# of the circle, please see the sqrt_bounds() function elsewhere in this code
+# in general, the hope is to avoid functions that require the use of 
+# radius. but in cases where we do need it, like plotting a graphical 
+# represnetation of the circle, please see the bablyonian_square_root() 
+# function elsewhere in this code
 class circle:
 	def __init__(self, *args):
 		if (len(args)<2): raise Exception('need center x,y and radial quadrance')
@@ -1328,11 +1329,12 @@ centroid=blue_centroid
 ############## bounding box
 
 def bounding_box_circle( c ):
-	xmin = c.center.x-sqrt_bounds(c.radial_quadrance)[0]
-	xmax = c.center.x+sqrt_bounds(c.radial_quadrance)[0]
-	ymin = c.center.y-sqrt_bounds(c.radial_quadrance)[0]
-	ymax = c.center.y+sqrt_bounds(c.radial_quadrance)[0]
+	xmin = c.center.x-babylonian_square_root(abs(c.radial_quadrance))
+	xmax = c.center.x+babylonian_square_root(abs(c.radial_quadrance))
+	ymin = c.center.y-babylonian_square_root(abs(c.radial_quadrance))
+	ymax = c.center.y+babylonian_square_root(abs(c.radial_quadrance))
 	return point(xmin,ymin),point(xmax,ymax)
+
 def bounding_box_triangle( t ):
 	xmin = min(t.p0.x,t.p1.x,t.p2.x)
 	ymin = min(t.p0.y,t.p1.y,t.p2.y)
@@ -1660,67 +1662,48 @@ def ninepoint_triangle( tri ):
 ### we ignore negative roots here.
 
 # return [r1, r2] such that the sqrt(s) is guaranteed to be between them
-def square_root_rough_bounds( s ):
-	bitlength = int(Fraction(s.bit_length(),2))
-	guess = 2
-	for i in range(0,bitlength-1): guess *= 2
+def square_root_rough_bounds_int( s ):
+	bitlength = int(Fraction(s.bit_length()-1,2))
+	guess = 1
+	for i in range(0,bitlength): guess *= 2
 	return guess,guess*2
 
-# return r1 such that int( r1 squared ) = s
-def babylonian_square_root_int( s, maxdepth=10, firstguess=1 ):
-	guesses = [firstguess]
+# return rational approximation of square root using Babylonian's method
+# iterate for maxdepth itersations or until answer>maxbits. 
+def babylonian_square_root_int( s, maxdepth=10, maxbits=256, firstguess=1 ):
+	guesses=[firstguess]
 	for i in range(1,maxdepth):
 		lastguess = guesses[i-1]
 		newguess = avg(lastguess,Fraction(s,lastguess))
-		if sqr(int(newguess))==s:
-			newguess=int(newguess) # perfect sqr
-		if int(sqr(newguess))==int(sqr(lastguess)): break
+		if lastguess==newguess: break
+		if sqr(int(newguess))==s: # perfect square
+			guesses += [ int(newguess) ]
+			break
+		# prevent digit ballooning and Big Int freezing
+		if (newguess.numerator.bit_length()+newguess.denominator.bit_length())>maxbits:
+			break
 		guesses += [newguess]
+	#print 'guesses for root of ',s,float(s)
+	#for g in guesses: print ' ',g,float(g),float(g*g)
 	return guesses[-1]
 
-# return [r1, r2] such that the sqrt(s) is guaranteed to be between them
-# annnnd such that int(r1 squared) == int(r2 squared) == s 
-# perfect squares's integer roots are detected and returned exactly.
-def babylonian_square_root_bounds_for_int( s, maxdepth=10 ):
-	# Thanks Wikipedia! Thanks Babylonians!
-	lowerguess, upperguess = square_root_rough_bounds( s )
-	lowerbound = babylonian_square_root_int( s, maxdepth, lowerguess )
-	higherbound = babylonian_square_root_int( s, maxdepth, upperguess )
-	return lowerbound,higherbound
-
-# return [r1, r2] such that the sqrt(s) is guaranteed to be between them.
-# how close is the approximation? i dont know. the numerator and 
-# denominator are approximated separately with 
-# babyloian_square_root_bounds_for_int() and then combined together in a 
-# single fraction. 
-#
-# perfect squares are detected and returned exactly.
-def babylonian_square_root_bounds_for_fraction( s, maxdepth=10 ):
-	boundsn=babylonian_square_root_bounds_for_int( s.numerator, maxdepth )
-	boundsd=babylonian_square_root_bounds_for_int( s.denominator, maxdepth )
-	lower_numer,higher_numer = (boundsn[0]),(boundsn[1])
-	lower_denom,higher_denom = (boundsd[0]),(boundsd[1])
-	if s<1:
-		lowbound = Fraction(lower_numer,lower_denom)
-		highbound = Fraction(higher_numer,higher_denom)
-	elif s>1:
-		lowbound = Fraction(higher_numer,higher_denom)
-		highbound = Fraction(lower_numer,lower_denom)
-	else:
-		lowbound = 1
-		highbound = 1
-	return lowbound,highbound
+def babylonian_square_root_for_fraction( s, maxdepth=10,maxbits=256 ):
+	lo_n,hi_n = square_root_rough_bounds_int( s.numerator )
+	lo_d,hi_d = square_root_rough_bounds_int( s.denominator )
+	numer=babylonian_square_root_int( s.numerator, maxdepth, maxbits, lo_n )
+	denom=babylonian_square_root_int( s.denominator, maxdepth, maxbits, lo_d )
+	return Fraction(numer,denom)
 
 def is_perfect_square(s):
-	lo,hi = babylonian_square_root_bounds(s)
-	return lo==hi
+	x = babylonian_square_root(s)
+	if x*x==s: return True
+	return False
 
-def babylonian_square_root_bounds( s, maxdepth=10 ):
-	return babylonian_square_root_bounds_for_fraction( Fraction(s) )
-
-def sqrt_bounds( s ):
-	return babylonian_square_root_bounds( s )
-
+# return rational approximation of square root of s
+def babylonian_square_root( s, maxdepth=10, maxbits=256 ):
+	if s<0: raise Exception('sqrt -1 aint rational')
+	return babylonian_square_root_for_fraction( Fraction(s),maxdepth,maxbits )
+	
 ##################### render objects into text
 
 def bounding_box_txt( b ):
@@ -1832,6 +1815,30 @@ def plot_points( points ):
 		ys += [p.y]
 	ax_floatplot(xs,ys,ax.scatter) # scatter plot
 
+def plot_blue_circle_w_radius( cx, cy, cr, depth ):
+	pdic={}
+	xs,ys=[],[]
+	for m in range(0,depth):
+		for n in range(0,depth):
+			if (blueq(m,n)==0): continue
+			x = cr*Fraction(redq(m,n),blueq(m,n))
+			y = cr*Fraction(greenq(m,n),blueq(m,n))
+			#print 'x,y,x^2+y^2',x,y,x*x+y*y
+			pdic[x]=y
+	sortedkeys = pdic.keys()
+	sortedkeys.sort()
+	# top half
+	for key in sortedkeys:
+		x,y=key,pdic[key]
+		xs += [cx+x]
+		ys += [cy+y]
+	sortedkeys.reverse()
+	# bottom half
+	for key in sortedkeys:
+		x,y=key,pdic[key]
+		xs += [cx+x]
+		ys += [cy-y]
+	ax_floatplot(xs,ys,ax.plot)
 
 # rational paramterization. 
 def plot_blue_circles( circles ):
@@ -1840,38 +1847,17 @@ def plot_blue_circles( circles ):
 	xs,ys=[],[]
 	depth=10
 	for c in circles:
-		print c
-		xs,ys=[],[]
-		pdic={}
-		cx,cy,cr=c.center.x,c.center.y,sqrt_bounds(c.radial_quadrance)[0]
-		for m in range(0,depth):
-			for n in range(0,depth):
-				if (blueq(m,n)==0): continue
-				x = cr*Fraction(redq(m,n),blueq(m,n))
-				y = cr*Fraction(greenq(m,n),blueq(m,n))
-				#print 'x,y,x^2+y^2',x,y,x*x+y*y
-				pdic[x]=y
-		sortedkeys = pdic.keys()
-		sortedkeys.sort()
-		# top half
-		for key in sortedkeys:
-			x,y=key,pdic[key]
-			xs += [cx+x]
-			ys += [cy+y]
-		sortedkeys.reverse()
-		# bottom half
-		for key in sortedkeys:
-			x,y=key,pdic[key]
-			xs += [cx+x]
-			ys += [cy-y]
-		ax_floatplot(xs,ys,ax.plot)
+		depth=8
+		cx,cy=c.center.x,c.center.y
+		crlo = babylonian_square_root(c.radial_quadrance)
+		plot_blue_circle_w_radius( cx, cy, crlo, depth )
 
 # (red circle = hyperbola)
 # rational paramterization.
-def plot_red_circle_core( cx, cy, cr, depth ):
+def plot_red_circle_w_radius( cx, cy, cr, depth ):
 	pdic={}
 	xs,ys=[],[]
-	for m in range(0,depth):
+	for m in range(0,int(Fraction(depth,2))):
 		for n in range(-m,m):
 			if (redq(m,n)==0): continue
 			x = cr*Fraction(blueq(m,n),redq(m,n))
@@ -1895,17 +1881,78 @@ def plot_red_circle_core( cx, cy, cr, depth ):
 	ax_floatplot(xs,ys,ax.plot)
 
 # (red circle = hyperbola)
+# rational paramterization.
+# imaginary radius.... represents red circles with negative radial quadrance.
+# the hyperbola in this case is 'flipped' over the line x=y from the ordinary
+# red circle
+def plot_red_circle_w_imaginary_radius( cx, cy, cr, depth ):
+	pdic={}
+	for m in range(0,int(Fraction(depth,2))):
+		for n in range(-m,m):
+			if (redq(m,n)==0): continue
+			y = cr*Fraction(blueq(m,n),redq(m,n))
+			x = cr*Fraction(greenq(m,n),redq(m,n))
+			#print 'x,y,x^2+y^2',x,y,x*x+y*y
+			pdic[x]=y
+	sortedkeys = pdic.keys()
+	sortedkeys.sort()
+	# top half
+	xs,ys=[],[]
+	for key in sortedkeys:
+		x,y=key,pdic[key]
+		xs += [cx+x]
+		ys += [cy+y]
+	ax_floatplot(xs,ys,ax.plot)
+	# top half
+	xs,ys=[],[]
+	for key in sortedkeys:
+		x,y=key,pdic[key]
+		xs += [cx+x]
+		ys += [cy-y]
+	ax_floatplot(xs,ys,ax.plot)
+
+# (red circle = hyperbola)
 def plot_red_circles( circles ):
 	print len(circles), 'red circles'
 	plotinit( circles[0] )
 	for c in circles:
-		depth=5
+		depth=10
 		cx,cy=c.center.x,c.center.y
-		crlo = sqrt_bounds(c.radial_quadrance)[0]
-		crhi = sqrt_bounds(c.radial_quadrance)[1]
-		plot_red_circle_core( cx, cy, crlo, depth )
-		if crlo!=crhi: plot_red_circle_core( cx, cy, crhi, depth )
-			
+		if c.radial_quadrance>0:
+			crlo = babylonian_square_root(c.radial_quadrance)
+			plot_red_circle_w_radius( cx, cy, crlo, depth )
+		else:
+			crlo = babylonian_square_root(-c.radial_quadrance)
+			plot_red_circle_w_imaginary_radius( cx, cy, crlo, depth )
+
+def plot_green_circle_w_radius( cx, cy, cr ):
+	depth=5
+	pdic={}
+	for m in range(0,depth):
+		for n in range(0,2*depth):
+			if (greenq(m,n)==0): continue
+			x = Fraction(m,n)
+			y = Fraction(n,2*m)
+			#print '2xy',x,y,2*x*y
+			x = cr*x
+			y = cr*y
+			pdic[x]=y
+	sortedkeys = pdic.keys()
+	sortedkeys.sort()
+	# right half
+	xs,ys=[],[]
+	for key in sortedkeys:
+		x,y=key,pdic[key]
+		xs += [cx+x]
+		ys += [cy+y]
+	ax_floatplot(xs,ys,ax.plot)
+	# right half
+	xs,ys=[],[]
+	for key in sortedkeys:
+		x,y=key,pdic[key]
+		xs += [cx-x]
+		ys += [cy-y]
+	ax_floatplot(xs,ys,ax.plot)
 
 # (green circle = hyperbola)
 # rational paramterization.
@@ -1915,37 +1962,11 @@ def plot_red_circles( circles ):
 def plot_green_circles( circles ):
 	print len(circles), 'green circles'
 	plotinit( circles[0] )
-	xs,ys=[],[]
 	for c in circles:
-		depth=10
-		pdic={}
-		cx,cy,cr=c.center.x,c.center.y,sqrt_bounds(c.radial_quadrance)[0]
-		print cx,cy,cr
-		for m in range(0,depth):
-			for n in range(0,2*depth):
-				if (greenq(m,n)==0): continue
-				x = Fraction(m,n)
-				y = Fraction(n,2*m)
-				#print '2xy',x,y,2*x*y
-				x = cr*x
-				y = cr*y
-				pdic[x]=y
-		sortedkeys = pdic.keys()
-		sortedkeys.sort()
-		# right half
-		xs,ys=[],[]
-		for key in sortedkeys:
-			x,y=key,pdic[key]
-			xs += [cx+x]
-			ys += [cy+y]
-		ax_floatplot(xs,ys,ax.plot)
-		# right half
-		xs,ys=[],[]
-		for key in sortedkeys:
-			x,y=key,pdic[key]
-			xs += [cx-x]
-			ys += [cy-y]
-		ax_floatplot(xs,ys,ax.plot)
+		depth=5
+		cx,cy=c.center.x,c.center.y
+		crlo = babylonian_square_root(c.radial_quadrance)
+		plot_green_circle_w_radius( cx, cy, crlo )
 
 plot_circles = plot_blue_circles
 
@@ -1976,12 +1997,21 @@ def intersection( l1, l2 ):
 	return meet( l1, l2 )
 
 # nice for doing paramterizations
-def blueq( m, n ):
-	return blue_quadrance(point(0,0),point(m,n))
-def redq( m, n ):
-	return red_quadrance(point(0,0),point(m,n))
-def greenq( m, n ):
-	return green_quadrance(point(0,0),point(m,n))
+def blueq( *args ):
+	if checktypes(point,*args):
+		return blue_quadrance(point(0,0),args[0])
+	elif checkrationals(*args):
+		return blue_quadrance(point(0,0),point(args[0],args[1]))
+def redq( *args ):
+	if checktypes(point,*args):
+		return red_quadrance(point(0,0),args[0])
+	elif checkrationals(*args):
+		return red_quadrance(point(0,0),point(args[0],args[1]))
+def greenq( *args ):
+	if checktypes(point,*args):
+		return green_quadrance(point(0,0),args[0])
+	elif checkrationals(*args):
+		return green_quadrance(point(0,0),point(args[0],args[1]))
 
 def blue_quadrance_coordinates(x1,y1,x2,y2):
 	return blue_quadrance_coords(x1,y1,x2,y2)
