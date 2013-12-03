@@ -1,6 +1,6 @@
 from piliko import *
 
-# Rational exploration of De Launay triangulation.
+# Rational exploration of De Launay triangulation annnnd refinement.
 
 # Source A: Norman Wildberger's "Chromogeometry", Jun 2008 (& his videos)
 # Source B: Jonathan Shewchuk's "Delaunay Refinement Algorithms
@@ -117,15 +117,12 @@ from piliko import *
 # if the three points of the triangle are rational? 
 #
 # It seems obvious that the Circum Quadrance will be rational in any case,
-# even if the circum-radius is a square root. 
-#
-#
-#
+# even if the circum-radius is a square root. Or... for red 
+# or green circles..Negative!
 #
 # Great. Now what about 'shortest edge'? We want to use 'smallest quadrance'.
 # That is easy enough. Just find the 3 quadrances betwee the triangle's 3 points
 # and you can find the smallest one easily. That is guaranteed to be Rational.
-#
 # 
 # Cool, so now we have our equivalent:
 # The Circumradius-to-shortest-edge ratio becomes
@@ -180,9 +177,10 @@ from piliko import *
 #
 
 # Then, in Shewchuk's language, the 'Key Insight' of Delaunay Refinement
-# is that you can chop out triangles by looking how they compare to B^2.
+# is that you can chop out triangles by looking how they compare to B.
 # 
-# Now, you can define 'Skinny' triangles as those with a CQ-to_SQ B^2igger than B^2.
+# Now, you can define 'Skinny' triangles as those with a CQ-to_SQ Bigger 
+# than B^2.
 #
 
 from random import randint

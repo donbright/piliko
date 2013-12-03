@@ -84,10 +84,10 @@ class point:
 			self.x=args[0][0]
 			self.y=args[0][1]
 			if (len(args)==3): self.z=args[0][2]
-		else:
-			crash_if_nonrationals( args )
+		elif checkrationals( *args ):
 			self.x,self.y=args[0],args[1]
 			if (len(args)==3): self.z=args[2]
+		else: raise Exception( 'cant build point')
 	def __str__( self ):
 		return point_txt(self)
 	def __getitem__( self, i ):
@@ -100,7 +100,12 @@ class point:
 	def __sub__( self, p):
 		v=vector(self)-vector(p)
 		return point(v)
-
+	def __eq__(self, p):
+		if hasattr(p,'z') and hasattr(self,'z'):
+			return self.x==p.x and self.y==p.y and self.z==p.z
+		if hasattr(p,'z') and not hasattr(self,'z'): return False
+		if hasattr(self,'z') and not hasattr(p,'z'): return False
+		return self.x==p.x and self.y==p.y
 class vector:
 	def __init__( self, *args ):
 		if checktype( point,args[0] ):
@@ -123,10 +128,19 @@ class vector:
 		negv = vector( -v.x, -v.y )
 		if hasattr(v,'z'): negv.z = -v.z
 		return self + negv
-	def __mul__( self, scalar ):
-		newv = vector( self.x * scalar, self.y * scalar )
-		if hasattr(self,'z'): newv.z = self.z * scalar
-		return newv
+	def __mul__( self, *args ):
+		if checkrationals(*args) and len(args)==1:
+			scalar = args[0]
+			newv = vector( self.x * scalar, self.y * scalar )
+			if hasattr(self,'z'): newv.z = self.z * scalar
+			return newv
+		elif checktypes(point,*args) and len(args)==1:
+			p = args[0]
+			nx,ny = self.x * p.x, self.y * p.y
+			if hasattr(self,'z'): nz = self.z * p.z
+			return point( nx, ny, nz )
+		else: raise Exception("unknown multiplication type for vector")
+
 	def __rmul__( self, scalar ):
 		return self * scalar
 	def __neg__( self ):
@@ -222,13 +236,33 @@ class triangle:
 	def __init__( self, *args ):
 		if checktypes( line, *args ) and len(args)==3:
 			self.init_from_lines( args[0],args[1],args[2] )
-		if checktypes( point, *args ) and len(args)==3:
+		elif checktypes( point, *args ) and len(args)==3:
 			self.init_from_points( args[0],args[1],args[2] )
-		if checktypes( int, *args ) and len(args)==6:
+		elif checkrationals( *args ) and len(args)==6:
 			p1=point(args[0],args[1])
 			p2=point(args[2],args[3])
 			p3=point(args[4],args[5])
 			self.init_from_points( p1, p2, p3 )
+		elif checkrationals( *args ) and len(args)==9:
+			p1=point(args[0],args[1],args[2])
+			p2=point(args[3],args[4],args[5])
+			p3=point(args[6],args[7],args[8])
+			self.init_from_points( p1, p2, p3 )
+		elif checktypes( triangle, *args ):
+			self.init_from_points( args[0][0],args[0][1],args[0][2] )
+		elif checktypes( list, *args ):
+			if len(args)==3 and len(args[0])==2 and len(args[1])==2 and len(args[2])==2:
+				p1 = point(args[0][0],args[0][1])
+				p2 = point(args[1][0],args[1][1])
+				p3 = point(args[2][0],args[2][1])
+			self.init_from_points( p1, p2, p3 )
+		elif checktypes( tuple, *args ):
+			if len(args)==3 and len(args[0])==2 and len(args[1])==2 and len(args[2])==2:
+				p1 = point(args[0][0],args[0][1])
+				p2 = point(args[1][0],args[1][1])
+				p3 = point(args[2][0],args[2][1])
+			self.init_from_points( p1, p2, p3 )
+		else: raise Exception('dont know how to build triangle')
 
 	def init_from_lines( self, l0, l1, l2 ):
 		p0,p1,p2 = meet(l1,l2),meet(l0,l2),meet(l0,l1)
@@ -257,14 +291,141 @@ class triangle:
 		if i==1: self.p1 = value
 		if i==2: self.p2 = value
 
-# circles are a bit different here. since the radius is not always rational
-# even between two rational points, we instead store the 'radial quadrance',
-# which is always rational between two rational points.
+# Circles in Rational Geometry
+#
+# The first thing to think about is that we don't store the radius. 
+# Radius is not always rational, even on a circle that has two rational 
+# points. Instead store the squared radius, or 'radial quadrance', which 
+# is always rational between two rational points. For example, consider a 
+# circle centered at 0,0 with the rational point 1,1. It has an 
+# irrational radius of sqrt(2).
 #
 # in general, the hope is to avoid functions that require the use of 
 # radius. but in cases where we do need it, like plotting a graphical 
-# represnetation of the circle, please see the bablyonian_square_root() 
-# function elsewhere in this code
+# representation of the circle, we Approximate.
+#
+# What does this mean for rational points on the circle? Ah. A circle 
+# with irrational radius might not have infinitely many rational points 
+# on it, like a circle with rational radius does. But of course, the 
+# circle with rational radius has Radial Quadrance that is a perfect 
+# square, like 9 or 81/25. And there are infinitely many perfect squares 
+# So... our rational radius circles are rather plentiful in the plane 
+# are they not? But still, unless we confine ourselves to some highly 
+# restricted set of points in the plane, we will deal with irrational 
+# radius Circles. And so there might not be a nice rational 
+# paramterization of a circle with irrational radius? Or am I missing 
+# something?
+#
+# As an aside, it's a fun fact that if you take a rational triangle you 
+# get a rational circumcenter, but the circumradius might be irrational 
+# --> but you still get three rational points on it! Another aside: Note 
+# that for example, given two circles, radius e and pi, both with 
+# rational centers, we as a species don't know if they can be tangent or 
+# not. This is the state of affairs of modern mathematics. So many 
+# questions still to ponder!
+#
+# OK. So. How do we draw a circle though? We approximate the radius 
+# using a rational number and a square root algorithm, like that used in 
+# ancient Mesopotamia / Iraq / Babylon. Ideally we could draw a 'fuzzy 
+# line' for irrational radius circles but .. it's beyond my graphics 
+# system at the moment. Anyways. We find the apporximate rational 
+# radius, and then use a rational paramterization of the circle to build 
+# a rational approximation of the irrational radius circle.
+#
+#
+# The next thing to think about is that in Chromogeometry, the shape of 
+# Red and Green circles is not a circle, it's a hyperbola. Red is 
+# x^2-y^2=radius^2=radial_quadrance. 
+#
+# Note that the quadrance for a circle in this particular computer code 
+# doesn't have a color tied to it, kind of like the quadrance of the 
+# formulas like triple-quad dont have a color tied to them. Whether a 
+# circle is blue, red, or green is a matter of interpretation when it 
+# comes time to draw it or use it somewhere within this computer code 
+# package. . . the circle itself only has a center point and a radial 
+# quadrance, not a 'color'.
+#
+# So take these three circles. They have a center, 0,0 and a radial 
+# quadrance, 1, but there are three chromogeometry interpretations:
+#
+#  x^2+y^2=1   x^2-y^2=1   2xy=1    blue,   red,   green
+#
+# They form one circle, one rectangluar hyperbola, and one 'sideways'
+# hyperbola... But if you draw them, they appear to be tangent. Where?
+# x=1,y=0 satisfies both blue and red formulas. So the blue circle touches
+# the red circle (hyperbola) there. And green? x=1,y=1 satisfies both
+# blue and green formulas, so the blue circle touches the green circle
+# (hyperbola) there.
+#
+# How about green and red? y=1/2x, x^2-(1/2x)^2=1, x^4-. . uhm yeah. 
+# Plug it into Wolfram Alpha (TM) and you will see if/where Red and 
+# Green touch.
+#
+#
+# Now... here is the clever bit. Note that Red Quadrance between points 
+# can be negative! That means that our red circles can have negative 
+# radial quadrance. But then what is the radius? Normally its 
+# sqrt(Quadrance). How can you 'approximate' sqrt(-7) with the 
+# Babylonian's algorithm? You can't. The root is what we moderns call an 
+# Imaginary Number.
+#
+# But hold on... I can draw a rational point, like 3,4, that has a 
+# negative Red Radial Quadrance between itself and 0,0. 3*3-4*4 = 9-16 = 
+# -7. What's the big deal? I can just draw the point at 3,4, thats not 
+# imaginary.
+#
+# Ah. But the 'shape' of the red circle then becomes 'flipped' over the 
+# line x=y (the 'red null line' / red axis). And so, you can have two 
+# red circles, one with radial quadrance 7 and another with -7, and they 
+# will not intersect! Instead, one will be the 'flipped' hyperbola of 
+# the other over the x=y line. One will have a irrational radius, 
+# sqrt(7), the other will have an imaginary irrational radius, sqrt(-7).
+# If you draw both, you get a sort of 'x' shape with four 'nubs' coming in
+# towards the origin.
+#
+# Lastly note that in addition to radial quadrance, we store squared 
+# curvature... curvature being the inverse of radius (1/radius). 
+# 
+# Note that this means we can have a circle with 'infinite radius'. We 
+# dont actually store infinity, instead we store curvature as 0 and 
+# radius as 'None'. And when radius is 0, we have 'infinite curvature' (None)
+#
+# So if Red and Green circles can have negative radial quadrance, and thus
+# imaginary radius... what about blue circles?
+# 
+# Interesting you should ask. No, they can't, if you consider the form 
+# of the blue quadrance equation. x^2+y^2=Q, then Q is never less than 
+# 0, unless x and/or y -itself- is imaginary. However... note that the
+# radius itself can be negative... and that x and y will still satisfy
+# the equation. But what is 'negative radius'???? What is the point of that?
+#
+# Ok. Let's say you are a Princess of Bohemia and you write letters to 
+# Renee Descartes. Lets say he tells you that with three 'kissing 
+# circles', you can find there are two possible choices for a fourth 
+# 'kisser'. In Algebra,
+#
+# 2*(k1^2+k2^2+k3^2+k4^2)=(k1+k2+k3+k4)^2 where k = curvature = 1/radius
+#
+# If you are given k1,k2,k3, then k4 is sqrt(some mess)... but recall that
+# sqrt() can have two answers! Negative and Positive! If, by chance, the
+# equation reduced to this:
+#
+# (k4-1)(k4+1/3)=0
+#
+# then k4 would have to be 1 or -1/3, meaning radius has to be 1 or -3, 
+# giving us radial quadrance of 1 or 9. Note that our points, x and y,
+# can satisfy the blue quadrance formula even with a negative radius.
+#
+# But if radius is distance, how could x and y give a 'negative' 
+# distance? Maybe we can imagine that instead of distance, we have 
+# 'displacement', or a sort of 'vector' x,y, to our rational points on 
+# the circle, and it has a 'negative' magnitude? For example the vector 
+# (3,4) could be multiplied by -1, to give (-3,-4). The circle formed by 
+# these points is basically an 'inversion' of the ordinary circle, 
+# inversion through the origin 0,0. It looks exactly the same, it has 
+# all the same points eventually, but it is still there, a sort of twin 
+# shadow of the ordinary circle, right on top of it.
+
 class circle:
 	def __init__(self, *args):
 		if (len(args)<2): raise Exception('need center x,y and radial quadrance')
@@ -279,6 +440,9 @@ class circle:
 			self.init_from_point_and_radial_q( args[0], args[1] )
 		elif checktypes(Fraction,args[0]) and checktypes(point,args[1]):
 			self.init_from_point_and_radial_q( args[1], args[0] )
+		elif checktypes(tuple,args[0]) and checkrationals(args[1]):
+			p = point(args[0][0],args[0][1])
+			self.init_from_point_and_radial_q( p, args[1] )
 		else: raise Exception('need center x,y and radial quadrance')
 	def init_from_point_and_radial_q( self, p, rq ):
 		self.center = p
@@ -530,18 +694,6 @@ def parallel( *args, **kwargs ):
 
 
 ############### quadrance
-
-def archimedes_function_3numbers(a,b,c): 
-	return sqr(a+b+c) - 2*(a*a+b*b+c*c)
-
-def archimedes_function( *args ):
-	crash_if_nonrationals( *args )
-	if not len(args)==3:
-		raise Exception("Archimede's function requires 3 numbers")
-	a=args[0]
-	b=args[1]
-	c=args[2]
-	return archimedes_function_3numbers( a, b, c )
 
 def red_quadrance_points( p1, p2 ):
 	if hasattr(p2,'z') and hasattr(p1,'z'):
@@ -922,6 +1074,89 @@ quadrea = blue_quadrea
 
 ############################## misc stuff
 
+def archimedes_function_3numbers(a,b,c): 
+	return sqr(a+b+c) - 2*(a*a+b*b+c*c)
+
+def Archimedes_function( *args ):
+	if checkrationals(*args) and len(args)==3:
+		a,b,c=args[0],args[1],args[2]
+		return archimedes_function_3numbers( a, b, c )
+	else: raise Exception("Archimede's function requires 3 numbers")
+archimedes_function=Archimedes_function
+
+def Herons_function( tri ):
+	q1=blueq(tri[0],tri[1])
+	q2=blueq(tri[1],tri[2])
+	q3=blueq(tri[2],tri[0])
+	return Archimedes_function(q1,q2,q3)
+herons_function=Herons_function
+
+def quadruple_quad( *args ):
+	print 'warning,,, i think this might be implenented wrong..'
+	if checkrationals(*args):
+		return quadruple_quad_rationals(args[0],args[1],args[2],args[3])
+	elif checktypes(list,*args) and len(args)==1:
+		l = args[0]
+		if len(l)==4:
+			return quadruple_quad_rationals(l[0],l[1],l[2],l[3])
+		else:
+			raise Exception('need 4 rationals or a list of 4 rationals')
+	else: 
+		raise Exception('need 4 rationals or a list of 4 rationals')
+
+def quadruple_quad_rationals( a, b, c, d):
+	term0 = sqr( a + b + c + d )
+	term1 = -2 * ( a*a + b*b + c*c + d*d )
+	term2 = sqr( term0 + term1 ) - 64*a*b*c*d
+	return term2
+
+def reverse_orientation_triangle( t ):
+	return triangle( t[0], t[2], t[1] )
+
+def reverse_orientation( *args ):
+	if checktypes(triangle,*args) and len(args)==1:
+		return reverse_orientation_triangle( args[0] )
+	elif checktypes(list,*args):
+		tris = []
+		for arg in args[0]:
+			if not checktypes(triangle,arg):
+				raise Exception('rever. orient. unimplemented')
+			tris += [reverse_orientation_triangle( arg )]
+		return tris
+	else:
+		raise Exception('reverse orientation not implemented')
+	
+def mirrorx_triangle(t):
+	p1 = t[0] * vector(-1,1,1)
+	p2 = t[1] * vector(-1,1,1)
+	p3 = t[2] * vector(-1,1,1)
+	return triangle( p1, p2, p3 )
+
+def mirrory_triangle(t):
+	p1 = t[0] * vector(1,-1,1)
+	p2 = t[1] * vector(1,-1,1)
+	p3 = t[2] * vector(1,-1,1)
+	return triangle( p1, p2, p3 )
+
+def mirrorz_triangle(t):
+	p1 = t[0] * vector(1,1,-1)
+	p2 = t[1] * vector(1,1,-1)
+	p3 = t[2] * vector(1,1,-1)
+	return triangle( p1, p2, p3 )
+
+def mirrorx( *args ):
+	if checktypes(triangle,*args) and len(args)==1:
+		return mirrorx_triangle( args[0] )
+	else: raise Exception('mirror not implemented')
+def mirrory( *args ):
+	if checktypes(triangle,*args) and len(args)==1:
+		return mirrory_triangle( args[0] )
+	else: raise Exception('mirror not implemented')
+def mirrorz( *args ):
+	if checktypes(triangle,*args) and len(args)==1:
+		return mirrorz_triangle( args[0] )
+	else: raise Exception('mirror not implemented')
+
 # translate a triangle by a vector. example, triangle 0,0 1,0 0,1 by vector 2,0
 # result is 2,0 3,0 2,1
 def translate_triangle_by_vector( t, v ):
@@ -1051,25 +1286,6 @@ def triple_quad_lhs( q0, q1, q2 ):
 def triple_quad_rhs( q0, q1, q2 ):
 	return 2*( q0*q0 + q1*q1 + q2*q2 )
 
-
-def quadruple_quad( *args ):
-	if checkrationals(*args):
-		return quadruple_quad_rationals(args[0],args[1],args[2],args[3])
-	elif checktypes(list,*args) and len(args)==1:
-		l = args[0]
-		if len(l)==4:
-			return quadruple_quad_rationals(l[0],l[1],l[2],l[3])
-		else:
-			raise Exception('need 4 rationals or a list of 4 rationals')
-	else: 
-		raise Exception('need 4 rationals or a list of 4 rationals')
-
-def quadruple_quad_rationals( a, b, c, d):
-	term0 = sqr( a + b + c + d )
-	term1 = -2 * ( a*a + b*b + c*c + d*d )
-	term2 = sqr( term0 + term1 ) - 64*a*b*c*d
-	return term2
-
 def quadruple_quad_lhs( q0, q1, q2, q3 ):
 	term0 = sqr( q0 + q1 + q2 + q3 )
 	term1 = q0*q0 + q1*q1 + q2*q2 + q3*q3
@@ -1125,25 +1341,39 @@ def colored_spread_rhs( l0, l1 ):
 ###### anti-symmetric polynomials
 
 # special polynomials used in many areas of geometry, especially 
-# chromogeometry generated from an 'input monomial' by transposing 
-# subscripts/indexes of variables
+# chromogeometry.
+# 
+# an anti-symmetrical polynomial is generated from an 'input monomial' 
+# by transposing subscripts/indexes of variables
 #
 # example:
 # input 'x1y2' returns six terms, by transposing '1' and '2' in a pattern:
 # +x1y2 -x1y3 +x2y3 -x3y2 +x3y1 -x2y1
+# 
 # this particular sum is twice the signed area of the triangle of the 3 points
-#  
+# x1,y1 x2,y2 x3,y3 
 #
-# The easiest function to use here is eval_asympoly(): 
+# It can be a bit confusing b/c the 'input' doesnt list x3,y3. But if 
+# you get the hang of the transpositions it can help to understand. 
+# Another way to think about it is to consider input monomial as 
+# sort of like a 'seed' and the six-term polynomial 'grows' out of it.
+# 
+# The easiest function to use in this code is eval_asympoly(): You give 
+# it a monomial and some values for x1,y1 x2,y2 x3,y3. It generates the 
+# complete antisymmetric polynomial and plugs in the values for you into 
+# the six generated terms, then sums them together and gives the 
+# resulting sum.
 #
 # eval_asympoly( 'x1*y2', 3,4, 3,0, 1,-2 ) -> returns 20
 #
 # The other functions are 'helpers'
 
 
+# More examples of antisymmetric polynomials:
+#
 # given: a monomial
 #
-# follow the 6 steps to generate the six terms of the antisymmetric 
+# follow these 6 steps to generate the six terms of the antisymmetric 
 # polynomial:
 #
 # start with the subscripts as given. 
@@ -1549,6 +1779,23 @@ def green_circumradial_quadrance( tri ):
 	p2 = tri.p0
 	return green_quadrance_points( p1, p2 )
 
+def blue_circumcircle( tri ):
+	return circle(blue_circumcenter(tri),blue_circumradial_quadrance(tri))
+def red_circumcircle( tri ):
+	return circle(red_circumcenter(tri),red_circumradial_quadrance(tri))
+def green_circumcircle( tri ):
+	return circle(green_circumcenter(tri),green_circumradial_quadrance(tri))
+
+def blue_ninepointcircle( tri ):
+	bnc = blue_ninepointcenter(tri)
+	return circle( bnc , blue_quadrance( bnc, midpoint(tri[0],tri[1]) ) )
+def red_ninepointcircle( tri ):
+	rnc = red_ninepointcenter(tri)
+	return circle( rnc , red_quadrance( rnc, midpoint(tri[0],tri[1]) ) )
+def green_ninepointcircle( tri ):
+	gnc = green_ninepointcenter(tri)
+	return circle( gnc , green_quadrance( gnc, midpoint(tri[0],tri[1]) ) )
+
 circumradial_quadrance=blue_circumradial_quadrance
 
 
@@ -1575,36 +1822,38 @@ def green_ninepointcenter_from_triangle( t ):
 
 def blue_ninepointcenter_from_points( p1, p2, p3 ):
 	t = triangle( p1, p2, p3 )
-	blue_ninepointcenter_from_triangle( t )
+	return blue_ninepointcenter_from_triangle( t )
 def red_ninepointcenter_from_points( p1, p2, p3 ):
 	t = triangle( p1, p2, p3 )
-	red_ninepointcenter_from_triangle( t )
+	return red_ninepointcenter_from_triangle( t )
 def green_ninepointcenter_from_points( p1, p2, p3 ):
 	t = triangle( p1, p2, p3 )
-	green_ninepointcenter_from_triangle( t )
+	return green_ninepointcenter_from_triangle( t )
 
 def blue_ninepointcenter( *args ):
 	if checktype(triangle, args[0]):
 		return blue_ninepointcenter_from_triangle( args[0] )
-	if checktype(point, args[0]) and checktype(point, args[1]):
+	elif checktype(point, args[0]) and checktype(point, args[1]):
 		if checktype(point, args[2]):
 			p1,p2,p3=args[0],args[1],args[2]
 			return blue_ninepointcenter_from_points( p1, p2, p3 )
+	else: raise Exception('unknown input type')
 def red_ninepointcenter( *args ):
 	if checktype(triangle, args[0]):
 		return red_ninepointcenter_from_triangle( args[0] )
-	if checktype(point, args[0]) and checktype(point, args[1]):
+	elif checktype(point, args[0]) and checktype(point, args[1]):
 		if checktype(point, args[2]):
 			p1,p2,p3=args[0],args[1],args[2]
 			return red_ninepointcenter_from_points( p1, p2, p3 )
+	else: raise Exception('unknown input type')
 def green_ninepointcenter( *args ):
 	if checktype(triangle, args[0]):
 		return green_ninepointcenter_from_triangle( args[0] )
-	if checktype(point, args[0]) and checktype(point, args[1]):
+	elif checktype(point, args[0]) and checktype(point, args[1]):
 		if checktype(point, args[2]):
 			p1,p2,p3=args[0],args[1],args[2]
 			return green_ninepointcenter_from_points( p1, p2, p3 )
-
+	else: raise Exception('unknown input type')
 ninepointcenter=blue_ninepointcenter
 
 
@@ -1648,7 +1897,7 @@ def green_smallest_spread( tri ):
 
 smallest_spread=blue_smallest_spread
 
-################## omega triangle
+################## omega triangle and friends
 
 def omega_triangle( tri ):
 	o0 = red_orthocenter( tri )
@@ -1673,12 +1922,12 @@ def ninepoint_triangle( tri ):
 
 ############## square root bounds
 ### the square root of a rational number is often irrational. 
-### these routines provide rational 'bounds' that guarantee the irrational
-### square root is 'between' them, as such. 
+### we can find a rational approximation, thanks to the ancient Iraqis / 
+### Babylonians.
 ### 
 ### there is also a 'is perfect square?' test function
 ###
-### we ignore negative roots here.
+### we ignore negative roots here. and imaginary roots.
 
 # return [r1, r2] such that the sqrt(s) is guaranteed to be between them
 def square_root_rough_bounds_int( s ):
@@ -1688,7 +1937,7 @@ def square_root_rough_bounds_int( s ):
 	return guess,guess*2
 
 # return rational approximation of square root using Babylonian's method
-# iterate for maxdepth itersations or until answer>maxbits. 
+# iterate for maxdepth iterations or until answer>maxbits. 
 def babylonian_square_root_int( s, maxdepth=10, maxbits=256, firstguess=1 ):
 	guesses=[firstguess]
 	for i in range(1,maxdepth):
@@ -1698,7 +1947,7 @@ def babylonian_square_root_int( s, maxdepth=10, maxbits=256, firstguess=1 ):
 		if sqr(int(newguess))==s: # perfect square
 			guesses += [ int(newguess) ]
 			break
-		# prevent digit ballooning and Big Int freezing
+		# prevent digit ballooning causing Big Int freezing
 		if (newguess.numerator.bit_length()+newguess.denominator.bit_length())>maxbits:
 			break
 		guesses += [newguess]
@@ -1722,7 +1971,7 @@ def is_perfect_square(s):
 def babylonian_square_root( s, maxdepth=10, maxbits=256 ):
 	if s<0: raise Exception('sqrt -1 aint rational')
 	return babylonian_square_root_for_fraction( Fraction(s),maxdepth,maxbits )
-	
+
 ##################### render objects into text
 
 def bounding_box_txt( b ):
@@ -1771,24 +2020,29 @@ def triangle_txt( tri ):
 	linesegs = str(tri.ls0)+' '+str(tri.ls1)+' '+str(tri.ls2)
 	points = str(tri.p0)+','+str(tri.p1)+','+str(tri.p2)
 	quadrances = str(tri.q0)+','+str(tri.q1)+','+str(tri.q2)
-	s ='\n line eqns: ' + line_eqns
+	s ='\ntriangle: '
+	s+='\n line eqns: ' + line_eqns
 	s+='\n line segs: ' + linesegs
 	s+='\n points: ' + points
-	s+='\n quadrances: ' + quadrances
-	s+='\n spreads: ' + spreads
+	s+='\n blue quadrances: ' + quadrances
+	s+='\n blue spreads: ' + spreads
 	return s
 
 
 ############################## draw in graphics
 # everything is done with rationals, except for a few
-# calls to ax. functions that require floats.
+# calls to matplotlib's "ax" functions that require floats.
 
 plotstarted=False
 fig,ax,plt=None,None,None
 plotbbox=None
 
-# call ax plot function 'func', but convert from rationals to floats first
-# example ax_floatplot( [1],[2],ax.scatter) # < scatter plot point at 1,2
+# call matplotlib's "ax" plot function 'func', but convert from 
+# rationals to floats first.
+#
+# example: 
+#   ax_floatplot( [1,5],[2,12],ax.scatter) # < scatter plot points at 1,2 5,12
+#   ax_floatplot( [0,4,5],[2,3,5],ax.plot ) #< plot line from 0,2 to 4,3 to 5,5
 def ax_floatplot( xs, ys, func ):
 	plotbbox.extend( xs,ys )
 	fxs,fys=[],[]
@@ -1812,7 +2066,11 @@ def plotshow():
 	ax.set_ylim(float(fmin.y),float(fmax.y))
 	plt.show()
 	
-def plot_triangles( triangles ):
+def plot_triangles( *args ):
+	if checktypes(list,*args):
+		plot_triangles(*args[0])
+		return
+	triangles = args
 	plotinit( triangles[0] )
 	print len(triangles), 'triangles'
 	xs,ys=[],[]
@@ -1835,7 +2093,14 @@ def plot_points( *args ):
 			ys += [p.y]
 		ax_floatplot(xs,ys,ax.scatter) # scatter plot
 	elif checktypes(list,*args):
-		plot_points(*args[0])
+		print len(args)
+		if checktypes(point,args[0]):
+			plot_points(*args[0])
+		elif checktypes(list,args[0]) and len(args)==2:
+			plotinit( point(args[0][0],args[1][0]) )
+			ax_floatplot(args[0],args[1],ax.scatter) # scatter plot
+	else: raise Exception('unknown type fed to plot_points')
+		
 
 def plot_blue_circle_w_radius( cx, cy, cr, depth ):
 	pdic={}
@@ -1863,19 +2128,23 @@ def plot_blue_circle_w_radius( cx, cy, cr, depth ):
 	ax_floatplot(xs,ys,ax.plot)
 
 # rational paramterization. 
-def plot_blue_circles( circles ):
-	print len(circles), 'circles'
+def plot_blue_circles( *args ):
+	if checktypes(list,*args):
+		plot_blue_circles(*args[0])
+		return
+	circles = list(args)
+	print len(circles), 'blue circles'
 	plotinit( circles[0] )
 	xs,ys=[],[]
 	depth=10
 	for c in circles:
 		depth=8
 		cx,cy=c.center.x,c.center.y
-		crlo = babylonian_square_root(c.radial_quadrance)
-		plot_blue_circle_w_radius( cx, cy, crlo, depth )
+		cr = babylonian_square_root(c.radial_quadrance)
+		plot_blue_circle_w_radius( cx, cy, cr, depth )
 
 # (red circle = hyperbola)
-# rational paramterization.
+# rational parameterization.
 def plot_red_circle_w_radius( cx, cy, cr, depth ):
 	pdic={}
 	xs,ys=[],[]
@@ -1934,7 +2203,11 @@ def plot_red_circle_w_imaginary_radius( cx, cy, cr, depth ):
 	ax_floatplot(xs,ys,ax.plot)
 
 # (red circle = hyperbola)
-def plot_red_circles( circles ):
+def plot_red_circles( *args ):
+	if checktypes(list,*args):
+		plot_red_circles(*args[0])
+		return
+	circles = list(args)
 	print len(circles), 'red circles'
 	plotinit( circles[0] )
 	for c in circles:
@@ -1946,6 +2219,35 @@ def plot_red_circles( circles ):
 		else:
 			crlo = babylonian_square_root(-c.radial_quadrance)
 			plot_red_circle_w_imaginary_radius( cx, cy, crlo, depth )
+
+def plot_green_circle_w_imaginary_radius( cx, cy, cr ):
+	depth=5
+	pdic={}
+	for m in range(0,depth):
+		for n in range(0,2*depth):
+			if (greenq(m,n)==0): continue
+			x = Fraction(m,n)
+			y = Fraction(n,2*m)
+			#print '2xy',x,y,2*x*y
+			x = cr*x
+			y = cr*y
+			pdic[x]=y
+	sortedkeys = pdic.keys()
+	sortedkeys.sort()
+	# right half
+	xs,ys=[],[]
+	for key in sortedkeys:
+		x,y=key,pdic[key]
+		xs += [cx-x]
+		ys += [cy+y]
+	ax_floatplot(xs,ys,ax.plot)
+	# right half
+	xs,ys=[],[]
+	for key in sortedkeys:
+		x,y=key,pdic[key]
+		xs += [cx+x]
+		ys += [cy-y]
+	ax_floatplot(xs,ys,ax.plot)
 
 def plot_green_circle_w_radius( cx, cy, cr ):
 	depth=5
@@ -1981,14 +2283,22 @@ def plot_green_circle_w_radius( cx, cy, cr ):
 #
 # bug - slow on small circles.
 #
-def plot_green_circles( circles ):
+def plot_green_circles( *args ):
+	if checktypes(list,*args):
+		plot_green_circles(*args[0])
+		return
+	circles = list(args)
 	print len(circles), 'green circles'
 	plotinit( circles[0] )
 	for c in circles:
 		depth=5
 		cx,cy=c.center.x,c.center.y
-		crlo = babylonian_square_root(c.radial_quadrance)
-		plot_green_circle_w_radius( cx, cy, crlo )
+		if c.radial_quadrance>0:
+			cr = babylonian_square_root(c.radial_quadrance)
+			plot_green_circle_w_radius( cx, cy, cr )
+		else:
+			cr = babylonian_square_root(-c.radial_quadrance)
+			plot_green_circle_w_imaginary_radius( cx, cy, cr )
 
 plot_circles = plot_blue_circles
 
@@ -2021,19 +2331,34 @@ def intersection( l1, l2 ):
 # nice for doing paramterizations
 def blueq( *args ):
 	if checktypes(point,*args):
-		return blue_quadrance(point(0,0),args[0])
+		if len(args)==1:
+			return blue_quadrance(point(0,0),args[0])
+		elif len(args)==2:
+			return blue_quadrance(args[0],args[1])
+		else: raise Exception('need 1 or 2 pts')
 	elif checkrationals(*args):
 		return blue_quadrance(point(0,0),point(args[0],args[1]))
+	else: raise Exception('need point or x,y coords')
 def redq( *args ):
 	if checktypes(point,*args):
-		return red_quadrance(point(0,0),args[0])
+		if len(args)==1:
+			return red_quadrance(point(0,0),args[0])
+		elif len(args)==2:
+			return red_quadrance(args[0],args[1])
+		else: raise Exception('need 1 or 2 pts')
 	elif checkrationals(*args):
 		return red_quadrance(point(0,0),point(args[0],args[1]))
+	else: raise Exception('need point or x,y coords')
 def greenq( *args ):
 	if checktypes(point,*args):
-		return green_quadrance(point(0,0),args[0])
+		if len(args)==1:
+			return green_quadrance(point(0,0),args[0])
+		elif len(args)==2:
+			return green_quadrance(args[0],args[1])
+		else: raise Exception('need 1 or 2 pts')
 	elif checkrationals(*args):
 		return green_quadrance(point(0,0),point(args[0],args[1]))
+	else: raise Exception('need point or x,y coords')
 
 def blue_quadrance_coordinates(x1,y1,x2,y2):
 	return blue_quadrance_coords(x1,y1,x2,y2)
@@ -2057,19 +2382,12 @@ def green_circum_center( tri ):
 	return green_circumcenter( tri )
 
 
-def plotcircles(circs): plot_circles(circs)
-def plotcircle(circ): plot_circles([circ])
-def plot_circle(circ): plot_circles([circ])
-def plottriangles(tris): plot_triangles(tris)
-def plottriangle(tri): plot_triangles([tri])
-def plot_triangle(tri): plot_triangles([tri])
-
-def drawcircles(circs): plot_circles(circs)
-def drawcircle(circ): plot_circles([circ])
-def draw_circle(circ): plot_circles([circ])
 def drawtriangles(tris): plot_triangles(tris)
 def drawtriangle(tri): plot_triangles([tri])
 def draw_triangle(tri): plot_triangles([tri])
+def plottriangles(tris): plot_triangles(tris)
+def plottriangle(tri): plot_triangles([tri])
+def plot_triangle(tri): plot_triangles([tri])
 
 def plotpoints(circs): plot_points(circs)
 def plotpoint(circ): plot_points([circ])
@@ -2078,3 +2396,36 @@ def drawpoints(circs): plot_points(circs)
 def drawpoint(circ): plot_points([circ])
 def draw_point(circ): plot_points([circ])
 
+def plotcircles(circs): plot_circles(circs)
+def plotcircle(circ): plot_circles([circ])
+def plot_circle(circ): plot_circles([circ])
+def drawcircles(circs): plot_circles(circs)
+def drawcircle(circ): plot_circles([circ])
+def draw_circle(circ): plot_circles([circ])
+
+def plotbluecircles(circs): plot_blue_circles(circs)
+def plotbluecircle(circ): plot_blue_circles([circ])
+def plot_blue_circle(circ): plot_blue_circles([circ])
+def drawbluecircles(circs): plot_blue_circles(circs)
+def drawbluecircle(circ): plot_blue_circles([circ])
+def draw_blue_circle(circ): plot_blue_circles([circ])
+
+def plotredcircles(circs): plot_red_circles(circs)
+def plotredcircle(circ): plot_red_circles([circ])
+def plot_red_circle(circ): plot_red_circles([circ])
+def drawredcircles(circs): plot_red_circles(circs)
+def drawredcircle(circ): plot_red_circles([circ])
+def draw_red_circle(circ): plot_red_circles([circ])
+
+def plotgreencircles(circs): plot_green_circles(circs)
+def plotgreencircle(circ): plot_green_circles([circ])
+def plot_green_circle(circ): plot_green_circles([circ])
+def drawgreencircles(circs): plot_green_circles(circs)
+def drawgreencircle(circ): plot_green_circles([circ])
+def draw_green_circle(circ): plot_green_circles([circ])
+
+
+def blue_ninepoint_center( *args ): return blue_ninepointcenter(*args)
+def red_ninepoint_center( *args ): return red_ninepointcenter(*args)
+def green_ninepoint_center( *args ): return green_ninepointcenter(*args)
+def nine_point_triangle( tri ): return ninepoint_triangle( tri )
