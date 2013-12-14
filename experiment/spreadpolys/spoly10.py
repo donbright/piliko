@@ -4,15 +4,17 @@ import math
 # attempt generate somewhat regularly spaced rational points on a 
 # circle. using spread polynomials. 
 #
-# now technically, you cant go all the way around the circle using 
-# exactly regularly spaced and be rational points. look at the regular 
-# polygons - the points are irrational coordinates. however, can we 
-# approximate regularity while using rational points?
+# now technically, you cannot go all the way around the circle using 
+# exactly regularly spaced rational points. look at the regular polygons 
+# - the points are irrational coordinates. however, can we approximate 
+# regularity while using rational points?
 
-# well. one major flaw of this program is that it uses square roots. 
-# however, we have chosen the initial spread input to the spread 
+# well. you can do pretty well.
+
+# we have chosen the initial spread input to the spread 
 # polynomial function such that all subsequent spreads will be a perfect 
 # square. therefore we are only taking rational square roots. in theory. 
+#
 # in reality the implementation has some problems... its using 
 # Babylonian square root finder which is not guaranteed to find the root 
 # in a reasonable amount of time , especially for huge BigInts. . . and 
@@ -31,9 +33,9 @@ import math
 # generate other sequences of points that approximate regularity well but
 # use fewer bits. 
 #
-# on the other hand, perhaps there is some inherent fact of the universe
-# that the more regular the 'spread', the more digits the rational will 
-# require?
+# on the other hand, perhaps there is some inherent fact of the universe 
+# that the more regular the 'spread', the more digits the rational 
+# points will require?
 
 #
 # the amount of the circle we draw at first, is depending on the
@@ -48,12 +50,15 @@ def blueq(x,y): return sqr(x)+sqr(y)
 def redq(x,y): return sqr(x)-sqr(y)
 def greenq(x,y): return 2*x*y
 sp=spread_polynomial
-maxn1=8
+maxn1=9
 xs,ys=[0],[0]
 for i in range(0,maxn1):
-	# note - you can find a good starting spread using the Stern
-	# Diatomic Sequence - see 'pythtrip_stern.py'
-	s = sp(i,Fraction(19*19,181*181))
+	# note - you can find interesting starting spread using parts of 
+	# the Stern Diatomic Sequence - see 'pythtrip_stern.py'
+	# theres also some formulas you can use... not handy to me at 
+	# the moment
+	s = sp(i,Fraction(21*21,221*221))
+	#s = sp(i,Fraction(19*19,181*181))
 	# starting spread: y^2 / hypoteneuse^2
 	# must be two parts of a pythagorean triple
 	num = s.numerator
@@ -62,10 +67,11 @@ for i in range(0,maxn1):
 	nx,nr=math.sqrt(abs(num)),math.sqrt(abs(dnm))
 	print num,'/',dnm,'sqrts:',nx,nr
 	#hypoteneuse_sqr = Fraction(4,25) # must be a perfect square
-	hypoteneuse_q = Fraction(625,1) # must be a perfect square
-	y = babylonian_square_root( hypoteneuse_q * s,maxbits=4096 )  
-	x = babylonian_square_root( hypoteneuse_q * ( 1-s ),maxbits=4096 )
+	hypoteneuse_q = Fraction(4096,1) # must be a perfect square
+	y = perfect_square_root( hypoteneuse_q * s )
+	x = perfect_square_root( hypoteneuse_q * ( 1-s ) )
 	print x,y,float(x),float(y)
+	print x.numerator.bit_length(),'bits'
 	xs += [x]
 	ys += [y]
 

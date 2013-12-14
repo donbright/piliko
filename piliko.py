@@ -1,25 +1,21 @@
 # very, very 'rought draft' implementation of some Rational Geometry 
-# formulas. the type system has not been thought out carefully at all.
-
-# most of this is for 2-dimensional space, some of it is for 1-dimensional space
+# codes. the type system has not been thought out carefully at all.
+# See README.md
 
 # Rational Geometry tries to stick to Rational numbers, here
 # we use python's "Fraction" type to represent rationals.
 
-# Rational Geometry is from Norman J Wildberger. This code is not affiliated
-# with him nor endorsed by him in any way. See the README for info.
+# Rational Geometry was discovered and developed by Norman J Wildberger. 
+# This code is not affiliated with him nor endorsed by him in any way. 
+# See the README.md file for info.
 
-#
 # todo
 
 # simplify code
 # use actual test suite
 # deal with /0 and other problems
 # implement non-implemented stuff
-# get the subscripts to match NJW's books/lectures (not 0 indexed, 1 indexed)
-# split out print functions from basic code? sep presentation w data...
 # make function pointers shorter code, better code 
-# add args* based triangle constructor (points or lines)
 # put 'of' in func names
 
 # what is omega inverse?
@@ -37,14 +33,21 @@ from fractions import Fraction
 def rat( x, y ):
 	return Fraction( x, y )
 
+def abso( x ):
+	if x<0: return -x
+	else: return x
+
 def sqr( x ):
 	return x*x
 
-def avg( *args ):
+def sum( *args ):
 	tot = Fraction(0)
 	for arg in args:
 		tot += arg
-	return Fraction(tot,len(args))
+	return tot
+
+def avg( *args ):
+	return Fraction(sum(*args),len(args))
 
 def sign( x ):
 	if x<0: return -1
@@ -62,7 +65,11 @@ def checktypes( typename, *args ): # are all args of a given type?
 # return true if all arguments are either int or Fraction
 def checkrationals( *args ):
 	for i in range(len(args)):
-		if checktypes( Fraction, args[i]) or checktypes( int, args[i] ):
+		if checktypes( Fraction, args[i]):
+			pass
+		elif checktypes( int, args[i] ):
+			pass
+		elif checktypes( long, args[i]):
 			pass
 		elif checktypes( tuple, args[i] ):
 			for a in args[i]:
@@ -78,6 +85,16 @@ def crash_if_nonrationals( *args ):
 	if not checkrationals( *args ):
 		raise Exception("Rationals only please")
 
+def bitcount(*args):
+	tot=0
+	if checkrationals( *args ):
+		for a in args:
+			tot+=Fraction(a).numerator.bit_length()
+			tot+=Fraction(a).denominator.bit_length()
+		return tot
+	else: raise Exception("Rationals only please")
+bit_count=bitcount
+
 class point:
 	def __init__(self, *args):
 		if checktypes(vector,*args):
@@ -90,6 +107,8 @@ class point:
 		else: raise Exception( 'cant build point')
 	def __str__( self ):
 		return point_txt(self)
+	def __repr__( self ):
+		return point_txt(self)
 	def __getitem__( self, i ):
 		if i==0: return self.x
 		if i==1: return self.y
@@ -101,6 +120,7 @@ class point:
 		v=vector(self)-vector(p)
 		return point(v)
 	def __eq__(self, p):
+		if p==None: return False
 		if hasattr(p,'z') and hasattr(self,'z'):
 			return self.x==p.x and self.y==p.y and self.z==p.z
 		if hasattr(p,'z') and not hasattr(self,'z'): return False
@@ -108,15 +128,16 @@ class point:
 		return self.x==p.x and self.y==p.y
 class vector:
 	def __init__( self, *args ):
-		if checktype( point,args[0] ):
-			p=args[0]
+		if checktypes( point,*args ) and len(args)==1:
+			p = args[0]
+		elif checktypes( complex,*args ) and len(args)==1:
+			p = point(args[0].x,args[0].y)
 		else:
 			p = point( *args )
 		self.x,self.y=p.x,p.y
 		if hasattr(p,'z'): self.z=p.z
 	def __str__( self ):
 		return vector_txt(self)
-
 	def __add__( self, v):
 		newx = self.x + v.x
 		newy = self.y + v.y
@@ -160,6 +181,58 @@ class vector:
 		if i==1: return self.y
 		if i==2: return self.z
 
+# very simple complex numbers. the form is as follows:
+#   x + y * i.
+#   i is the square root of negative one
+#   x and y are rationals. they also represent coordinates.
+class complex:
+	def __init__( self, *args ):
+		if checkrationals(*args) and len(args)==2:
+			self.x,self.y = args[0],args[1]
+		elif checktypes(complex,*args) and len(args)==1:
+			self.x,self.y=args[0].x,args[0].y
+		else: raise Exception('complex needs x,y for x+yi')
+	def __str__( self ): return complex_txt(self)
+	def __repr__( self ): return complex_txt(self)
+	def __add__( self, c ): return complex(self.x+c.x,self.y+c.y)
+	def __neg__( self ): return complex(-self.x,-self.y)
+	def __sub__( self, c ): return complex(self.x-c.x,self.y-c.y)
+	def __div__( self, *args ):
+		if checkrationals(*args) and len(args)==1:
+			return complex( Fraction(self.x,args[0]), Fraction(self.y,args[0]) )
+		else: raise Exception("unknown division for complex number")
+	def __mul__( self, *args ):
+		if checkrationals(*args) and len(args)==1:
+			return complex( self.x*args[0], self.y*args[0] )
+		elif checktypes(complex,*args) and len(args)==1:
+			a,b,c,d = self.x,self.y,args[0].x,args[0].y 
+			return complex(a*c-b*d, a*d+b*c) # (a+bi)(c+di)
+		else: raise Exception("unknown multiplication for complex number")
+	def __rmul__( self, scalar ): return self * scalar
+	def sqrt( self ):
+		x, y = self.x,self.y
+		#  x + yi  => ( xoo + yoo i )( xoo + yoo i )
+		# xoo*yoo*2 = y, xoo^2-yoo^2 = x
+		# yoo = y / (2*xoo)
+		# xoo^2 - ( y/(2*xoo) )^2 = x
+		# xoo^4 - y^2/4 = x * xoo^2
+		# xoo^2=q
+		# q^2 - x * q - y^2/4 = 0
+		# quadratic formula, solve q
+		# q = [ -(-x) +/- sqrt( x*x - 4*1*-y^2/4 ) ] / 2*1
+		# q = [ x +/- sqrt( x^2 + y^2 ) ]
+		# xoo = +/- sqrt(q)
+		# yoo = y / (2*xoo)
+		qa = Fraction( x + babylonian_square_root( x*x + y*y ), 2 )
+		qb = Fraction( x - babylonian_square_root( x*x + y*y ), 2 )
+		#print 'qa,qb',qa,qb
+		xooa = babylonian_square_root( abs(qa) )
+		xoob = babylonian_square_root( abs(qb) )
+		#print 'xoo',xooa,xoob
+		yooa = Fraction( y, 2*xooa )
+		yoob = Fraction( y, 2*xoob )
+		return complex( xooa, yooa ), complex( xoob, yoob )
+		
 class bivector:
 	def __init__( self, *args ):
 		if checktypes( vector, *args ):
@@ -189,36 +262,104 @@ class bivector:
 		if i==0: return self.v1
 		if i==1: return self.v2
 
+# determinant, aka wedge, aka signed area of paralellogram formed by 2 vectors
+def wedge( *args ):
+	if checktypes(point,*args) and len(args)==2:
+		x1,y1,x2,y2=args[0].x,args[0].y,args[1].x,args[1].y
+	elif checkrationals(*args) and len(args)==4:
+		x1,y1,x2,y2=args[0],args[1],args[2],args[3]
+	elif checktypes(vector,*args) and len(args)==2:
+		x1,y1,x2,y2=args[0].x,args[0].y,args[1].x,args[1].y
+	else: raise Exception('dont understand input to wedge()')
+	return x1*y2-x2*y1
+
+# line formula here is ax + by + c = 0
 class line:
-	# line formula here is ax + by + c = 0
 	def __init__( self, *args ):
-		if len(args)==2 and isinstance(args[0],point) and isinstance(args[1],point):
-			x1,y1,x2,y2=args[0].x,args[0].y,args[1].x,args[1].y
-			a,b,c=y1-y2,x2-x1,x1*y2-x2*y1
-		elif len(args)==3 and type(args[0])==int and type(args[1])==int and type(args[2])==int:
-			a,b,c=args[0],args[1],args[2]
-		elif len(args)==3 and instanceof(args[0],Fraction) and instanceof(args[1],Fraction) and instanceof(args[2],Fraction):
-			a,b,c=args[0],args[1],args[2]
+		if checktypes(point,*args) and len(args)==2:
+			self.init_from_points( args[0], args[1] )
+		elif checktypes(list,*args) and len(args)==2:
+			if len(args[0])==2 and len(args[1])==2:
+				p1 = point(args[0][0],args[0][1])
+				p2 = point(args[1][0],args[1][1])
+				self.init_from_points( p1, p2 )
+			else: raise Exception('line needs pts or rationals a,b,c')
+		elif checktypes(tuple,*args) and len(args)==2:
+			if len(args[0])==2 and len(args[1])==2:
+				p1 = point(args[0][0],args[0][1])
+				p2 = point(args[1][0],args[1][1])
+				self.init_from_points( p1, p2 )
+			else: raise Exception('line needs pts or rationals a,b,c')
+		elif checkrationals(*args) and len(args)==3:
+			self.a,self.b,self.c=args[0],args[1],args[2]
+		elif checkrationals(*args) and len(args)==4:
+			p1=point(args[0],args[1])
+			p2=point(args[2],args[3])
+			self.init_from_points( p1, p2 )
 		else:
-			raise Exception('not implemented. line needs pts or rationals a,b,c')
-		self.a,self.b,self.c=a,b,c
+			raise Exception('line needs pts or rationals a,b,c')
+	def init_from_points( self, p1, p2 ):
+		# for any p collinear to p1,p2, area of 
+		# paralello-gram formed by vector v1 (p2-p) and 
+		# vector v2 (p1-p) = 0. thus v1 wedge v2 == 0. 
+		# expand, and a,b,c become obvious.
+		# (same theory as building plane from pts)
+		pdiff = p2-p1
+		self.a,self.b = pdiff.y,-pdiff.x
+		self.c = -wedge( p1, p2 )
+	def __str__( self ): return line_txt( self )
+	def __repr__( self ): return line_txt( self )
+	def __getitem__( self, i ):
+		if i==0: return self.a
+		if i==1: return self.b
+
+		if i==2: return self.c
+
+# plane formula here is ax + by + cz + d = 0
+class plane:
+	def __init__( self, *args ):
+		if checktypes(point,*args) and len(args)==3:
+			p1,p2,p3 = args[0],args[1],args[2]
+			a,b,c,d=self.findequation(p1.x,p1.y,p1.z,p2.x,p2.y,p2.z,p3.x,p3.y,p3.z)
+		elif checkrationals(*args) and len(args)==4:
+			a,b,c,d=args[0],args[1],args[2],args[3]
+		else:
+			raise Exception('not implemented. plane needs pts or rationals a,b,c')
+		self.a,self.b,self.c,self.d=a,b,c,d
+	def findequation(self,x1,y1,z1,x2,y2,z2,x3,y3,z3 ):
+		# Theory+Problems of Vector Analysis, Murray R Spiegel, 1959
+		# Schaum Publishing, New York. 
+		# For any p coplanar to p1,p2,p3, area of paralellapiped 
+		# formed by vector (p2-p), vector (p1-p), and 
+		# vector(p3-p) = 0. thus v1 dot v2 cross v3 = 0. expand 
+		# and a,b,c become obvious
+		x21,x31 = x2-x1, x3-x1
+		y21,y31 = y2-y1, y3-y1
+		z21,z31 = z2-z1, z3-z1
+		a = y21*z31-z21*y31
+		b = z21*x31-x21*z31
+		c = x21*y31-y21*x31
+		dx = x1*( z21*y31 - y21*z31 )
+		dy = y1*( x21*z31 - z21*x31 )
+		dz = z1*( y21*x31 - x21*y31 )
+		d = sum(dx,dy,dz)
+		return a,b,c,d
 	def __str__( self ):
-		return line_txt( self )
+		return plane_txt( self )
 	def __getitem__( self, i ):
 		if i==0: return self.a
 		if i==1: return self.b
 		if i==2: return self.c
+		if i==3: return self.d
 
 class lineseg:
 	def __init__( self, *args ):
-		if checktypes(point,*args):
+		if checktypes(point,*args) and len(args)==2:
 			self.p0,self.p1=args[0],args[1]
-		if checktypes(Fraction,*args):
+		elif checkrationals(*args) and len(args)==4:
 			self.p0 = point(args[0],args[1])
 			self.p1 = point(args[2],args[3])
-		if checktypes(int,*args):
-			self.p0 = point(args[0],args[1])
-			self.p1 = point(args[2],args[3])
+		else: raise Exception('lineseg needs 2 points')
 	def __str__( self ):
 		return lineseg_txt( self )
 	def quadrance( self ):
@@ -226,6 +367,7 @@ class lineseg:
 	def __getitem__( self, i ):
 		if i==0: return self.p0
 		if i==1: return self.p1
+line_seg=lineseg
 
 class triangle:
 	l0,l1,l2=None,None,None
@@ -269,16 +411,16 @@ class triangle:
 		self.init_from_points( p0, p1, p2 )
 
 	def init_from_points( self, p0, p1, p2 ):
-		l0,l1,l2 = line(p0,p1),line(p1,p2),line(p2,p0)
-		ls0,ls1,ls2 = lineseg(p1,p2),lineseg(p0,p2),lineseg(p0,p1)
-		q0,q1,q2=quadrance(ls0),quadrance(ls1),quadrance(ls2)
-		s0,s1,s2=spread(l1,l2),spread(l0,l2),spread(l0,l1)
+		#l0,l1,l2 = line(p0,p1),line(p1,p2),line(p2,p0)
+		#ls0,ls1,ls2 = lineseg(p1,p2),lineseg(p0,p2),lineseg(p0,p1)
+		#q0,q1,q2=quadrance(ls0),quadrance(ls1),quadrance(ls2)
+		#s0,s1,s2=spread(l1,l2),spread(l0,l2),spread(l0,l1)
 
-		self.l0,self.l1,self.l2=l0,l1,l2
+		#self.l0,self.l1,self.l2=l0,l1,l2
 		self.p0,self.p1,self.p2=p0,p1,p2
-		self.ls0,self.ls1,self.ls2=ls0,ls1,ls2
-		self.q0,self.q1,self.q2=q0,q1,q2
-		self.s0,self.s1,self.s2=s0,s1,s2
+		#self.ls0,self.ls1,self.ls2=ls0,ls1,ls2
+		#self.q0,self.q1,self.q2=q0,q1,q2
+		#self.s0,self.s1,self.s2=s0,s1,s2
 		
 	def __str__( self ):
 		return triangle_txt( self )
@@ -426,6 +568,20 @@ class triangle:
 # all the same points eventually, but it is still there, a sort of twin 
 # shadow of the ordinary circle, right on top of it.
 
+#
+# Lastly, what about 'infinite radius', where curvature is zero?
+#
+# Recall the actualy full equation for a conic section
+#
+# ax^2+by^2+cx+dy+exy+f=0
+#
+# In that case, the curvature is 0 so the circle is a line. 
+# Therefore a=0,b=0,e=0, and then c,d,f become coefficients of a line equation:
+#
+# cx+dy+f = 0
+#
+#in that case, the circle will contain 'equation coefficients'.
+# 
 class circle:
 	def __init__(self, *args):
 		if (len(args)<2): raise Exception('need center x,y and radial quadrance')
@@ -449,12 +605,19 @@ class circle:
 		self.radial_quadrance = rq
 		if (rq!=0): self.curvature_quadrance = Fraction(1,rq)
 		else: self.curvature_quadrance = None
+#	def init_curvature_zero( self,
+
 	def __str__( self ):
+		return circle_txt(self)
+	def __repr__( self ):
 		return circle_txt(self)
 
 class quaternion:
 	def __init__(self,t,v):
 		self.t,self.v=t,v
+
+
+
 
 ######## formulas, functions, theorems, operations
 
@@ -463,9 +626,12 @@ class quaternion:
 ## note there is no matrix definition here
 
 def determinant( *args ):
-	for i in range(len(args)):
-		if not isinstance(args[i],vector):
-			raise Exception('this determinant() needs vector input as rows')
+	if checktypes(vector,*args):
+		pass
+	elif checktypes(point,*args):
+		v1,v2=vector(args[0]),vector(args[1])
+	else:
+		raise Exception('this determinant() needs vector input as rows')
 	result = None
 
 	if len(args)<=1: raise Exception('not implemented')
@@ -586,59 +752,98 @@ def green_altitude( *args ):
 		raise Exception('need line and point')
 	return green_altitude( l, A )
 
+def blue_foot( line0, point0 ):
+	a,b,c=line0.a,line0.b,line0.c
+	x0,y0=point0.x,point0.y
+	fx=Fraction(sqr(b)*x0-a*b*y0-a*c,blueq(a,b))
+	fy=Fraction(-a*b*x0+sqr(a)*y0-b*c,blueq(a,b))
+	return point(fx,fy)
+
+def red_foot( line0, point0 ):
+	a,b,c=line0.a,line0.b,line0.c
+	x0,y0=point0.x,point0.y
+	fx=Fraction(-sqr(b)*x0-a*b*y0-a*c,redq(a,b))
+	fy=Fraction(a*b*x0+sqr(a)*y0+b*c,redq(a,b))
+	return point(fx,fy)
+
+def green_foot( line0, point0 ):
+	a,b,c=line0.a,line0.b,line0.c
+	x0,y0=point0.x,point0.y
+	fx=Fraction(a*x0-b*y0-c,2*a)
+	fy=Fraction(-a*x0+b*y0-c,2*b)
+	return point(fx,fy)
+
 ###### perpendicular
 
-def red_perpendicular_vectors( v1, v2 ):
-	raise Exception("not implemented ")
-def green_perpendicular_vectors( v1, v2 ):
-	raise Exception("not implemented ")
-def blue_perpendicular_vectors( v1, v2 ):
+# Question - can there be multiple perpendiculars for one vector? 
+# answer - yes... do we return both though?
+def blue_find_perpendicular_vector( v1 ):
+	return vector(-v1.y,v1.x)
+def red_find_perpendicular_vector( v1 ):
+	return vector(v1.y,v1.x)
+def green_find_perpendicular_vector( v1 ):
+	return vector(-v1.x,v1.y)
+find_perpendicular_vector=blue_find_perpendicular_vector
+
+def blue_find_perpendicular_line( l1 ):
+	return line(-l1.b,l1.a,l1.c)
+def red_find_perpendicular_line( l1 ):
+	return line(l1.b,l1.a,l1.c)
+def green_find_perpendicular_line( l1 ):
+	return line(-l1.a,l1.b,l1.c)
+find_perpendicular_line=blue_find_perpendicular_line
+
+def blue_is_perpendicular_for_vectors( v1, v2 ):
 	return v1.x*v2.x + v1.y*v2.y == 0
+def red_is_perpendicular_for_vectors( v1, v2 ):
+	return v1.x*v2.x - v1.y*v2.y == 0
+def green_is_perpendicular_for_vectors( v1, v2 ):
+	return v1.x*v2.y + v1.y*v2.x == 0
 
-def red_perpendicular_linesegs( v1, v2 ):
-	raise Exception("not implemented ")
-def green_perpendicular_linesegs( v1, v2 ):
-	raise Exception("not implemented ")
-def blue_perpendicular_linesegs( v1, v2 ):
-	raise Exception("not implemented ")
+def blue_is_perpendicular_for_linesegs( ls1, ls2 ):
+	v1,v2=vector(ls1[1]-ls1[0]),vector(ls2[1]-ls2[0])
+	return blue_is_perpendicular_for_vectors(v1,v2)
+def red_is_perpendicular_for_linesegs( ls1, ls2 ):
+	v1,v2=vector(ls1[1]-ls1[0]),vector(ls2[1]-ls2[0])
+	return red_is_perpendicular_for_vectors(v1,v2)
+def green_is_perpendicular_for_linesegs( ls1, ls2 ):
+	v1,v2=vector(ls1[1]-ls1[0]),vector(ls2[1]-ls2[0])
+	return green_is_perpendicular_for_vectors(v1,v2)
 
-def red_perpendicular_lines( v1, v2 ):
-	raise Exception("not implemented ")
-def green_perpendicular_lines( v1, v2 ):
-	raise Exception("not implemented ")
-def blue_perpendicular_lines( v1, v2 ):
-	raise Exception("not implemented ")
+def blue_is_perpendicular_for_lines( l1,l2 ):
+	return l1.a*l2.a+l1.b*l2.b==0
+def red_is_perpendicular_for_lines( l1,l2 ):
+	return l1.a*l2.a-l1.b*l2.b==0
+def green_is_perpendicular_for_lines( l1,l2 ):
+	return l1.a*l2.b+l1.b*l2.a==0
 
-
-def perpendicular( *args, **kwargs ):
-	if 'color' in kwargs.keys(): color=kwargs['color']
- 	else: color='blue'
-
-	if color=='red':
-		perpendicular_vectors = red_perpendicular_vectors
-		perpendicular_lines = red_perpendicular_lines
-		perpendicular_linesegs = red_perpendicular_linesegs
-	elif color == 'green':
-		perpendicular_vectors = green_perpendicular_vectors
-		perpendicular_lines = green_perpendicular_lines
-		perpendicular_linesegs = green_perpendicular_linesegs
-	elif color == 'blue':
-		perpendicular_vectors = blue_perpendicular_vectors
-		perpendicular_lines = blue_perpendicular_lines
-		perpendicular_linesegs = blue_perpendicular_linesegs
-
-	if isinstance(args[0],point): # and isinstance(args[1],point):
-		raise Exception( "not implemented")
-	if isinstance(args[0],line) and isinstance(args[1],line):
-		return perpendicular_lines( args[0], args[1] )
-	if isinstance(args[0],lineseg) and isinstance(args[1],lineseg):
-		return perpendicular_linesegs( args[0], args[1] )
-	if isinstance(args[0],vector) and isinstance(args[1],vector):
-		return perpendicular_vectors( args[0], args[1] )
-	return None
-
-
-
+def blue_is_perpendicular( *args ):
+	if checktypes(line,*args) and len(args)==2:
+		return blue_is_perpendicular_for_lines(args[0],args[1])
+	elif checktypes(lineseg,*args) and len(args)==2:
+		return blue_is_perpendicular_for_linesegs(args[0],args[1])
+	elif checktypes(vector,*args) and len(args)==2:
+		return blue_is_perpendicular_for_vectors(args[0],args[1])
+	else: raise Exception('unknown args to blue_is_perpendicular',args)
+def red_is_perpendicular( *args ):
+	if checktypes(line,*args) and len(args)==2:
+		return red_is_perpendicular_for_lines(args[0],args[1])
+	elif checktypes(lineseg,*args) and len(args)==2:
+		return red_is_perpendicular_for_linesegs(args[0],args[1])
+	elif checktypes(vector,*args) and len(args)==2:
+		return red_is_perpendicular_for_vectors(args[0],args[1])
+	else: raise Exception('unknown args to red_is_perpendicular',args)
+def green_is_perpendicular( *args ):
+	if checktypes(line,*args) and len(args)==2:
+		return green_is_perpendicular_for_lines(args[0],args[1])
+	elif checktypes(lineseg,*args) and len(args)==2:
+		return green_is_perpendicular_for_linesegs(args[0],args[1])
+	elif checktypes(vector,*args) and len(args)==2:
+		return green_is_perpendicular_for_vectors(args[0],args[1])
+	else: raise Exception('unknown args to green_is_perpendicular',args)
+def is_blue_perpendicular( *args ): return blue_is_perpendicular( *args )
+def is_red_perpendicular( *args ): return red_is_perpendicular( *args )
+def is_green_perpendicular( *args ): return green_is_perpendicular( *args )
 
 ########## parallel
 
@@ -916,13 +1121,24 @@ def meet_line_and_point( l, p ):
 	if l.a*p.x + l.b*p.y + l.c == 0: return p
 	else: return None
 
+def meet_plane_and_point( pl, pt ):
+	if pt.x*pl.a + pt.y*pl.b + pt.z*pl.c + pl.d == 0:
+		return pt
+	else:
+		return None
+	
 def meet( *args ):
 	if isinstance(args[0],line) and isinstance(args[1],line):
 		return meet_lines( args[0], args[1] )
-	if isinstance(args[0],line) and isinstance(args[1],point):
+	elif isinstance(args[0],line) and isinstance(args[1],point):
 		return meet_line_and_point( args[0], args[1] )
-	if isinstance(args[0],point) and isinstance(args[1],line):
+	elif isinstance(args[0],point) and isinstance(args[1],line):
 		return meet_line_and_point( args[1], args[0] )
+	elif isinstance(args[0],point) and isinstance(args[1],plane):
+		return meet_plane_and_point( args[1], args[0] )
+	elif isinstance(args[1],point) and isinstance(args[0],plane):
+		return meet_plane_and_point( args[0], args[1] )
+
 	raise Exception(' not implemented' + str(args) )
 
 ############################## 1-dimensional projective geometry
@@ -1074,6 +1290,199 @@ quadrea = blue_quadrea
 
 ############################## misc stuff
 
+
+
+
+# def find_tangent_lines( circle0, a, b):
+# given a blue circle and the slope of a line, find the two lines that are 
+# tangent to the circle that have the given slope. the slope is expressed as
+# two rationals, a and b, which are the 'a','b' coefficients of a line with
+# this form: ax+by+c=0. we dont know c. this function will find c for us.
+# 
+# for example. given a circle at 0,0 with radial quadrance 1, and a slope
+# of a=1,b=0, find the tangent lines.
+#
+# slope of a=1,b=0 is basically a straight vertical line going up and down. 
+# the result will be two lines touching the circle at 1,0 and -1,0. Their
+# equations: 
+#   1x+0y+1=0
+#   1x+0y-1=0
+#
+# Note that in order to produce a rational result, input a and b must be 
+# the two legs of a rational Pythagorean triple. Also the circle's 
+# quadrance must be a perfect rational square. For example: 
+# a=3,b=4,circ=(2,3,25) is OK but a=1,b=1,circle(0,0,1) is not OK 
+# because the intersection point would be sqrt(2),sqrt(2) which is irrational.
+# 
+# If non-pythagorean inputs are givenm an Exception is raised.
+#
+# Approximations can be made in cases like a=1,b=1, as long as they are
+# Rational approximations. I don't have an algorithm for finding such
+# approximations but its possible to do it, as they are an infinite number
+# of rational Pythagorean triples.
+def find_blue_tangent_lines( circle0, a, b):
+	# algorithm: translate the circle to 0,0. consider a line with 
+	# perpendicular slope, -b a, thru 0,0 and find its 2 
+	# intersection points with the circle centered at 0,0. translate those 
+	# 2 points back to where the circles original center was. find 
+	# the eqn of the lines with the original slope passing thru those 
+	# new pts.
+
+	# x^2+y^2=r^2=Quadrance << circle eqn
+	# ax+by+c=0 << line eqn
+	# bx-ay=0 << line eqn thru origin thats perpendicular to given slope
+	# y=-bx/-a 
+	# x^2+(-bx/-a)^2=Q 
+	# x^2*a^2+b^2*x^2=a^2*Q
+	# meetx= + or - a*sqrt(Q/(a^2+b^2))
+	# by symmetry, x=ay/b, etc etc -> 
+	# meety= + or - b*sqrt(Q/(a^2+b^2))
+	if sqr(a)+sqr(b)==0: return line(0,0,0),line(0,0,0)
+	tmp = Fraction(circle0.radial_quadrance,sqr(a)+sqr(b))
+	root = perfect_square_root( tmp )
+	meet1 = point(a*root,b*root)
+	meet2 = point(-a*root,-b*root)
+	meet3 = meet1+circle0.center
+	meet4 = meet2+circle0.center
+	c3 = -1*(a*meet3.x+b*meet3.y)
+	c4 = -1*(a*meet4.x+b*meet4.y)
+	l3,l4 = line(a,b,c3),line(a,b,c4)
+	return l3,l4
+find_tangent_lines=find_blue_tangent_lines
+
+
+# def find_red_tangent_lines( circle0, a, b): given a red circle (hyperbola) 
+# and the slope of a line, find the two lines that are tangent to the 
+# circle that have the given slope. the slope is expressed as two 
+# rationals, a and b, which are the 'a','b' coefficients of a line with 
+# this form: ax+by+c=0. we dont know c. this function will find c for us.
+#
+# Note that in order to produce a rational result, input a and b must be 
+# the hypoteneuse and one leg of a rational Pythagorean triple. Also the circle's 
+# quadrance must be a perfect rational square (negative OK). For example: 
+# a=5,b=4,circ=(2,3,25) is OK but a=2,b=1,circle(0,0,1) is not OK 
+# because the intersection point would be irrational.
+#
+# you can generate such pythagorean pairs using a paramteriztaion, like
+# m,n=random integers, then a=blueq(m,n) and b=redq(m,n) will be OK.
+#
+# for red circles, a line with slope>1 is only tangent to a red circle 
+# with positive quadrance. in other words, for every red circle with
+# positive quadrance, the slope of a tangent line will always be >1
+# so if you try to find a tangent with a slope<1, you get no result.
+#
+# a line with slope<1 is only tangent to a red circle with negative 
+# quadrance. in other word, for every red circle with negative quadrance,
+# the slope of a tangent line will always be <1.
+# so if you try to find a tangent with a slope>1, you get no result.
+#
+# algebraically, this is because you wind up with imaginary coordinates. 
+# visually, its because the the hyperbola x^2-y^2=1 will never have a 
+# tangent with slope of, say, for example, slope of 1/2, or 1/8, or etc 
+# etc. and the hyperbola x^2-y^2=-1 wont have a tangent line with slope
+# of, say, 2, or 4, or 5.
+#
+def find_red_tangent_lines( circle0, a, b):
+	# algorithm: similar to blue circles, 
+	# but using the red circle equation,
+	# annnd the red idea of perpendicular.
+	# annnnnnd we deal with negative Quadrance, which is OK for red circs.
+	# ( for neg quadrance info, see description of 'circles' 
+	#   elsewhere in this code )
+	# 
+	# x^2-y^2=r^2=Quadrance << red circle eqn
+	# ax+by+c=0 << line eqn
+	# bx+ay=0 << line eqn thru 0,0 thats red perpendicular to given slope
+	# y=-bx/a 
+	# x^2-(-bx/a)^2=Q 
+	# x^2*a^2-b^2*x^2=a^2*Q
+	# meetx= + or - a*sqrt(Q/(a^2-b^2))
+	# by symmetry, x=-ay/b, etc etc -> 
+	# meety= + or - b*sqrt(Q/(a^2-b^2))
+	Q=circle0.radial_quadrance
+	#x=y and x=-y lines are considered never tangent
+	# (null lines of the red geometry)
+	if sqr(a)-sqr(b)==0: return line(0,0,0),line(0,0,0)
+	tmp = Fraction(circle0.radial_quadrance,sqr(a)-sqr(b))
+	# this is where we detect lines with slope<1 and positive quadrance,
+	# or lines with slope>1 and negative quadrance, both have null solutions
+	if tmp<0: return line(0,0,0),line(0,0,0)
+	root = perfect_square_root( tmp )
+	meet1 = point(-a*root,b*root)
+	meet2 = point(a*root,-b*root)
+	meet3 = meet1+circle0.center
+	meet4 = meet2+circle0.center
+	c3 = -1*(a*meet3.x+b*meet3.y)
+	c4 = -1*(a*meet4.x+b*meet4.y)
+	l3,l4 = line(a,b,c3),line(a,b,c4)
+	return l3,l4
+
+
+
+# def find_green_tangent_lines( circle0, a, b): given a green circle (hyperbola) 
+# and the slope of a line, find the two lines that are tangent to the 
+# circle that have the given slope. the slope is expressed as two 
+# rationals, a and b, which are the 'a','b' coefficients of a line with 
+# this form: ax+by+c=0. we dont know c. this function will find c for us.
+#
+# Note that in order to produce a rational result, input a and b must be 
+# of a form such that a/2*b is a perfect square. In other words, a and b
+# must be the two 'differences' between a Pythagorean triple hypoteneuse and
+# each of its legs. 
+#
+# Also the circle's quadrance must be a perfect rational square 
+# (negative OK). For example: a=1,b=2,circ=(0,0,25) is OK but 
+# a=4,b=3,circle(0,0,1) is not OK because the intersection point would 
+# be irrational.
+#
+# You can generate such Pythagorean pairs using a paramteriztaion. For example
+# given m,n=random integers, then 
+#   a=blueq(m,n)-greenq(m,n)
+#   b=blueq(m,n)-redq(m,n)
+#
+# for green circles, a line with positive slope (a*b<0) is only going to have
+# a tangent to a green circle with negative quadrance. the same is true for
+# negative slope-lines and positive quadrances. algebraically its because
+# you wind up with imaginary intersection points. visually, it's because
+# the hyperbola xy=1 will never have a tangent with slope of, say, for example,
+# slope of 1. nor with 1/2, not with 1/8, etc.
+#
+def find_green_tangent_lines( circle0, a, b):
+	# algorithm: similar to red circles, 
+	#
+	# 2xy=r^2=Quadrance << green circle eqn
+	# ax+by+c=0 << line eqn
+	# -ax+by=0 << line eqn thru 0,0 thats green perpendicular to given slope
+	# y=ax/b 
+	# 2*x*(ax/b)=Q 
+	# 2*x*x*(a/b)=Q
+	# x*x*(a/b)=Q/2
+	# x*x=bQ/2a
+	# meetx= + or - sqrt(bQ/2a)
+	# by symmetry, x=-by/-a, etc etc -> 
+	# meety= + or - sqrt(aQ/2b)
+	Q=circle0.radial_quadrance
+	#horiz and vert lines are considered never tangent
+	# (null lines of the green geometry)
+	if a*b==0: return line(0,0,0),line(0,0,0)
+	tmp1 = Fraction(Q*b,2*a)
+	tmp2 = Fraction(Q*a,2*b)
+	# this is where we detect if the circle's quadrance and the 
+	# line's slope both are both positive or both negative... either 
+	# situation has a null result. note that a,b both >0 = negative slope
+	if tmp1<0 or tmp2<0: return line(0,0,0),line(0,0,0)
+	root1 = perfect_square_root( tmp1 )
+	root2 = perfect_square_root( tmp2 )
+	meet1 = point(root1,sign(a*b)*root2)
+	meet2 = point(-root1,sign(a*b)*-root2)
+	meet3 = meet1+circle0.center
+	meet4 = meet2+circle0.center
+	c3 = -1*(a*meet3.x+b*meet3.y)
+	c4 = -1*(a*meet4.x+b*meet4.y)
+	l3,l4 = line(a,b,c3),line(a,b,c4)
+	return l3,l4
+
+
 def archimedes_function_3numbers(a,b,c): 
 	return sqr(a+b+c) - 2*(a*a+b*b+c*c)
 
@@ -1144,29 +1553,51 @@ def mirrorz_triangle(t):
 	p3 = t[2] * vector(1,1,-1)
 	return triangle( p1, p2, p3 )
 
+def mirrorx_point(p):
+	if hasattr(p,'z'): return point(-p.x,p.y,p.z) 
+	else: return point(-p.x,p.y)
+def mirrory_point(p):
+	if hasattr(p,'z'): return point(p.x,-p.y,p.z) 
+	else: return point(p.x,-p.y)
+def mirrorz_point(p):
+	if hasattr(p,'z'): return point(p.x,p.y,-p.z) 
+	else: return point(p.x,p.y)
+
 def mirrorx( *args ):
 	if checktypes(triangle,*args) and len(args)==1:
 		return mirrorx_triangle( args[0] )
+	elif checktypes(point,*args) and len(args)==1:
+		return mirrorx_point( args[0] )
 	else: raise Exception('mirror not implemented')
 def mirrory( *args ):
 	if checktypes(triangle,*args) and len(args)==1:
 		return mirrory_triangle( args[0] )
+	elif checktypes(point,*args) and len(args)==1:
+		return mirrory_point( args[0] )
 	else: raise Exception('mirror not implemented')
 def mirrorz( *args ):
 	if checktypes(triangle,*args) and len(args)==1:
 		return mirrorz_triangle( args[0] )
+	elif checktypes(point,*args) and len(args)==1:
+		return mirrorz_point( args[0] )
 	else: raise Exception('mirror not implemented')
 
 # translate a triangle by a vector. example, triangle 0,0 1,0 0,1 by vector 2,0
 # result is 2,0 3,0 2,1
 def translate_triangle_by_vector( t, v ):
 	return triangle( t.p0+v, t.p1+v, t.p2+v )
+def translate_lineseg_by_vector( ls, v ):
+	p1,p2 = ls[0]+v,ls[1]+v
+	return lineseg(p1,p2)
 def translate( *args ):
 	if len(args)<2: raise Exception( 'need 2 objects for translation' )
 	if checktypes( vector, args[0] ) and checktypes( triangle, args[1] ):
 		return translate_triangle_by_vector( args[1], args[0] )
-	if checktypes( triangle, args[0] ) and checktypes( vector, args[1] ):
-		return translate_triangle_by_vector( args[0], args[1] )
+	elif checktypes( vector, args[0] ) and checktypes( triangle, args[1] ):
+		return translate_triangle_by_vector( args[1], args[0] )
+	elif checktypes( lineseg, args[0] ) and checktypes( vector, args[1] ):
+		return translate_lineseg_by_vector( args[0], args[1] )
+	else: raise Exception('unknown type to translate'+str(args))
 
 # midpoint, its the half-way point between two points.
 def midpoint_from_points( p1, p2 ):
@@ -1277,492 +1708,6 @@ def is_pythagorean_triple_permutation( a, b, c ):
 	if a*a+b*b == c*c: return True
 	return False
 
-####### calculate left hand side and right hand side of various formulas
-
-
-def triple_quad_lhs( q0, q1, q2 ):
-	return sqr(q0+q1+q2)
-
-def triple_quad_rhs( q0, q1, q2 ):
-	return 2*( q0*q0 + q1*q1 + q2*q2 )
-
-def quadruple_quad_lhs( q0, q1, q2, q3 ):
-	term0 = sqr( q0 + q1 + q2 + q3 )
-	term1 = q0*q0 + q1*q1 + q2*q2 + q3*q3
-	return sqr( term0 - 2*term1 )
-
-def quadruple_quad_rhs( q0, q1, q2, q3 ):
-	return 64 * q0 * q1 * q2 * q3
-
-def cross_law_lhs( tri ):
-	return sqr(tri.q0+tri.q1-tri.q2)
-	
-def cross_law_rhs( tri ):
-	cross = 1-tri.s2
-	return 4*tri.q0*tri.q1*(cross)
-
-def spread_law( tri ):
-	a,b,c = tri.s0/tri.q0 , tri.s1/tri.q1 , tri.s2/tri.q2
-	return str(a)+', '+str(b)+', '+str(c)
-
-def triple_spread_lhs( tri ):
-	return sqr( tri.s0 + tri.s1 + tri.s2 )
-
-def triple_spread_rhs( tri ):
-	s0,s1,s2 = tri.s0, tri.s1, tri.s2
-	return 2 * ( s0*s0 + s1*s1 + s2*s2 ) + 4*s0*s1*s2
-
-def pythagoras_lhs( tri ):
-	return tri.q0 + tri.q1
-
-def pythagoras_rhs( tri ):
-	return tri.q2
-
-
-
-###### formulas, functions, theorems - chromogeometry
-
-def colored_quadrance_lhs( p0, p1 ):
-	return sqr(blue_quadrance( p0, p1 ))
-
-def colored_quadrance_rhs( p0, p1 ):
-	return sqr(red_quadrance(p0, p1)) + sqr(green_quadrance(p0, p1))
-
-def colored_spread_lhs( l0, l1 ):
-	bs = blue_spread_lines( l0, l1 )
-	rs = red_spread_lines( l0, l1 )
-	gs = green_spread_lines( l0, l1 )
-	return 1/bs + 1/rs + 1/gs
-
-def colored_spread_rhs( l0, l1 ):
-	return 2
-
-
-###### anti-symmetric polynomials
-
-# special polynomials used in many areas of geometry, especially 
-# chromogeometry.
-# 
-# an anti-symmetrical polynomial is generated from an 'input monomial' 
-# by transposing subscripts/indexes of variables
-#
-# example:
-# input 'x1y2' returns six terms, by transposing '1' and '2' in a pattern:
-# +x1y2 -x1y3 +x2y3 -x3y2 +x3y1 -x2y1
-# 
-# this particular sum is twice the signed area of the triangle of the 3 points
-# x1,y1 x2,y2 x3,y3 
-#
-# It can be a bit confusing b/c the 'input' doesnt list x3,y3. But if 
-# you get the hang of the transpositions it can help to understand. 
-# Another way to think about it is to consider input monomial as 
-# sort of like a 'seed' and the six-term polynomial 'grows' out of it.
-# 
-# The easiest function to use in this code is eval_asympoly(): You give 
-# it a monomial and some values for x1,y1 x2,y2 x3,y3. It generates the 
-# complete antisymmetric polynomial and plugs in the values for you into 
-# the six generated terms, then sums them together and gives the 
-# resulting sum.
-#
-# eval_asympoly( 'x1*y2', 3,4, 3,0, 1,-2 ) -> returns 20
-#
-# The other functions are 'helpers'
-
-
-# More examples of antisymmetric polynomials:
-#
-# given: a monomial
-#
-# follow these 6 steps to generate the six terms of the antisymmetric 
-# polynomial:
-#
-# start with the subscripts as given. 
-# replace '2' with '3', and vice versa
-# replace '1' with '2', and vice versa
-# replace '2' with '3', and vice versa
-# replace '1' with '2', and vice versa
-# replace '2' with '3', and vice versa
-# now assign positive and negative: like so: + - + - + -
-
-# examples:
-#
-# input x1y2 returns six terms:
-# +x1y2 -x1y3 +x2y3 -x3y2 +x3y1 -x2y1
-#
-# input x1*x1*x2*y2 returns six terms:
-# +x1*x1*x2*y2 -x1*x1*x3*y3 +x2*x2*x3*y3 -x3*x3*x2*y2 +x3*x3*x1*y1 -x2*x2*x1*y1
-#
-# input x1*x1*x1*y1 returns six terms:
-# +x1*x1*x1*y1 -x1*x1*x1*y1 +x2*x2*x2*y2 -x3*x3*x3*y3 +x3*x3*x3*y3 -x2*x2*x2*y2
-
-
-
-# replace s1 for s2, and vice versa, in the input string s.
-# example: given 'xabx','a','b' return 'xbax'
-def transpose( s, s1, s2 ):
-	s = s.replace(s1,'______term1______').replace(s2,'_____term2_____')
-	s = s.replace('______term1______',s2).replace('_____term2_____',s1)
-	return s
-
-# given string representation of input monomial, generate a string
-# with the six terms of the antisymmetric polynomial
-def gen_antisymmetric_polynomial_string( s ):
-	term1 = s
-	term2 = transpose( term1, '2', '3' )
-	term3 = transpose( term2, '1', '2' )
-	term4 = transpose( term3, '2', '3' )
-	term5 = transpose( term4, '1', '2' )
-	term6 = transpose( term5, '2', '3' )
-	#term1 = '+'+term1
-	term2 = '-'+term2
-	term3 = '+'+term3
-	term4 = '-'+term4
-	term5 = '+'+term5
-	term6 = '-'+term6
-	return term1+term2+term3+term4+term5+term6
-
-# generate and calc the value of an antisymmetric polyonmial, given an 
-# input monomial and some values for the input variables.
-#
-# first input must be a string representing a monomial python expression
-# second input must be a python dictionary mapping strings to Rationals.
-# example:
-# dic = { 'x1': 4, 'y1': 5, 'x2': 3, 'y2': 0, 'x3': 1, 'y3': -2 }
-# calc_antisymmetric_polynomial( 'x1*y2', dic )
-# result: 20
-def calc_antisymmetric_polynomial( monomial, vardict ):
-	asp_str = gen_antisymmetric_polynomial_string( monomial )
-	return eval(asp_str,{},vardict)
-
-#### antisymmetric polynomial convenience functions
-
-def gen_asymp_dict_from_points( p1, p2, p3 ):
-	dic = {}
-	dic['x1'],dic['y1']=p1.x,p1.y
-	dic['x2'],dic['y2']=p2.x,p2.y
-	dic['x3'],dic['y3']=p3.x,p3.y
-	return dic
-
-def gen_asymp_dict_from_triangle( t ):
-	return gen_asymp_dict_from_points( t.p0, t.p1, t.p2 )
-
-def gen_asymp_dict_from_rationals( x1,y1,x2,y2,x3,y3 ):
-	p1 = point(x1,y1)
-	p2 = point(x2,y2)
-	p3 = point(x3,y3)
-	return gen_asymp_dict_from_points( p1, p2, p3 )
-
-def eval_asympoly_from_triangle( monomial, tri ):
-	vardict = gen_asymp_dict_from_triangle( tri )
-	return calc_antisymmetric_polynomial( monomial, vardict )
-
-def eval_asympoly_from_points( monomial, p1, p2, p3 ):
-	vardict = gen_asymp_dict_from_points( p1, p2, p3 )
-	return calc_antisymmetric_polynomial( monomial, vardict )
-
-def eval_asympoly_from_rationals( monomial, x1,y1,x2,y2,x3,y3 ):
-	vardict = gen_asymp_dict_from_rationals( x1,y1,x2,y2,x3,y3 )
-	return calc_antisymmetric_polynomial( monomial, vardict )
-
-# easiest version to use. Examples:
-# eval_asympoly('x1*y2',3,4,3,0,1,-2) -> returns 20
-# p1,p2,p3 = point(3,4),point(3,0),point(1,-2) 
-# eval_asympoly('x1*y2',p1,p2,p3) -> returns 20
-# t = triangle(p1,p2,p3)
-# eval_asympoly('x1*y2',t) -> returns 20
-def eval_asympoly( *args ):
-	if len(args)<2: raise Exception('need monomial, pointdata')
-	if not isinstance(args[0],str):
-		raise Exception('arg[0] s/b string')
-	monomial = args[0]
-	if checktype(triangle, args[1]):
-		return eval_asympoly_from_triangle( monomial, args[1] )
-	if checktype(point, args[1]) and checktype(point, args[2]):
-		if checktype(point, args[3]):
-			p1,p2,p3=args[1],args[2],args[3]
-			return eval_asympoly_from_points( monomial, p1, p2, p3 )
-	if checktype(Fraction, args[1]):
-		x1,y1,x2,y2,x3,y3 = args[1],args[2],args[3],args[4],args[5],args[6]
-		return eval_asympoly_from_rationals( monomial, x1,y1,x2,y2,x3,y3 )
-	if checktype(int, args[1]):
-		x1,y1,x2,y2,x3,y3 = args[1],args[2],args[3],args[4],args[5],args[6]
-		return eval_asympoly_from_rationals( monomial, x1,y1,x2,y2,x3,y3 )
-	
-############################### triangle centers
-
-
-############## orthocenters
-
-def blue_orthocenter_from_triangle( t ):
-	if not checktype(triangle,t): raise Exception('need triangle')
-	terma = eval_asympoly( 'x1*x2*y2', t )
-	termb = eval_asympoly( 'y1*y2*y2', t )
-	termc = eval_asympoly( 'x1*y2', t )
-	termd = eval_asympoly( 'x1*y1*y2', t )
-	terme = eval_asympoly( 'x1*x1*x2', t )
-	termf = eval_asympoly( 'x1*y2', t )
-	x = Fraction( terma + termb, termc )
-	y = Fraction( termd + terme, termf )
-	return point(x,y)
-
-def red_orthocenter_from_triangle( t ):
-	if not checktype(triangle,t): raise Exception('need triangle')
-	terma = eval_asympoly( 'x1*x2*y2', t )
-	termb = eval_asympoly( 'y1*y2*y2', t )
-	termc = eval_asympoly( 'x1*y2', t )
-	termd = eval_asympoly( 'x1*y1*y2', t )
-	terme = eval_asympoly( 'x1*x1*x2', t )
-	termf = eval_asympoly( 'x1*y2', t )
-	x = Fraction( terma - termb, termc )
-	y = Fraction( termd - terme, termf )
-	return point(x,y)
-
-def green_orthocenter_from_triangle( t ):
-	if not checktype(triangle,t): raise Exception('need triangle')
-	terma = eval_asympoly( 'x1*x1*y2', t )
-	termb = eval_asympoly( 'x1*x2*y1', t )
-	termc = eval_asympoly( 'x1*y2', t )
-	termd = eval_asympoly( 'x1*y2*y2', t )
-	terme = eval_asympoly( 'x1*y1*y2', t )
-	termf = eval_asympoly( 'x1*y2', t )
-	x = Fraction( terma + termb, termc )
-	y = Fraction( termd - terme, termf )
-	return point(x,y)
-
-def blue_orthocenter_from_points( p1, p2, p3 ):
-	t = triangle( p1, p2, p3 )
-	blue_orthocenter_from_triangle( t )
-def red_orthocenter_from_points( p1, p2, p3 ):
-	t = triangle( p1, p2, p3 )
-	red_orthocenter_from_triangle( t )
-def green_orthocenter_from_points( p1, p2, p3 ):
-	t = triangle( p1, p2, p3 )
-	green_orthocenter_from_triangle( t )
-
-
-def blue_orthocenter( *args ):
-	if checktype(triangle, args[0]):
-		return blue_orthocenter_from_triangle( args[0] )
-	if checktype(point, args[0]) and checktype(point, args[1]):
-		if checktype(point, args[2]):
-			p1,p2,p3=args[0],args[1],args[2]
-			return blue_orthocenter_from_points( p1, p2, p3 )
-def red_orthocenter( *args ):
-	if checktype(triangle, args[0]):
-		return red_orthocenter_from_triangle( args[0] )
-	if checktype(point, args[0]) and checktype(point, args[1]):
-		if checktype(point, args[2]):
-			p1,p2,p3=args[0],args[1],args[2]
-			return red_orthocenter_from_points( p1, p2, p3 )
-def green_orthocenter( *args ):
-	if checktype(triangle, args[0]):
-		return green_orthocenter_from_triangle( args[0] )
-	if checktype(point, args[0]) and checktype(point, args[1]):
-		if checktype(point, args[2]):
-			p1,p2,p3=args[0],args[1],args[2]
-			return green_orthocenter_from_points( p1, p2, p3 )
-
-orthocenter=blue_orthocenter
-
-
-def blue_centroid( t ):
-	x = avg(t.p0.x,t.p1.x,t.p2.x)	
-	y = avg(t.p0.y,t.p1.y,t.p2.y)	
-	return point(x,y)
-def red_centroid( t ):
-	return blue_centroid(t)
-def green_centroid( t ):
-	return blue_centroid(t)
-centroid=blue_centroid
-
-############## bounding box
-
-def bounding_box_circle( c ):
-	xmin = c.center.x-babylonian_square_root(abs(c.radial_quadrance))
-	xmax = c.center.x+babylonian_square_root(abs(c.radial_quadrance))
-	ymin = c.center.y-babylonian_square_root(abs(c.radial_quadrance))
-	ymax = c.center.y+babylonian_square_root(abs(c.radial_quadrance))
-	return point(xmin,ymin),point(xmax,ymax)
-
-def bounding_box_triangle( t ):
-	xmin = min(t.p0.x,t.p1.x,t.p2.x)
-	ymin = min(t.p0.y,t.p1.y,t.p2.y)
-	xmax = max(t.p0.x,t.p1.x,t.p2.x)
-	ymax = max(t.p0.y,t.p1.y,t.p2.y)
-	return point(xmin,ymin),point(xmax,ymax)
-def bounding_box_triangles( ts ):
-	minp,maxp = bounding_box_triangle(ts[0])
-	tmpbox = bounding_box(minp,maxp)
-	for t in ts: tmpbox.extend(bounding_box_triangle(t))
-	return tmpbox.min,tmpbox.max
-def bounding_box_circles( cs ):
-	minp,maxp = bounding_box_circle(cs[0])
-	tmpbox = bounding_box(minp,maxp)
-	for c in cs: tmpbox.extend(bounding_box_circle(c))
-	return tmpbox.min,tmpbox.max
-def bounding_box_points( pts ):
-	xmin,ymin,xmax,ymax=pts[0].x,pts[0].y,pts[0].x,pts[0].y
-	for p in pts:
-		xmin = min(xmin,p.x)
-		ymin = min(ymin,p.y)
-		xmax = max(xmax,p.x)
-		ymax = max(ymax,p.y)
-	return point(xmin,ymin),point(xmax,ymax)
-def bounding_box_bboxes( boxes ):
-	tmpbox = bounding_box(boxes[0].min,boxes[0].max);
-	for b in boxes:
-		tmpbox.extend( b.min, b.max )
-	return tmpbox.min,tmpbox.max
-def bounding_width( *args ):
-	if checktypes(triangle,args) and len(args==1):
-		minp,maxp = bbox_triangle( args[0] )
-		return Fraction(minp.x+maxp.x,2)
-def bounding_height( *args ):
-	if checktypes(triangle,args) and len(args==1):
-		minp,maxp = bbox_triangle( args[0] )
-		return Fraction(minp.y+maxp.y,2)
-
-class bounding_box:
-	def __init__(self,*args):
-		testmin,testmax = None,None
-		if checktypes(triangle,*args):
-			testmin,testmax = bounding_box_triangles( args )
-		elif checktypes(point,*args):
-			testmin,testmax = bounding_box_points( args )
-		elif checktypes(bounding_box,*args):
-			testmin,testmax = bounding_box_bboxes( args )
-		elif checktypes(circle,*args):
-			testmin,testmax = bounding_box_circles( args )
-		elif checktypes(list,*args):
-			if len(args)==2 and checkrationals(args[0][0]):
-				xs,ys=args[0],args[1]
-				testmin=point(min(xs),min(ys))
-				testmax=point(max(xs),max(ys))
-			else:
-				for l in args:
-					for item in l:
-						self.extend(item)
-					
-		else:
-			raise Exception('unknown types:'+str(args))
-		self.min,self.max = testmin,testmax
-	def extend(self,*args):
-		testmin,testmax=self.min,self.max
-		if checktypes(triangle,*args):
-			testmin,testmax = bounding_box_triangles( args )
-		elif checktypes(point,*args):
-			testmin,testmax = bounding_box_points( args )
-		elif checktypes(bounding_box,*args):
-			testmin,testmax = bounding_box_bboxes( args )
-		elif checktypes(circle,*args):
-			testmin,testmax = bounding_box_circles( args )
-		elif checktypes(list,*args):
-			if len(args)==2 and checkrationals(args[0][0]):
-				xs,ys=args[0],args[1]
-				testmin=point(min(xs),min(ys))
-				testmax=point(max(xs),max(ys))
-			else:
-				for l in args:
-					for item in l:
-						self.extend(item)
-		elif checktypes(tuple,*args):
-			for l in args:
-				for item in l:
-					self.extend(item)
-		else: raise Exception('cannot extend,unknown type',args)
-		self.min.x = min(testmin.x,self.min.x)
-		self.min.y = min(testmin.y,self.min.y)
-		self.max.x = max(testmax.x,self.max.x)
-		self.max.y = max(testmax.y,self.max.y)
-		return self
-	def __add__( self, p): return self.extend( p )
-	def add( self, p): return self.extend( p )
-	def addto( self, p): return self.extend( p )
-	def __str__(self): return bounding_box_txt(self)
-	def width(self): return self.max.x-self.min.x
-	def height(self): return self.max.y-self.min.y
-	def frame(self): # slightly larger box
-		newminx = self.min.x - self.width() * Fraction(5,100)
-		newmaxx = self.max.x + self.width() * Fraction(5,100)
-		newminy = self.min.y - self.height() * Fraction(5,100)
-		newmaxy = self.max.y + self.height() * Fraction(5,100)
-		return point(newminx,newminy),point(newmaxx,newmaxy)
-
-############ circumcenters
-
-def blue_circumcenter_from_triangle( t ):
-	if not checktype(triangle,t): raise Exception('need triangle')
-	terma = eval_asympoly( 'x1*x1*y2', t )
-	termb = eval_asympoly( 'y1*y1*y2', t )
-	termc = eval_asympoly( 'x1*y2', t )
-	termd = eval_asympoly( 'x1*y2*y2', t )
-	terme = eval_asympoly( 'x1*x2*x2', t )
-	termf = eval_asympoly( 'x1*y2', t )
-	x = Fraction( terma + termb, 2 * termc )
-	y = Fraction( termd + terme, 2 * termf )
-	return point(x,y)
-
-def red_circumcenter_from_triangle( t ):
-	if not checktype(triangle,t): raise Exception('need triangle')
-	terma = eval_asympoly( 'x1*x1*y2', t )
-	termb = eval_asympoly( 'y1*y1*y2', t )
-	termc = eval_asympoly( 'x1*y2', t )
-	termd = eval_asympoly( 'x1*y2*y2', t )
-	terme = eval_asympoly( 'x1*x2*x2', t )
-	termf = eval_asympoly( 'x1*y2', t )
-	x = Fraction( terma - termb, 2 * termc )
-	y = Fraction( termd - terme, 2 * termf )
-	return point(x,y)
-
-def green_circumcenter_from_triangle( t ):
-	if not checktype(triangle,t): raise Exception('need triangle')
-	terma = eval_asympoly( 'x1*x2*y2', t )
-	termb = 0
-	termc = eval_asympoly( 'x1*y2', t )
-	termd = eval_asympoly( 'x1*y1*y2', t )
-	terme = 0
-	termf = eval_asympoly( 'x1*y2', t )
-	x = Fraction( terma + termb, termc )
-	y = Fraction( termd - terme, termf )
-	return point(x,y)
-
-def blue_circumcenter_from_points( p1, p2, p3 ):
-	t = triangle( p1, p2, p3 )
-	blue_circumcenter_from_triangle( t )
-def red_circumcenter_from_points( p1, p2, p3 ):
-	t = triangle( p1, p2, p3 )
-	red_circumcenter_from_triangle( t )
-def green_circumcenter_from_points( p1, p2, p3 ):
-	t = triangle( p1, p2, p3 )
-	green_circumcenter_from_triangle( t )
-
-
-def blue_circumcenter( *args ):
-	if checktype(triangle, args[0]):
-		return blue_circumcenter_from_triangle( args[0] )
-	if checktype(point, args[0]) and checktype(point, args[1]):
-		if checktype(point, args[2]):
-			p1,p2,p3=args[0],args[1],args[2]
-			return blue_circumcenter_from_points( p1, p2, p3 )
-def red_circumcenter( *args ):
-	if checktype(triangle, args[0]):
-		return red_circumcenter_from_triangle( args[0] )
-	if checktype(point, args[0]) and checktype(point, args[1]):
-		if checktype(point, args[2]):
-			p1,p2,p3=args[0],args[1],args[2]
-			return red_circumcenter_from_points( p1, p2, p3 )
-def green_circumcenter( *args ):
-	if checktype(triangle, args[0]):
-		return green_circumcenter_from_triangle( args[0] )
-	if checktype(point, args[0]) and checktype(point, args[1]):
-		if checktype(point, args[2]):
-			p1,p2,p3=args[0],args[1],args[2]
-			return green_circumcenter_from_points( p1, p2, p3 )
-
-circumcenter=blue_circumcenter
-
-
-
 # circumradial quadrance -> basiclly the square of circumradius.
 # whats circumradius? the radius of a circle that has all 3 points of the
 # triangle lying exactly on the circle
@@ -1789,75 +1734,17 @@ def green_circumcircle( tri ):
 def blue_ninepointcircle( tri ):
 	bnc = blue_ninepointcenter(tri)
 	return circle( bnc , blue_quadrance( bnc, midpoint(tri[0],tri[1]) ) )
+blue_ninepoint_circle=blue_ninepointcircle
 def red_ninepointcircle( tri ):
 	rnc = red_ninepointcenter(tri)
 	return circle( rnc , red_quadrance( rnc, midpoint(tri[0],tri[1]) ) )
+red_ninepoint_circle=red_ninepointcircle
 def green_ninepointcircle( tri ):
 	gnc = green_ninepointcenter(tri)
 	return circle( gnc , green_quadrance( gnc, midpoint(tri[0],tri[1]) ) )
+green_ninepoint_circle=green_ninepointcircle
 
 circumradial_quadrance=blue_circumradial_quadrance
-
-
-
-######################## nine point centers
-
-def blue_ninepointcenter_from_triangle( t ):
-	if not checktype(triangle,t): raise Exception('need triangle')
-	p1 = red_circumcenter_from_triangle( t )
-	p2 = green_circumcenter_from_triangle( t )
-	return midpoint_from_points( p1, p2 )
-
-def red_ninepointcenter_from_triangle( t ):
-	if not checktype(triangle,t): raise Exception('need triangle')
-	p1 = blue_circumcenter_from_triangle( t )
-	p2 = green_circumcenter_from_triangle( t )
-	return midpoint_from_points( p1, p2 )
-
-def green_ninepointcenter_from_triangle( t ):
-	if not checktype(triangle,t): raise Exception('need triangle')
-	p1 = blue_circumcenter_from_triangle( t )
-	p2 = red_circumcenter_from_triangle( t )
-	return midpoint_from_points( p1, p2 )
-
-def blue_ninepointcenter_from_points( p1, p2, p3 ):
-	t = triangle( p1, p2, p3 )
-	return blue_ninepointcenter_from_triangle( t )
-def red_ninepointcenter_from_points( p1, p2, p3 ):
-	t = triangle( p1, p2, p3 )
-	return red_ninepointcenter_from_triangle( t )
-def green_ninepointcenter_from_points( p1, p2, p3 ):
-	t = triangle( p1, p2, p3 )
-	return green_ninepointcenter_from_triangle( t )
-
-def blue_ninepointcenter( *args ):
-	if checktype(triangle, args[0]):
-		return blue_ninepointcenter_from_triangle( args[0] )
-	elif checktype(point, args[0]) and checktype(point, args[1]):
-		if checktype(point, args[2]):
-			p1,p2,p3=args[0],args[1],args[2]
-			return blue_ninepointcenter_from_points( p1, p2, p3 )
-	else: raise Exception('unknown input type')
-def red_ninepointcenter( *args ):
-	if checktype(triangle, args[0]):
-		return red_ninepointcenter_from_triangle( args[0] )
-	elif checktype(point, args[0]) and checktype(point, args[1]):
-		if checktype(point, args[2]):
-			p1,p2,p3=args[0],args[1],args[2]
-			return red_ninepointcenter_from_points( p1, p2, p3 )
-	else: raise Exception('unknown input type')
-def green_ninepointcenter( *args ):
-	if checktype(triangle, args[0]):
-		return green_ninepointcenter_from_triangle( args[0] )
-	elif checktype(point, args[0]) and checktype(point, args[1]):
-		if checktype(point, args[2]):
-			p1,p2,p3=args[0],args[1],args[2]
-			return green_ninepointcenter_from_points( p1, p2, p3 )
-	else: raise Exception('unknown input type')
-ninepointcenter=blue_ninepointcenter
-
-
-
 
 ##################### triangle measurements
 
@@ -1905,6 +1792,7 @@ def omega_triangle( tri ):
 	o2 = blue_orthocenter( tri )
 	return triangle( o0, o1, o2 )
 
+
 def circum_triangle( tri ):
 	c0 = red_circumcenter( tri )
 	c1 = green_circumcenter( tri )
@@ -1918,514 +1806,50 @@ def ninepoint_triangle( tri ):
 	return triangle( c0, c1, c2 )
 
 
+# return the nth layer of the Farey sequence
+farey_layers=[]
+def farey_sequence(n):
+	global farey_layers
+	farey_layers=[[Fraction(0,1),Fraction(1,1)]]
+	depth = n
+	for i in range(0,depth):
+		layer = farey_layers[i]
+		farey_layers+=[[]]
+		for j in range(len(layer)-1):
+			numer = layer[j].numerator+layer[j+1].numerator
+			denom = layer[j].denominator+layer[j+1].denominator
+			farey_layers[i+1] += [layer[j],Fraction(numer,denom)]
+		farey_layers[i+1]+=[Fraction(1,1)]
+	return farey_layers[n]
 
-
-############## square root bounds
-### the square root of a rational number is often irrational. 
-### we can find a rational approximation, thanks to the ancient Iraqis / 
-### Babylonians.
-### 
-### there is also a 'is perfect square?' test function
-###
-### we ignore negative roots here. and imaginary roots.
-
-# return [r1, r2] such that the sqrt(s) is guaranteed to be between them
-def square_root_rough_bounds_int( s ):
-	bitlength = int(Fraction(s.bit_length()-1,2))
-	guess = 1
-	for i in range(0,bitlength): guess *= 2
-	return guess,guess*2
-
-# return rational approximation of square root using Babylonian's method
-# iterate for maxdepth iterations or until answer>maxbits. 
-def babylonian_square_root_int( s, maxdepth=10, maxbits=256, firstguess=1 ):
-	guesses=[firstguess]
-	for i in range(1,maxdepth):
-		lastguess = guesses[i-1]
-		newguess = avg(lastguess,Fraction(s,lastguess))
-		if lastguess==newguess: break
-		if sqr(int(newguess))==s: # perfect square
-			guesses += [ int(newguess) ]
-			break
-		# prevent digit ballooning causing Big Int freezing
-		if (newguess.numerator.bit_length()+newguess.denominator.bit_length())>maxbits:
-			break
-		guesses += [newguess]
-	#print 'guesses for root of ',s,float(s)
-	#for g in guesses: print ' ',g,float(g),float(g*g)
-	return guesses[-1]
-
-def babylonian_square_root_for_fraction( s, maxdepth=10,maxbits=256 ):
-	lo_n,hi_n = square_root_rough_bounds_int( s.numerator )
-	lo_d,hi_d = square_root_rough_bounds_int( s.denominator )
-	numer=babylonian_square_root_int( s.numerator, maxdepth, maxbits, lo_n )
-	denom=babylonian_square_root_int( s.denominator, maxdepth, maxbits, lo_d )
-	return Fraction(numer,denom)
-
-def is_perfect_square(s):
-	x = babylonian_square_root(s)
-	if x*x==s: return True
-	return False
-
-# return rational approximation of square root of s
-def babylonian_square_root( s, maxdepth=10, maxbits=256 ):
-	if s<0: raise Exception('sqrt -1 aint rational')
-	return babylonian_square_root_for_fraction( Fraction(s),maxdepth,maxbits )
-
-##################### render objects into text
-
-def bounding_box_txt( b ):
-	s = '[ ' + str(b.min) + ' , ' + str(b.max) + ' ]'
-	return s
-
-def point_txt( p ):
-	s = '['+str(p.x)+','+str(p.y)
-	if hasattr(p,'z'): s += ',' + str(p.z)
-	s += ']'
-	return s
-
-def bivector_txt( bv ):
-	return vector_txt( bv.v1 ) + 'V' + vector_txt( bv.v2 ) + ' value: ' + str(bv.value())
-
-def vector_txt( v ):
-	s = '('+str(v.x)+','+str(v.y)
-	if hasattr(v,'z'): s += ',' + str(v.z)
-	s += ')'
-	return s
-
-def line_txt( l ):
-	s = '<'+str(l.a)+":"+str(l.b)+":"+str(l.c)
-	s += '>'
-	return s
-
-def lineseg_txt( l ):
-	s = str(l.p0) +'-'+str(l.p1)
-	return s
-
-def projective_form_txt( pf ):
-	s = str('['+ str(pf.d)+':'+str(pf.e)+':'+str(pf.f)+']')
-	if pf.d==1 and pf.e==0 and pf.f == 1: s += ' (blue)'
-	elif pf.d==1 and pf.e==0 and pf.f == -1: s += ' (red)'
-	elif pf.d==0 and pf.e==1 and pf.f == 0: s += ' (green)'
-	else: s += ' (unknown)'
-	return s
-
-def circle_txt( c ):
-	s = str('['+str(c.center)+','+str(c.radial_quadrance)+'<->'+str(c.curvature_quadrance)+']')
-	return s
-
-def triangle_txt( tri ):
-	spreads = str(tri.s0)+','+str(tri.s1)+','+str(tri.s2)
-	line_eqns = str(tri.l0)+','+str(tri.l1)+','+str(tri.l2)
-	linesegs = str(tri.ls0)+' '+str(tri.ls1)+' '+str(tri.ls2)
-	points = str(tri.p0)+','+str(tri.p1)+','+str(tri.p2)
-	quadrances = str(tri.q0)+','+str(tri.q1)+','+str(tri.q2)
-	s ='\ntriangle: '
-	s+='\n line eqns: ' + line_eqns
-	s+='\n line segs: ' + linesegs
-	s+='\n points: ' + points
-	s+='\n blue quadrances: ' + quadrances
-	s+='\n blue spreads: ' + spreads
-	return s
-
-
-############################## draw in graphics
-# everything is done with rationals, except for a few
-# calls to matplotlib's "ax" functions that require floats.
-
-plotstarted=False
-fig,ax,plt=None,None,None
-plotbbox=None
-
-# call matplotlib's "ax" plot function 'func', but convert from 
-# rationals to floats first.
-#
-# example: 
-#   ax_floatplot( [1,5],[2,12],ax.scatter) # < scatter plot points at 1,2 5,12
-#   ax_floatplot( [0,4,5],[2,3,5],ax.plot ) #< plot line from 0,2 to 4,3 to 5,5
-def ax_floatplot( xs, ys, func ):
-	plotbbox.extend( xs,ys )
-	fxs,fys=[],[]
-	for x in xs: fxs += [float(x)]
-	for y in ys: fys += [float(y)]
-	func( xs, ys )
-
-def plotinit( startitem ):
-	global plotstarted,fig,ax,plt,plotbbox
-	if plotstarted: return
-	import numpy as np
-	import matplotlib.pylab as plt
-	fig,ax = plt.subplots(figsize=(8,8))
-	plotstarted = True
-	plotbbox = bounding_box( startitem )
-
-def plotshow():
-	ax.set_aspect(1)
-	fmin,fmax = plotbbox.frame()
-	ax.set_xlim(float(fmin.x),float(fmax.x))
-	ax.set_ylim(float(fmin.y),float(fmax.y))
-	plt.show()
+# return Ford circle for x coordinate 'x'
+def ford_circle(x):
+	x=Fraction(x)
+	radius = Fraction(1,2*sqr(x.denominator))
+	return circle( point(x,radius), sqr(radius) )
 	
-def plot_triangles( *args ):
-	if checktypes(list,*args):
-		plot_triangles(*args[0])
-		return
-	triangles = args
-	plotinit( triangles[0] )
-	print len(triangles), 'triangles'
-	xs,ys=[],[]
-	for t in triangles:
-		xs,ys=[],[]
-		for i in 0,1,2:
-			xs+=[t[i].x]
-			ys+=[t[i].y]
-		xs += [xs[0]]
-		ys += [ys[0]]
-		ax_floatplot(xs,ys,ax.plot)
-
-def plot_points( *args ):
-	if checktypes(point,*args):
-		plotinit( args[0] )
-		print len( args ), 'points'
-		xs,ys=[],[]
-		for p in args:
-			xs += [p.x]
-			ys += [p.y]
-		ax_floatplot(xs,ys,ax.scatter) # scatter plot
-	elif checktypes(list,*args):
-		print len(args)
-		if checktypes(point,args[0]):
-			plot_points(*args[0])
-		elif checktypes(list,args[0]) and len(args)==2:
-			plotinit( point(args[0][0],args[1][0]) )
-			ax_floatplot(args[0],args[1],ax.scatter) # scatter plot
-	else: raise Exception('unknown type fed to plot_points')
-		
-
-def plot_blue_circle_w_radius( cx, cy, cr, depth ):
-	pdic={}
-	xs,ys=[],[]
-	for m in range(0,depth):
-		for n in range(0,depth):
-			if (blueq(m,n)==0): continue
-			x = cr*Fraction(redq(m,n),blueq(m,n))
-			y = cr*Fraction(greenq(m,n),blueq(m,n))
-			#print 'x,y,x^2+y^2',x,y,x*x+y*y
-			pdic[x]=y
-	sortedkeys = pdic.keys()
-	sortedkeys.sort()
-	# top half
-	for key in sortedkeys:
-		x,y=key,pdic[key]
-		xs += [cx+x]
-		ys += [cy+y]
-	sortedkeys.reverse()
-	# bottom half
-	for key in sortedkeys:
-		x,y=key,pdic[key]
-		xs += [cx+x]
-		ys += [cy-y]
-	ax_floatplot(xs,ys,ax.plot)
-
-# rational paramterization. 
-def plot_blue_circles( *args ):
-	if checktypes(list,*args):
-		plot_blue_circles(*args[0])
-		return
-	circles = list(args)
-	print len(circles), 'blue circles'
-	plotinit( circles[0] )
-	xs,ys=[],[]
-	depth=10
-	for c in circles:
-		depth=8
-		cx,cy=c.center.x,c.center.y
-		cr = babylonian_square_root(c.radial_quadrance)
-		plot_blue_circle_w_radius( cx, cy, cr, depth )
-
-# (red circle = hyperbola)
-# rational parameterization.
-def plot_red_circle_w_radius( cx, cy, cr, depth ):
-	pdic={}
-	xs,ys=[],[]
-	for m in range(0,int(Fraction(depth,2))):
-		for n in range(-m,m):
-			if (redq(m,n)==0): continue
-			x = cr*Fraction(blueq(m,n),redq(m,n))
-			y = cr*Fraction(greenq(m,n),redq(m,n))
-			#print 'x,y,x^2-y^2',x,y,x*x-y*y
-			pdic[y]=x
-	sortedkeys = pdic.keys()
-	sortedkeys.sort()
-	# right half
-	for key in sortedkeys:
-		y,x=key,pdic[key]
-		xs += [cx+x]
-		ys += [cy+y]
-	ax_floatplot(xs,ys,ax.plot)
-	# left half
-	xs,ys=[],[]
-	for key in sortedkeys:
-		y,x=key,pdic[key]
-		xs += [cx-x]
-		ys += [cy+y]
-	ax_floatplot(xs,ys,ax.plot)
-
-# (red circle = hyperbola)
-# rational paramterization.
-# imaginary radius.... represents red circles with negative radial quadrance.
-# the hyperbola in this case is 'flipped' over the line x=y from the ordinary
-# red circle
-def plot_red_circle_w_imaginary_radius( cx, cy, cr, depth ):
-	pdic={}
-	for m in range(0,int(Fraction(depth,2))):
-		for n in range(-m,m):
-			if (redq(m,n)==0): continue
-			y = cr*Fraction(blueq(m,n),redq(m,n))
-			x = cr*Fraction(greenq(m,n),redq(m,n))
-			#print 'x,y,x^2+y^2',x,y,x*x+y*y
-			pdic[x]=y
-	sortedkeys = pdic.keys()
-	sortedkeys.sort()
-	# top half
-	xs,ys=[],[]
-	for key in sortedkeys:
-		x,y=key,pdic[key]
-		xs += [cx+x]
-		ys += [cy+y]
-	ax_floatplot(xs,ys,ax.plot)
-	# top half
-	xs,ys=[],[]
-	for key in sortedkeys:
-		x,y=key,pdic[key]
-		xs += [cx+x]
-		ys += [cy-y]
-	ax_floatplot(xs,ys,ax.plot)
-
-# (red circle = hyperbola)
-def plot_red_circles( *args ):
-	if checktypes(list,*args):
-		plot_red_circles(*args[0])
-		return
-	circles = list(args)
-	print len(circles), 'red circles'
-	plotinit( circles[0] )
-	for c in circles:
-		depth=10
-		cx,cy=c.center.x,c.center.y
-		if c.radial_quadrance>0:
-			crlo = babylonian_square_root(c.radial_quadrance)
-			plot_red_circle_w_radius( cx, cy, crlo, depth )
-		else:
-			crlo = babylonian_square_root(-c.radial_quadrance)
-			plot_red_circle_w_imaginary_radius( cx, cy, crlo, depth )
-
-def plot_green_circle_w_imaginary_radius( cx, cy, cr ):
-	depth=5
-	pdic={}
-	for m in range(0,depth):
-		for n in range(0,2*depth):
-			if (greenq(m,n)==0): continue
-			x = Fraction(m,n)
-			y = Fraction(n,2*m)
-			#print '2xy',x,y,2*x*y
-			x = cr*x
-			y = cr*y
-			pdic[x]=y
-	sortedkeys = pdic.keys()
-	sortedkeys.sort()
-	# right half
-	xs,ys=[],[]
-	for key in sortedkeys:
-		x,y=key,pdic[key]
-		xs += [cx-x]
-		ys += [cy+y]
-	ax_floatplot(xs,ys,ax.plot)
-	# right half
-	xs,ys=[],[]
-	for key in sortedkeys:
-		x,y=key,pdic[key]
-		xs += [cx+x]
-		ys += [cy-y]
-	ax_floatplot(xs,ys,ax.plot)
-
-def plot_green_circle_w_radius( cx, cy, cr ):
-	depth=5
-	pdic={}
-	for m in range(0,depth):
-		for n in range(0,2*depth):
-			if (greenq(m,n)==0): continue
-			x = Fraction(m,n)
-			y = Fraction(n,2*m)
-			#print '2xy',x,y,2*x*y
-			x = cr*x
-			y = cr*y
-			pdic[x]=y
-	sortedkeys = pdic.keys()
-	sortedkeys.sort()
-	# right half
-	xs,ys=[],[]
-	for key in sortedkeys:
-		x,y=key,pdic[key]
-		xs += [cx+x]
-		ys += [cy+y]
-	ax_floatplot(xs,ys,ax.plot)
-	# right half
-	xs,ys=[],[]
-	for key in sortedkeys:
-		x,y=key,pdic[key]
-		xs += [cx-x]
-		ys += [cy-y]
-	ax_floatplot(xs,ys,ax.plot)
-
-# (green circle = hyperbola)
-# rational paramterization.
-#
-# bug - slow on small circles.
-#
-def plot_green_circles( *args ):
-	if checktypes(list,*args):
-		plot_green_circles(*args[0])
-		return
-	circles = list(args)
-	print len(circles), 'green circles'
-	plotinit( circles[0] )
-	for c in circles:
-		depth=5
-		cx,cy=c.center.x,c.center.y
-		if c.radial_quadrance>0:
-			cr = babylonian_square_root(c.radial_quadrance)
-			plot_green_circle_w_radius( cx, cy, cr )
-		else:
-			cr = babylonian_square_root(-c.radial_quadrance)
-			plot_green_circle_w_imaginary_radius( cx, cy, cr )
-
-plot_circles = plot_blue_circles
+# return the nth layer of ford circles
+def ford_circles(n):
+	circles = []
+	for number in farey_sequence(n):
+		circles += [ford_circle( number )]
+	return circles
 
 
 
-####################################3 shortcuts and conveniene functions
-############ for the spelling challenged, frogetful, and inebriated
-
-def is_paralell( l1, l2):
-	return is_parallel( l1, l2 )
-
-def is_green_perpendicular( l1, l2 ):
-	raise Exception(" not implemented ")
-	
-def is_red_perpendicular( l1, l2 ):
-	raise Exception(" not implemented ")
-	
-def is_blue_perpendicular( l1, l2 ):
-	return spread( l1, l2 ) == 1
-
-def is_perpendicular( l1, l2):
-	return is_blue_perpendicular( l1, l2 )
-
-def is_parallel( l1, l2):
-	return spread( l1, l2 ) == 0
-
-def intersection( l1, l2 ):
-	return meet( l1, l2 )
-
-# nice for doing paramterizations
-def blueq( *args ):
-	if checktypes(point,*args):
-		if len(args)==1:
-			return blue_quadrance(point(0,0),args[0])
-		elif len(args)==2:
-			return blue_quadrance(args[0],args[1])
-		else: raise Exception('need 1 or 2 pts')
-	elif checkrationals(*args):
-		return blue_quadrance(point(0,0),point(args[0],args[1]))
-	else: raise Exception('need point or x,y coords')
-def redq( *args ):
-	if checktypes(point,*args):
-		if len(args)==1:
-			return red_quadrance(point(0,0),args[0])
-		elif len(args)==2:
-			return red_quadrance(args[0],args[1])
-		else: raise Exception('need 1 or 2 pts')
-	elif checkrationals(*args):
-		return red_quadrance(point(0,0),point(args[0],args[1]))
-	else: raise Exception('need point or x,y coords')
-def greenq( *args ):
-	if checktypes(point,*args):
-		if len(args)==1:
-			return green_quadrance(point(0,0),args[0])
-		elif len(args)==2:
-			return green_quadrance(args[0],args[1])
-		else: raise Exception('need 1 or 2 pts')
-	elif checkrationals(*args):
-		return green_quadrance(point(0,0),point(args[0],args[1]))
-	else: raise Exception('need point or x,y coords')
-
-def blue_quadrance_coordinates(x1,y1,x2,y2):
-	return blue_quadrance_coords(x1,y1,x2,y2)
-def red_quadrance_coordinates(x1,y1,x2,y2):
-	return red_quadrance_coords(x1,y1,x2,y2)
-def green_quadrance_coordinates(x1,y1,x2,y2):
-	return green_quadrance_coords(x1,y1,x2,y2)
-
-def blue_quadria(p1,p2,p3):
-	return blue_quadrea(p1,p2,p3)
-def red_quadria(p1,p2,p3):
-	return red_quadrea(p1,p2,p3)
-def green_quadria(p1,p2,p3):
-	return green_quadrea(p1,p2,p3)
-
-def blue_circum_center( tri ):
-	return blue_circumcenter( tri )
-def red_circum_center( tri ):
-	return red_circumcenter( tri )
-def green_circum_center( tri ):
-	return green_circumcenter( tri )
 
 
-def drawtriangles(tris): plot_triangles(tris)
-def drawtriangle(tri): plot_triangles([tri])
-def draw_triangle(tri): plot_triangles([tri])
-def plottriangles(tris): plot_triangles(tris)
-def plottriangle(tri): plot_triangles([tri])
-def plot_triangle(tri): plot_triangles([tri])
-
-def plotpoints(circs): plot_points(circs)
-def plotpoint(circ): plot_points([circ])
-def plot_point(circ): plot_points([circ])
-def drawpoints(circs): plot_points(circs)
-def drawpoint(circ): plot_points([circ])
-def draw_point(circ): plot_points([circ])
-
-def plotcircles(circs): plot_circles(circs)
-def plotcircle(circ): plot_circles([circ])
-def plot_circle(circ): plot_circles([circ])
-def drawcircles(circs): plot_circles(circs)
-def drawcircle(circ): plot_circles([circ])
-def draw_circle(circ): plot_circles([circ])
-
-def plotbluecircles(circs): plot_blue_circles(circs)
-def plotbluecircle(circ): plot_blue_circles([circ])
-def plot_blue_circle(circ): plot_blue_circles([circ])
-def drawbluecircles(circs): plot_blue_circles(circs)
-def drawbluecircle(circ): plot_blue_circles([circ])
-def draw_blue_circle(circ): plot_blue_circles([circ])
-
-def plotredcircles(circs): plot_red_circles(circs)
-def plotredcircle(circ): plot_red_circles([circ])
-def plot_red_circle(circ): plot_red_circles([circ])
-def drawredcircles(circs): plot_red_circles(circs)
-def drawredcircle(circ): plot_red_circles([circ])
-def draw_red_circle(circ): plot_red_circles([circ])
-
-def plotgreencircles(circs): plot_green_circles(circs)
-def plotgreencircle(circ): plot_green_circles([circ])
-def plot_green_circle(circ): plot_green_circles([circ])
-def drawgreencircles(circs): plot_green_circles(circs)
-def drawgreencircle(circ): plot_green_circles([circ])
-def draw_green_circle(circ): plot_green_circles([circ])
 
 
-def blue_ninepoint_center( *args ): return blue_ninepointcenter(*args)
-def red_ninepoint_center( *args ): return red_ninepointcenter(*args)
-def green_ninepoint_center( *args ): return green_ninepointcenter(*args)
-def nine_point_triangle( tri ): return ninepoint_triangle( tri )
+
+
+# must come last?
+from piliko_sqrt import *
+from piliko_bbox import *
+from piliko_plot import *
+from piliko_thms import *
+from piliko_asymp import *
+from piliko_tcents import *
+from piliko_rand import *
+
+from piliko_scuts import *
