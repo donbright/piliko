@@ -1,0 +1,47 @@
+from piliko import *
+import math
+from random import randint
+
+# given an angle, find a spread that is close
+# to that angle. 
+
+desired_slices=20
+
+print 'desired slices:',desired_slices
+desired_angle_degrees=45.0/desired_slices
+desired_angle_radians=math.radians(desired_angle_degrees)
+print 'desired angle',desired_angle_degrees,' <deg',
+print desired_angle_radians,' <rad'
+
+done=False
+t=Fraction(desired_slices*Fraction(90,45),1)
+
+for i in range(1,20):
+	x=abs(Fraction(redq(1,t),blueq(1,t)))
+	y=abs(Fraction(greenq(1,t),blueq(1,t)))
+	slice_spread=Fraction(sqr(y),sqr(x)+sqr(y))
+	print 't,x,y,spread',t,x,y,slice_spread
+	generated_angle = math.atan(float(y)/float(x))
+	diff = generated_angle - desired_angle_radians
+	print 'gen angle, diff:',math.degrees(generated_angle),math.degrees(diff)
+	if diff>0: 
+		t=Fraction(randint(1000),randint(1000))
+	if diff<0: 
+		t=t-Fraction(1,desired_slices)
+
+radius = 5
+radial_quadrance = radius*radius
+print 'rational points:'
+for n in range(0,desired_slices):
+	s = spread_polynomial( n, slice_spread )
+	y = perfect_square_root( radial_quadrance * s )
+	x = perfect_square_root( radial_quadrance * ( 1 - s ) )
+	#print '--'
+	#print s,x,y,float(x),float(y)
+	#print sqr(x)+sqr(y)
+	#print math.degrees(math.atan(float(y)/float(x+0.0001)))
+	print n,'th spread',s,bitcount(s),'bits'
+
+
+print 'slices:',desired_slices
+print 'starting spread:',perfect_square_root(slice_spread),' squared'
