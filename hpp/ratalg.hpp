@@ -224,6 +224,17 @@ a,b,c,d become clear.
     | x-x1  y-y1  z-z1|
 det |x2-x1 y2-y1 z2-z1| = 0 --> x[(y2-y1)(z3-z1)-(y3-y1)(z2-z1)] + y[ ... = 0
     |x3-x1 y3-y1 z3-z1|         a=(y2-y1)(z3-z1)-(y3-y1)(z2-z1) b=... c=...
+
+On Orientation:
+
+An interesting note. Given 3 points, M,N,P, if you feed them in the
+reverse order, like P,N,M, then the resulting a,b,c,d will be 'flipped'
+in sign. For example
+
+M,N,P = [0,0,1],[1,0,1],[0,1,1]
+plane(M,N,P) -> <0:0:1:-1>
+plane(P,N,M) -> <0:0:-1:1>
+
 */
 rational_plane::rational_plane( const rational_point &p1, const rational_point &p2, const rational_point &p3 )
 {
@@ -843,6 +854,7 @@ void test() {
 	assert( m8.projection = AT_INFINITY );
 }
 
+// fibonacci type sequence, modulo hi-lo = pseudorandom number generator
 static unsigned int r1 = 1, r2 = 1;
 int rand(int lo,int hi) { r2 = r1+r2; r1 = r2-r1; return (r2 % (hi-lo))+lo; }
 

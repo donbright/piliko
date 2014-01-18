@@ -9,10 +9,12 @@ import math
 
 sp=spread_polynomial
 maxn=15
+print 's(s,n) -> result numerator, denominator, dnm-num, sqrt(numerator), sqrt(denominator), sqrt(dnm-num)'
+starts = Fraction(9,25)
 for n in range(0,maxn):
-	s = sp(n,Fraction(9,25))
+	s = sp(n,starts)
 	num = s.numerator
 	dnm = s.denominator
 	p = dnm-num
-	print num,dnm,p,math.sqrt(num),math.sqrt(dnm),math.sqrt(p)
+	print 'S(s=',starts,'n=',n,')',num,dnm,p,math.sqrt(num),math.sqrt(dnm),math.sqrt(p)
 print

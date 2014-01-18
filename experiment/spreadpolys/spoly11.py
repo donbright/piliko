@@ -5,6 +5,8 @@ from random import randint
 # given an angle, find a spread that is close
 # to that angle. 
 
+# (doesnt work very wel...)
+
 desired_slices=20
 
 print 'desired slices:',desired_slices

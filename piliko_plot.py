@@ -53,20 +53,28 @@ def circle_txt( c ):
 	s = str('['+str(c.center)+','+str(c.radial_quadrance)+'<->'+str(c.curvature_quadrance)+']')
 	return s
 
-def triangle_txt( tri ):
-	spreads = str(tri.s0)+','+str(tri.s1)+','+str(tri.s2)
-	line_eqns = str(tri.l0)+','+str(tri.l1)+','+str(tri.l2)
-	linesegs = str(tri.ls0)+' '+str(tri.ls1)+' '+str(tri.ls2)
-	points = str(tri.p0)+','+str(tri.p1)+','+str(tri.p2)
-	quadrances = str(tri.q0)+','+str(tri.q1)+','+str(tri.q2)
-	s ='\ntriangle: '
-	s+='\n line eqns: ' + line_eqns
-	s+='\n line segs: ' + linesegs
-	s+='\n points: ' + points
-	s+='\n blue quadrances: ' + quadrances
-	s+='\n blue spreads: ' + spreads
+def sphere_txt( c ):
+	s = str('['+str(c.center)+','+str(c.radial_quadrance)+'<->'+str(c.curvature_quadrance)+']')
 	return s
 
+def triangle_txt( tri ):
+	#spreads = str(tri.s0)+','+str(tri.s1)+','+str(tri.s2)
+	#line_eqns = str(tri.l0)+','+str(tri.l1)+','+str(tri.l2)
+	#linesegs = str(tri.ls0)+' '+str(tri.ls1)+' '+str(tri.ls2)
+	#points = str(tri.p0)+','+str(tri.p1)+','+str(tri.p2)
+	#quadrances = str(tri.q0)+','+str(tri.q1)+','+str(tri.q2)
+	#s ='\ntriangle: '
+	#s+='\n line eqns: ' + line_eqns
+	#s+='\n line segs: ' + linesegs
+	#s+='\n points: ' + points
+	#s+='\n blue quadrances: ' + quadrances
+	#s+='\n blue spreads: ' + spreads
+	s = '['+str(tri.p0)+','+str(tri.p1)+','+str(tri.p2)+']'
+	return s
+
+def spherical_triangle_txt( tri ):
+	s = '['+str(tri.p1)+','+str(tri.p2)+','+str(tri.p3)+']'
+	return s
 
 ############################## render objects into MatPlotLib graphics
 # everything is done with rationals, except for a few
@@ -89,6 +97,10 @@ def ax_floatplot( xs, ys, func ):
 	for y in ys: fys += [float(y)]
 	func( xs, ys )
 
+def getax():
+	global ax
+	return ax
+
 def plotinit( startitem ):
 	global plotstarted,fig,ax,plt,plotbbox
 	if plotstarted: return
@@ -108,6 +120,9 @@ def plot_show(): plotshow()
 	
 def plot_triangles( *args ):
 	if checktypes(list,*args):
+		plot_triangles(*args[0])
+		return
+	if checktypes(tuple,*args):
 		plot_triangles(*args[0])
 		return
 	triangles = args
@@ -170,6 +185,7 @@ def plot_lines( *args ):
 	else: raise Exception('unknown type for plot lines')
 
 def plot_points( *args ):
+	#print args
 	if checktypes(point,*args):
 		plotinit( args[0] )
 		print len( args ), 'points'
@@ -179,12 +195,16 @@ def plot_points( *args ):
 			ys += [p.y]
 		ax_floatplot(xs,ys,ax.scatter) # scatter plot
 	elif checktypes(list,*args):
-		print len(args),'points'
 		if checktypes(point,args[0]):
+			print len(args),'points'
 			plot_points(*args[0])
-		elif checktypes(list,args[0]) and len(args)==2:
-			plotinit( point(args[0][0],args[1][0]) )
-			ax_floatplot(args[0],args[1],ax.scatter) # scatter plot
+		elif checktypes(list,args[0]):
+			if checkrationals(args[0][0]) and len(args)==2:
+				plotinit( point(args[0][0],args[1][0]) )
+				ax_floatplot(args[0],args[1],ax.scatter) # scatter plot
+			elif checktypes(point,args[0][0]):
+				plot_points(*args[0])
+			else: raise Exception('unknown type fed to plot_points')
 	else: raise Exception('unknown type fed to plot_points')
 		
 
@@ -389,8 +409,31 @@ def plot_green_circles( *args ):
 
 
 
-
-
+#############################
+### 3d
+def triangles_to_stl(*args):
+	if checktypes(list,*args): pass
+	if checktypes(triangle,*args):
+		for t in args: newargs+=[t]
+		triangles_to_stl( newargs )
+	#if checktypes(spherical_triangle,*args):
+	#	for t in args: newargs+=[t]
+	#	triangles_to_stl( newargs )
+	triangles=args
+        stl='solid piliko_model\n'
+        for t in triangles:
+                x0,y0,z0=str(float(t[0].x)),str(float(t[0].y)),str(float(t[0].z))
+                x1,y1,z1=str(float(t[1].x)),str(float(t[1].y)),str(float(t[1].z))
+                x2,y2,z2=str(float(t[2].x)),str(float(t[2].y)),str(float(t[2].z))
+                stl+=' facet normal 0 0 1\n'
+                stl+='  outer loop\n'
+                stl+='   vertex '+x0+' '+y0+' '+z0+'\n'
+                stl+='   vertex '+x1+' '+y1+' '+z1+'\n'
+                stl+='   vertex '+x2+' '+y2+' '+z2+'\n'
+                stl+='  endloop\n'
+                stl+=' endfacet\n'
+        stl+='endsolid piliko_model\n'
+        return stl
 
 # shortcuts
 # for bad spellers etc

@@ -9,6 +9,7 @@ def intersection( a1,a2,b1,b2 ):
 	if l[1]<alo and l[2]>bhi: lo,hi=None,None
 	return a1,a2,b1,b2,lo,hi
 
+
 if __name__=='__main__':
 	print intersection(1,2,3,4)
 	print intersection(1,3,2,4)

@@ -100,11 +100,15 @@ class point:
 		if checktypes(vector,*args):
 			self.x=args[0][0]
 			self.y=args[0][1]
-			if (len(args)==3): self.z=args[0][2]
+			if (hasattr(args[0],'z')): self.z=args[0][2]
 		elif checkrationals( *args ):
 			self.x,self.y=args[0],args[1]
 			if (len(args)==3): self.z=args[2]
-		else: raise Exception( 'cant build point')
+		elif checktypes( list,*args ) and len(args[0])==2:
+			self.x,self.y=args[0][0],args[0][1]
+		elif checktypes( list,*args ) and len(args[0])==3:
+			self.x,self.y,self.z=args[0][0],args[0][1],args[0][2]
+		else: raise Exception( 'cant build point from'+str(args))
 	def __str__( self ):
 		return point_txt(self)
 	def __repr__( self ):
@@ -161,7 +165,9 @@ class vector:
 			if hasattr(self,'z'): nz = self.z * p.z
 			return point( nx, ny, nz )
 		else: raise Exception("unknown multiplication type for vector")
-
+	def __div__( self, *args ):
+		if checkrationals(*args) and len(args)==1:
+			return self * Fraction(1,args[0])
 	def __rmul__( self, scalar ):
 		return self * scalar
 	def __neg__( self ):
@@ -169,9 +175,16 @@ class vector:
 	def dot( self, v ):
 		x1,y1,x2,y2 = self.x,self.y,v.x,v.y
 		p = x1*x2+y1*y2
-		if hasattr(v,'z'): raise Exception( 'not implemented' )
-		if hasattr(self,'z'): raise Exception( 'not implemented' )
+		if hasattr(v,'z') and hasattr(self,'z'):
+			z1,z2 = self.z,v.z
+			p += z1*z2
 		return p
+	def cross( self, v ):
+		ax,ay,az,bx,by,bz=self.x,self.y,self.z,v.x,v.y,v.z
+		nx = wedge( ay, az, by, bz )
+		ny = wedge( ax, az, bx, bz )
+		nz = wedge( ax, ay, bx, by )
+		return vector( nx, -ny, nz )
 	def perpendicular( self, v ):
 		return perpendicular( self, v )
 	def parallel( self, v ):
@@ -270,7 +283,7 @@ def wedge( *args ):
 		x1,y1,x2,y2=args[0],args[1],args[2],args[3]
 	elif checktypes(vector,*args) and len(args)==2:
 		x1,y1,x2,y2=args[0].x,args[0].y,args[1].x,args[1].y
-	else: raise Exception('dont understand input to wedge()')
+	else: raise Exception('dont understand input to wedge()'+str(args))
 	return x1*y2-x2*y1
 
 # line formula here is ax + by + c = 0
@@ -315,7 +328,29 @@ class line:
 
 		if i==2: return self.c
 
+
 # plane formula here is ax + by + cz + d = 0
+# Theory+Problems of Vector Analysis, Murray R Spiegel, 1959
+# Schaum Publishing, New York. 
+# For any p coplanar to p1,p2,p3, area of paralellapiped 
+# formed by vector (p2-p), vector (p1-p), and 
+# vector(p3-p) = 0. thus v1 dot v2 cross v3 = 0. expand 
+# and a,b,c become obvious
+#
+#    | x-x1  y-y1  z-z1|
+#det |x2-x1 y2-y1 z2-z1| = 0 --> x[(y2-y1)(z3-z1)-(y3-y1)(z2-z1)] + y[ ... = 0
+#    |x3-x1 y3-y1 z3-z1|         a=(y2-y1)(z3-z1)-(y3-y1)(z2-z1) b=... c=...
+#
+#On Orientation:
+#
+#An interesting note. Given 3 points, M,N,P, if you feed them in the 
+#reverse order, like P,N,M, then the resulting a,b,c,d will be 'flipped' 
+#in sign. For example
+#
+#M,N,P = [0,0,1],[1,0,1],[0,1,1]
+#plane(M,N,P) -> <0:0:1:-1>
+#plane(P,N,M) -> <0:0:-1:1>
+#
 class plane:
 	def __init__( self, *args ):
 		if checktypes(point,*args) and len(args)==3:
@@ -327,12 +362,6 @@ class plane:
 			raise Exception('not implemented. plane needs pts or rationals a,b,c')
 		self.a,self.b,self.c,self.d=a,b,c,d
 	def findequation(self,x1,y1,z1,x2,y2,z2,x3,y3,z3 ):
-		# Theory+Problems of Vector Analysis, Murray R Spiegel, 1959
-		# Schaum Publishing, New York. 
-		# For any p coplanar to p1,p2,p3, area of paralellapiped 
-		# formed by vector (p2-p), vector (p1-p), and 
-		# vector(p3-p) = 0. thus v1 dot v2 cross v3 = 0. expand 
-		# and a,b,c become obvious
 		x21,x31 = x2-x1, x3-x1
 		y21,y31 = y2-y1, y3-y1
 		z21,z31 = z2-z1, z3-z1
@@ -380,6 +409,8 @@ class triangle:
 			self.init_from_lines( args[0],args[1],args[2] )
 		elif checktypes( point, *args ) and len(args)==3:
 			self.init_from_points( args[0],args[1],args[2] )
+		elif checktypes( vector, *args ) and len(args)==3:
+			self.init_from_points( point(args[0]),point(args[1]),point(args[2]) )
 		elif checkrationals( *args ) and len(args)==6:
 			p1=point(args[0],args[1])
 			p2=point(args[2],args[3])
@@ -397,14 +428,18 @@ class triangle:
 				p1 = point(args[0][0],args[0][1])
 				p2 = point(args[1][0],args[1][1])
 				p3 = point(args[2][0],args[2][1])
-			self.init_from_points( p1, p2, p3 )
+				self.init_from_points( p1, p2, p3 )
+			elif len(args)==1:
+				t=triangle(*args[0])
+				self.init_from_points( t[0],t[1],t[2])
 		elif checktypes( tuple, *args ):
 			if len(args)==3 and len(args[0])==2 and len(args[1])==2 and len(args[2])==2:
 				p1 = point(args[0][0],args[0][1])
 				p2 = point(args[1][0],args[1][1])
 				p3 = point(args[2][0],args[2][1])
 			self.init_from_points( p1, p2, p3 )
-		else: raise Exception('dont know how to build triangle')
+		else:
+			raise Exception('dont know how to build triangle'+str(args))
 
 	def init_from_lines( self, l0, l1, l2 ):
 		p0,p1,p2 = meet(l1,l2),meet(l0,l2),meet(l0,l1)
@@ -599,6 +634,9 @@ class circle:
 		elif checktypes(tuple,args[0]) and checkrationals(args[1]):
 			p = point(args[0][0],args[0][1])
 			self.init_from_point_and_radial_q( p, args[1] )
+		elif checktypes(list,args[0]) and checkrationals(args[1]):
+			p = point(args[0][0],args[0][1])
+			self.init_from_point_and_radial_q( p, args[1] )
 		else: raise Exception('need center x,y and radial quadrance')
 	def init_from_point_and_radial_q( self, p, rq ):
 		self.center = p
@@ -611,6 +649,43 @@ class circle:
 		return circle_txt(self)
 	def __repr__( self ):
 		return circle_txt(self)
+
+
+
+
+class sphere:
+	def __init__(self, *args):
+		if (len(args)<2): raise Exception('need center x,y,z and radial quadrance')
+		if checkrationals(*args) and len(args)>=4:
+			p = point(args[0],args[1],args[2])
+			self.init_from_point_and_radial_q( p, args[3] )
+		elif checktypes(point,args[0]) and checktypes(int,args[1]):
+			self.init_from_point_and_radial_q( args[0], args[1] )
+		elif checktypes(int,args[0]) and checktypes(point,args[1]):
+			self.init_from_point_and_radial_q( args[1], args[0] )
+		elif checktypes(point,args[0]) and checktypes(Fraction,args[1]):
+			self.init_from_point_and_radial_q( args[0], args[1] )
+		elif checktypes(Fraction,args[0]) and checktypes(point,args[1]):
+			self.init_from_point_and_radial_q( args[1], args[0] )
+		elif checktypes(tuple,args[0]) and checkrationals(args[1]):
+			p = point(args[0][0],args[0][1],args[0][2])
+			self.init_from_point_and_radial_q( p, args[1] )
+		elif checktypes(list,args[0]) and checkrationals(args[1]):
+			p = point(args[0][0],args[0][1],args[0][2])
+			self.init_from_point_and_radial_q( p, args[1] )
+		else: raise Exception('need center x,y,z and radial quadrance')
+	def init_from_point_and_radial_q( self, p, rq ):
+		self.center = p
+		self.radial_quadrance = rq
+		if (rq!=0): self.curvature_quadrance = Fraction(1,rq)
+		else: self.curvature_quadrance = None
+#	def init_curvature_zero( self,
+
+	def __str__( self ):
+		return sphere_txt(self)
+	def __repr__( self ):
+		return sphere_txt(self)
+
 
 class quaternion:
 	def __init__(self,t,v):
@@ -1141,11 +1216,13 @@ def meet( *args ):
 
 	raise Exception(' not implemented' + str(args) )
 
+
+
 ############################## 1-dimensional projective geometry
 
 # see NJW's paper, arxiv.org/pdf/math/0701338v1.pdf
 
-class projective_form:
+class projective_form1d:
 	def __init__(self, *args):
 		crash_if_nonrationals( args )
 		self.d,self.e,self.f=args[0],args[1],args[2]
@@ -1154,21 +1231,21 @@ class projective_form:
 	def discriminant( self ):
 		return self.d*self.f-sqr(self.e)
 
-blue_projective_form = projective_form(1,0,1)
-red_projective_form = projective_form(1,0,-1)
-green_projective_form = projective_form(0,1,0)
+blue_projective_form1d = projective_form1d(1,0,1)
+red_projective_form1d = projective_form1d(1,0,-1)
+green_projective_form = projective_form1d(0,1,0)
 
-def ppoint_nullcheck( ppoint, pform ):
+def ppoint_nullcheck1d( ppoint, pform ):
 	x,y=ppoint.x,ppoint.y
 	d,e,f=pform.d,pform.e,pform.f
 	return d*sqr(x)+2*e*x*y+f*sqr(y)
 
-def projective_point( *args ):
+def projective_point1d( *args ):
 	if args[0]==0 and args[1]==0:
 		raise Exception('projective point cannot have x & y as 0 ')
 	return point(args[0],args[1])
 
-def ppoint_perpendicular( *args, **kwargs ):
+def ppoint_perpendicular1d( *args, **kwargs ):
 	if 'color' in kwargs.keys(): color=kwargs['color']
  	else: color='blue'
 	if not checktype( point, args[0] ):
@@ -1180,14 +1257,14 @@ def ppoint_perpendicular( *args, **kwargs ):
 	elif color == 'green': p=projective_point( x, -y )
 	return p
 
-def projective_quadrance_blue( *args ):
+def projective_quadrance_blue1d( *args ):
 	return projective_quadrance( *args, color='blue' )
-def projective_quadrance_red( *args ):
+def projective_quadrance_red1d( *args ):
 	return projective_quadrance( *args, color='red' )
-def projective_quadrance_green( *args ):
+def projective_quadrance_green1d( *args ):
 	return projective_quadrance( *args, color='green' )
 
-def projective_quadrance( *args, **kwargs ):
+def projective_quadrance1d( *args, **kwargs ):
 	if 'color' in kwargs.keys(): color=kwargs['color']
  	else: color='blue'
 
@@ -1201,7 +1278,7 @@ def projective_quadrance( *args, **kwargs ):
 
 	return projective_quadrance_wform( args[0], args[1], form )
 
-def projective_quadrance_wform( *args ):
+def projective_quadrance_wform1d( *args ):
 	if not checktype(point, args[0]):
 		raise Exception('arg 0-projective_quadrance() needs point,point,form')
 	if not checktype(point, args[1]):
@@ -1218,7 +1295,7 @@ def projective_quadrance_wform( *args ):
 	denominator = ppoint_nullcheck( p1, form ) * ppoint_nullcheck ( p2, form )
 	return Fraction( numerator, denominator )
 
-def projective_triple_spread( *args ):
+def projective_triple_spread1d( *args ):
 	crash_if_nonrationals( *args )
 	if not len(args)==3:
 		raise Exception( 'proj trip spread requires 3 numbers')
@@ -1730,6 +1807,7 @@ def red_circumcircle( tri ):
 	return circle(red_circumcenter(tri),red_circumradial_quadrance(tri))
 def green_circumcircle( tri ):
 	return circle(green_circumcenter(tri),green_circumradial_quadrance(tri))
+circumcircle=blue_circumcircle
 
 def blue_ninepointcircle( tri ):
 	bnc = blue_ninepointcenter(tri)
@@ -1853,3 +1931,4 @@ from piliko_tcents import *
 from piliko_rand import *
 
 from piliko_scuts import *
+

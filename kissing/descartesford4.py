@@ -58,3 +58,6 @@ plot_circles( circs )
 plotshow()
 
 	
+# note
+# there is a relationship between the x+yi of a partial solution
+# and the slope of the tangent line.

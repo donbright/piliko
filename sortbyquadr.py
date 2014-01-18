@@ -28,8 +28,9 @@ def gqcmp( a, b ):
  	return cmp(greenq(a.x,a.y),greenq( b.x, b.y ))
 
 points=[]
-for i in range(0,80):
-	points += [ point( randint(0,1000) , randint(0,1000) ) ]
+#for i in range(0,80):
+for i in range(0,5):
+	points += [ point( randint(-100,100) , randint(-100,100) ) ]
 
 points.sort( bqcmp )
 bpoints = list(points)
@@ -51,5 +52,6 @@ plot_blue_circles([bc_min,bc_max])
 plot_red_circles([rc_min,rc_max])
 plot_green_circles([gc_min,gc_max])
 plot_points(points)
+print points
 plotshow()
 

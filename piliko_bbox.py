@@ -66,7 +66,11 @@ class bounding_box:
 				for l in args:
 					for item in l:
 						self.extend(item)
-					
+		elif checktypes(tuple,*args):
+			for l in args:
+				for item in l:
+					bb = bounding_box(item)
+					self.min,self.max=bb.min,bb.max
 		else:
 			raise Exception('unknown types:'+str(args))
 		self.min,self.max = testmin,testmax
