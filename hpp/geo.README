@@ -1,0 +1,12 @@
+geodesic spheres
+and the cuboids they love
+
+Geodesic spheres are based on a very simple algorithm. 
+
+1. create a platonic solid
+
+2. split each face polygon into a large number of triangles
+
+3. push each triangle out to a sphere centered at 0,0,0
+
+
