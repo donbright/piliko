@@ -97,7 +97,11 @@ bit_count=bitcount
 
 class point:
 	def __init__(self, *args):
-		if checktypes(vector,*args):
+		if checktypes(point,*args):
+			self.x=args[0].x
+			self.y=args[0].y
+			if (hasattr(args[0],'z')): self.z=args[0].z
+		elif checktypes(vector,*args):
 			self.x=args[0][0]
 			self.y=args[0][1]
 			if (hasattr(args[0],'z')): self.z=args[0][2]

@@ -132,7 +132,7 @@ sphere_quadrance = blueq(point(0,0,0),pts[0])
 for f in faces:
 	#print f,pts[f[0]],pts[f[1]],pts[f[2]]
 	tri = triangle(pts[f[0]],pts[f[1]],pts[f[2]])
-	newtris = splitn( tri, 13 ) 
+	newtris = splitn( tri, 4 ) 
 	sphtris = project( newtris, sphere_quadrance )
 	tris += sphtris 
 #tris = splitn(tri,4)

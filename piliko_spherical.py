@@ -1,11 +1,13 @@
 from piliko import *
+from piliko_geodesic import *
 
 # spherical geometry.
 # See "UnivHypGeom41 Trigonometry in elliptic geometry.mp4.", 
 # Norman J Wildberger, University of New South Wales, youtube
 
-# projective point = line through origin
+# projective point = line through origin (0,0,0)
 # projective quadrance = spread between lines through origin
+# projective spreads of spherical triangle = proj quadrances of 'polar triangle'
 
 projective_point_sph = vector
 
@@ -27,6 +29,8 @@ def find_polar_triangle( spherical_tri ):
 	b3 = t.p2.cross(t.p1)
 	return spherical_triangle( b1,b2,b3 )
 
+# note - this seems to break if the points are given in 'clockwise' order
+# (as seen from outside the sphere)
 class spherical_triangle:
 	def __init__(self, p1,p2,p3): self.p1,self.p2,self.p3=p1,p2,p3
 	def quadrances(self):
@@ -44,6 +48,11 @@ class spherical_triangle:
                 if i==0: return self.p1
                 if i==1: return self.p2
                 if i==2: return self.p3
+
+def sph_tri_tess( tri, splits, sphere_quadrance ):
+	tris = geo_splitn( tri, splits )
+	tris2 = geo_project( tris, sphere_quadrance )
+	return tris2
 
 def testsph():
 	pa = projective_point_sph(1,2,3)
@@ -104,7 +113,7 @@ def testsph():
 	print
 	a1=projective_point_sph( 4,3,0 )
 	a2=projective_point_sph( 3,4,0 )
-	a3=projective_point_sph( 0,0,5 )
+	a3=projective_point_sph( 3,4,1 )
 	st = spherical_triangle( a1,a2,a3 )
 	pt = find_polar_triangle( st )
 	q1,q2,q3 = st.quadrances()
@@ -118,7 +127,11 @@ def testsph():
 	print 'rhs:',4*(1-q1)*(1-q2)*(1-q3)
 	print 'dual of cross law: lhs:',sqr(q1*s2*s3-s1-s2-s3+2),
 	print 'rhs:',4*(1-s1)*(1-s2)*(1-s3)
-	print 'spherical pythagoras theorem, q1 = q2+q3-q2q3 :', q1, '=',q2+q3-q2*q3
-	#triangles_to_stl( [st,pt] )
+	print 'sph pythag thm, s1=1 -> q1 = q2+q3-q2q3 :', q1, '=',q2+q3-q2*q3
+	print 'dual sph pythag thm, q1=1 -> s1 = s2+s3-s2s3 :', s1, '=',s2+s3-s2*s3
+	t2 = sph_tri_tess( pt, 15, 1 )
+	t = sph_tri_tess( st, 15, 1 )
+	open('out2.stl','w').write( triangles_to_stl( t+t2 ) )
+	print 'wrote to out2.stl'
 testsph()
 

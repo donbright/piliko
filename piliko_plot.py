@@ -412,14 +412,12 @@ def plot_green_circles( *args ):
 #############################
 ### 3d
 def triangles_to_stl(*args):
-	if checktypes(list,*args): pass
-	if checktypes(triangle,*args):
-		for t in args: newargs+=[t]
-		triangles_to_stl( newargs )
+	if checktypes(list,*args):
+		return triangles_to_stl(*args[0])
+	triangles = list(args)
 	#if checktypes(spherical_triangle,*args):
 	#	for t in args: newargs+=[t]
 	#	triangles_to_stl( newargs )
-	triangles=args
         stl='solid piliko_model\n'
         for t in triangles:
                 x0,y0,z0=str(float(t[0].x)),str(float(t[0].y)),str(float(t[0].z))
