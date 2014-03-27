@@ -54,6 +54,51 @@ def sph_tri_tess( tri, splits, sphere_quadrance ):
 	tris2 = geo_project( tris, sphere_quadrance )
 	return tris2
 
+# consider if the rational spherical coordinates are considered as 
+# quadrances. then consider an origin point, 0,0. now consider two 
+# rational spreads, a and b. a is 'across', and b is 'up'. consider 
+# calling the arc from 0,0 to a,0 as 'geodesic arc a', and from a,0 to 
+# a,b as 'geodesic arc b'. consider a,b the high point of the triangle, 
+# well, call it point M. Now.
+#
+# consider lifting another point straight up from the origin, equal in 
+# quadrance to b. we can call this arc 'geodesic arc c' consider it ends 
+# at a Point, lets call it N.
+#
+# The line segment from M to N, lets call it a 'lifted arc' to the 
+# equator (the equator being the great circle where 'up' spread is 
+# always 0). the Lifted Arc sort of forms a spherical quadrilateral with 
+# c, b, and a.
+#
+# Mini Theorem
+#
+# The lifted arc quadrance has the same rationality as sqrt(1-a) That 
+# is, if 1-a is a perfect square, and b is rational, the lifted arc has rational 
+# quadrance. Interesting that 'b' only has to be rational! a can therefore
+# be .. uhm?? i forget. something like the square of the leg of a pythagorean
+# triangle, over the square of the hypoteneuse?
+def lifted_arc(a,b):
+	root = perfect_square_root(1-a)
+	term1 = (2*b*b-2*b)
+	term2 = (2*b-2*b*b)
+	term3 = (a-2)*b*b + (2-2*a)*b + a
+	answer = root*term1 + term3, root*term2 + term3
+	return answer
+
+def check_lifted_arc_answer( a,b ):
+	# check answer
+	c = b
+	d = a+b-a*b
+	s = (1-(Fraction(b,d)))
+	e = lifted_arc( a,b )[0]
+	lhs = sqr(s*c*d-c-d-e+2)
+	rhs = 4*(1-c)*(1-d)*(1-e)
+	print 'check1',lhs,rhs,lhs==rhs
+	e = lifted_arc( a,b )[1]
+	lhs = sqr(s*c*d-c-d-e+2)
+	rhs = 4*(1-c)*(1-d)*(1-e)
+	print 'check2',lhs,rhs,lhs==rhs
+
 def testsph():
 	pa = projective_point_sph(1,2,3)
 	pb = projective_point_sph(4,-1,2)
@@ -129,9 +174,51 @@ def testsph():
 	print 'rhs:',4*(1-s1)*(1-s2)*(1-s3)
 	print 'sph pythag thm, s1=1 -> q1 = q2+q3-q2q3 :', q1, '=',q2+q3-q2*q3
 	print 'dual sph pythag thm, q1=1 -> s1 = s2+s3-s2s3 :', s1, '=',s2+s3-s2*s3
-	t2 = sph_tri_tess( pt, 15, 1 )
-	t = sph_tri_tess( st, 15, 1 )
+	t2 = sph_tri_tess( pt, 3, 1 ) # pt,15,1 make smoother circle
+	t = sph_tri_tess( st, 3, 1 )
 	open('out2.stl','w').write( triangles_to_stl( t+t2 ) )
 	print 'wrote to out2.stl'
+
+	a=Fraction(3,4)
+	b=Fraction(1,4)
+	print 
+	print 'lifting'
+	print 'across: ',a,'up:',b
+	print 'lifted arc: ',lifted_arc(a,b)
+
+	a=Fraction(3,4)
+	b=Fraction(3,4)
+	print 
+	print 'lifting'
+	print 'across: ',a,'up:',b
+	print 'lifted arc: ',lifted_arc(a,b)
+
+	print
+	print 'lifting'
+	a=Fraction(3*3,5*5)
+	for bn in range(1,50):
+		b = Fraction(bn,51)
+		print 'across: ',a,'up:',bn,"/",51,
+		q1,q2=lifted_arc(a,Fraction(bn,51))
+		print 'lifted arc: ',float(q1),float(q2)
+		print check_lifted_arc_answer(a,b)
+
+	print
+	print 'lifting'
+	for m in range(1,10):
+		for n in range(1,10):
+			bq=blueq(m,n)
+			rq=redq(m,n)
+			#guarantee a is a leg,hypot of pythag triple
+			# (i.e. guarantee (1-a) is a perfect square fraction
+			a=abs(Fraction(rq*rq,bq*bq))
+			for bn in range(1,8):
+				b = Fraction(bn,8)
+				print 'across: ',a,'up:',bn,"/",8,
+				q1,q2=lifted_arc(a,Fraction(bn,8))
+				print 'lifted arc: ',float(q1),float(q2)
+				print check_lifted_arc_answer(a,b)
+
+
 testsph()
 
