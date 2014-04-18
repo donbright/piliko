@@ -35,3 +35,4 @@ for x in range(0,depth):
 # sqr q0+q1-q2 / 4q0q1   - 1 =  - s2
 # - sqr q0+q1-q2 / 4q0q1   + 1 =  s2
 
+# to run, install antiview package, then do python ellipson.py | conv_hull | antiview
