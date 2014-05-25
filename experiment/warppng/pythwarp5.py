@@ -10,7 +10,8 @@ import sys
 # you get this 'explosion' of points into the interior of the shape. 
 # modifting k from 1 to 2 to 3 to 5 to 10 will produce an interesting sequence
 
-k = 8
+if len(sys.argv)>1:
+	k = int(sys.argv[1])
 
 def sqr(x): return x*x
 def greenq(x,y,x2,y2): return 2*(x2-x)*(y2-y)

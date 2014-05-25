@@ -23,7 +23,7 @@ for i in range(0,randint(1,4)):
 
 seed=seeds[randint(0,len(seeds)-1)]
 if seed[-1] in 'PAY': seed += str(randint(3,10))
-cmd = './conway -f m '+ops+seed + ' | antiview -t no_triangulation'
+cmd = 'conway -f m '+ops+seed + ' | antiview -t no_triangulation'
 print cmd
 import os
 os.popen( cmd )
