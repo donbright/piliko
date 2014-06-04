@@ -20,8 +20,9 @@ debugging, as you might imagine, has been minimal.
 
 Rational Trigonometry was discovered and developed by Dr. Norman J 
 Wildberger. His concepts and terminology are used here without 
-permission and the use of these ideas/terms doesn't necessarily imply his 
-endorsement. Please see these sites for more information:
+permission and the use of these ideas/terms doesn't necessarily imply 
+his endorsement. All apologies if I make mistakes. Please see these 
+sites for more information:
 
 * https://www.youtube.com/user/njwildberger
 * http://web.maths.unsw.edu.au/~norman/
