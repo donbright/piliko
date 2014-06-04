@@ -139,6 +139,7 @@ Differences with 'ordinary' geometry
 Geometry under rational numbers is different than 'ordinary' geometry that
 is taught in schools. Here are some key points.
 
+```
 Ordinary                           Rational
 --------                           --------
 
@@ -184,6 +185,7 @@ expressed with 'sin'               x1*y2-x2*y1
 
 Regular polygons are specified    Many regular polygons have irrational
 by angles added.                  points and so are not representable.
+```
 
 Chromogeometry
 ==============
