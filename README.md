@@ -1,28 +1,24 @@
 piliko
 ======
 
-Piliko is a very, very, basic collection of Rational Geometry computer 
-codes in the computer language called Python. It follows, roughly, the 
+Piliko is a very, very, experimenral mishmash of Rational Geometry computer 
+codes in the computer language called Python. It follows, roughly,
 Rational Trigonometry in that it avoids irrational and transcendental 
 numbers and functions, and the concepts of angle and distance are 
 avoided.
 
-Current status
-==============
+#Current status
 
-This code is 'alpha' level. It is highly experimental. It can do basic 
+This code is 'alpha' level. It is highly experimental. It may or may not 
+work at any time, as I am constantly tinkering with it. It can do basic 
 calculations, but the whole type system has not been thought out very 
 carefully and many functions are partially or wholly unimplemented. 
-Tests have not been created. There are no actual users at this time so
+Tests have not been created. There are no actual users at this time so 
 debugging, as you might imagine, has been minimal.
 
-Plotting of pictures is only possible if your system has the 'matlpotlib'
-python add-on packages installed.
- 
-Disclaimer 
-==========
+#Disclaimer 
 
-Rational Trigonometry was discovered and developed by Norman J 
+Rational Trigonometry was discovered and developed by Dr. Norman J 
 Wildberger. His concepts and terminology are used here without 
 permission and the use of these ideas/terms doesn't necessarily imply his 
 endorsement. Please see these sites for more information:
@@ -36,8 +32,7 @@ endorsement. Please see these sites for more information:
 The statements below are probably somewhat accurate, but of course I am 
 not an expert so there you have it.
 
-But I don't know the computer language Python
-=============================================
+#But I don't know the computer language Python
 
 You don't need to know Python to do basic calculations. The syntax is
 designed to be somewhat simple. Please see the examples. As long as you can
@@ -54,8 +49,7 @@ command in python:
 
 	from piliko import *
 
-Examples
-========
+#Examples
 
 Example A:
 
@@ -119,8 +113,7 @@ To run them:
 
 Even more examples are under the 'experiment' folder of this bundle.
 
-Plotting pictures
-=================
+#Plotting pictures
 
 When the add-on 'matplotlib' package is installed on your system, you can do
 some basic plotting of pictures. For example:
@@ -133,15 +126,14 @@ some basic plotting of pictures. For example:
 	plot_triangle( t )
 	plotshow()
 
-Differences with 'ordinary' geometry
-====================================
+#Differences with real-number geometry
 
-Geometry under rational numbers is different than 'ordinary' geometry that
-is taught in schools. Here are some key points.
+Geometry under rational numbers is different than 'ordinary' geometry using
+the real numbers. Here are some key points.
 
 ```
-Ordinary                           Rational
---------                           --------
+Real                               Rational
+----                               --------
 
 The real number line is            The Rational line is fundamental
 fundamental and used               and irrationals are avoided.
@@ -150,8 +142,9 @@ in calculations
 Points can have any                Points can only have Rational
 coordinates                        coordinates
 
-Distances are fundamental          Squared distance (Quadrance)
-sqrt(x^2+y^2)                      is fundamental. x^2+y^2
+Distances are fundamental          Quadratic Forms (Quadrance)
+sqrt(x^2+y^2)                      are fundamental. x^2+y^2
+                                   Distance = square root of Quadrance.
 
 Circles are specified              Circles are specified by rational 
 by radius & center                 center and by radius squared.
@@ -185,7 +178,28 @@ expressed with 'sin'               x1*y2-x2*y1
 
 Regular polygons are specified    Many regular polygons have irrational
 by angles added.                  points and so are not representable.
-```
+
+Hyperbolic, Elliptical,           Hyperbolic, Elliptic, and Spherical
+Spherical are special cases       geometry share many of the same formulas
+with very different formulas      and ideas.
+
+Circles are described with        Circles are described exactly using
+sine and cosine approximations    rational paramterizations
+
+Infinite series and sets are      Infinite series and sets are avoided
+commonplace
+
+Infinity is something we cant     Infinity can be dealt with using
+deal with concretely              projective geometry (points-at-infinity map
+                                  to finite points in 'ordinary' space, perhaps
+                                  of a lower dimension)
+
+Tangents can have any slope       Tangents have rational slope.
+
+Tangents exist at every point     Tangents exist at rational points
+
+
+```                               
 
 Chromogeometry
 ==============
