@@ -1,0 +1,14 @@
+Every Quaternion has an associated Descartes Configuration. 
+(capitals = smallcase squared)
+
+               W + X + Y + Z <=> B1 + B2 + B3 + B4
+ 
+
+If W = 0
+
+Every Quaternion has an associated Descartes Configuration of
+Ford Circles, and an associated Triple Quad Squares
+
+
+                                       X + Y + Z
+                (B1^2 + B2^2 + B3^2)=k(B1+B2+B3)^2

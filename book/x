@@ -1,0 +1,67 @@
+
+$$\sin \theta = \frac{1}{(2+ \beta)^{1/2}}$$
+
+
+$$ x = \cos \theta (\sin \theta + (\sin^{2} \theta + \beta)^{1/2})$$
+
+$$ x = \cos \theta (\sin \theta + (\frac{1}{(2+ \beta)^{1/2}}^2 + \beta)^{1/2})$$
+
+
+$$ x = \cos \theta (\sin \theta + (\frac{1}{(2+ \beta)} + \beta)^{1/2})$$
+
+
+
+$$ x = \cos \theta (\sin \theta + (\frac{1}{(2+ \beta)} + \frac{(2+\beta)\beta}{(2+\beta)})^{1/2})$$
+
+
+$$ x = \cos \theta (\sin \theta + (\frac{1+(2+\beta)\beta}{(2+ \beta)})^{1/2})$$
+
+
+$$ x = \cos \theta (\sin \theta + (\frac{1+2\beta+\beta^2}{(2+ \beta)})^{1/2})$$
+
+
+$$ x = \cos \theta (\sin \theta + (\frac{(1+\beta)^2}{(2+ \beta)})^{1/2})$$
+
+
+$$ x = \cos \theta (\sin \theta + \frac{(1+\beta)}{(2+ \beta)^{1/2}})$$
+
+
+$$ x = \cos \theta (\frac{1}{(2+ \beta)^{1/2}} + \frac{(1+\beta)}{(2+ \beta)^{1/2}})$$
+
+$$ x = \cos \theta (\frac{1+(1+\beta)}{(2+ \beta)^{1/2}})$$
+
+
+
+$$ x = \cos \theta (\frac{2+\beta}{(2+ \beta)^{1/2}})$$
+
+
+
+$$ x = \cos \theta (\frac{2+\beta}{(2+ \beta)^{1/2}})$$
+
+
+$$ x^2 = \cos^2 \theta (\frac{2+\beta}{(2+ \beta)^{1/2}})^2$$
+
+$$ x^2 = \cos^2 \theta \frac{(2+\beta)^2}{(2+ \beta)}$$
+
+
+$$ x^2 = (1-\sin^2 \theta)\frac{(2+\beta)^2}{(2+ \beta)}$$
+
+
+$$ x^2 = (1-( \frac{1}{(2+ \beta)^{1/2}} )^2) \frac{(2+\beta)^2}{(2+ \beta)}$$
+
+
+$$ x^2 = (1-\frac{1}{(2+ \beta)}) \frac{(2+\beta)^2}{(2+ \beta)}$$
+
+$$ x^2 = (\frac{(2+ \beta)}{(2+ \beta)}-\frac{1}{(2+ \beta)}) \frac{(2+\beta)^2}{(2+ \beta)}$$
+
+$$ x^2 = \frac{(1+ \beta)}{(2+ \beta)} \frac{(2+\beta)^2}{(2+ \beta)}$$
+
+
+$$ x^2 = \frac{(1+ \beta)}{1} \frac{(2+\beta)^2}{(2+ \beta)^2}$$
+
+$$ x^2 = (1+ \beta)$$
+
+
+$$ x = (1+ \beta)^{1/2}$$
+
+

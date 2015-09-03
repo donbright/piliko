@@ -23,20 +23,20 @@ for m in range(-depth,depth):
 		xs += [x]
 		ys += [y]
 
-max=max(xs+ys)
+maxval=max(xs+ys)
 i=0
 print xs[i]*xs[i]+ys[i]*ys[i]
 for i in range(0,len(xs)):
-	xs[i] = Fraction( xs[i], max )
-	ys[i] = Fraction( ys[i], max )
+	xs[i] = Fraction( xs[i], maxval )
+	ys[i] = Fraction( ys[i], maxval )
 
 print len(xs), 'points'
 import numpy as np
 import matplotlib.pylab as plt
 fig,ax = plt.subplots(figsize=(8,8))
 
-ax.set_xlim([min(xs)-2,max(xs)+2])
-ax.set_ylim([min(ys)-2,max(ys)+2])
+ax.set_xlim(-1.2,1.2)
+ax.set_ylim(-1.2,1.2)
 for i in range(0,len(xs)):
 	xs[i]=xs[i]#+zs[i]/4
 	ys[i]=ys[i]#+zs[i]/4

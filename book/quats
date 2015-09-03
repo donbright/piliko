@@ -1,0 +1,795 @@
+Fun With Quaternions
+
+
+Let's start with counting. 1, 2, 3, 4... Of course counting has squares, 
+4, 16, 25. Also each square has a root, sqrt(4)=2, sqrt(16)=4, 
+sqrt(25)=5... Then there are the irrational square roots, which are of
+infinite decimal expansion, such as root 2, root 3, root 5, and on.
+
+When writing, we use exact notation to describe these irrational roots:
+                                  _
+                                sqrt(2
+
+If we wanted, we can approximate the root with place-value decimals
+
+                                1.414....infinity
+
+But if we calculate with decimals, we could lose precision. How many
+digits do you want to work with? Sometimes you want to keep it exactly
+precise. So you don't use digits, you stick to just writing "root 2".
+ 
+And when adding other numbers, we write them as a sum
+                                    _
+                              1 + sqrt(2
+
+The approximation of this, in decimal, would be 2.414...to infinity. But 
+if we want to keep precision, so we keep it in the form as a sum of two 
+numbers, the integer and the irrational root.
+
+We can add these combined-numbers. Like so:
+                                _              _
+                         (1 + sqrt(2) + 3 = 4 + sqrt(2
+
+The result retains the same form. The irrational root is in one part, 
+and the integer is in the other part - they are joined as a sum. We can 
+also write numbers that contain multiples of an irrational root. For example.
+                                     _
+                                (3*sqrt(2)
+                                        _
+                               (1 + 5*sqrt(2)
+
+And those can also be in a sum.
+
+                                _             _             _
+                       (1 + 4*sqrt(2) + (3 + 5*sqrt(2)  = 4 + 9*sqrt(2
+
+The way that we treat Irrational roots is somewhat similar to the way we 
+think about another interesting root - the root of Negative One. Here are 
+three examples:
+
+                                     
+                                  sqrt(-1)
+                                        
+                                1 + 4*sqrt(-1)
+                                                        
+                 (1 + 4*sqrt(-1) + (3 + 5*sqrt(-1) = 4 + 9*sqrt(-1)
+
+These are called Complex Numbers and consist of an ordinary number 
+summed with a multiple of the root of negative one. The interesting part 
+is that there is no decimal approximation of the root of negative one. 
+So we have no chance to convert to a simpler approximation and do 
+calculations. We kind of have to keep the complex numbers in complex 
+number form - as a sum of two parts - the ordinary part and the root 
+part. Since it is a bit abstract, we also call the root part the 
+"imaginary" part. And, to save a bit of hassle, we go ahead and say the 
+square root of negative one is called "i". Then you can write an 
+equation like so:
+
+                         (2+i) + (3+i) = 5+i
+
+But. What if there is more than one 'kind' of root of -1? William 
+Hamilton asked himself that question in the 1800s, and found some 
+interesting possibilities.
+
+Consider three interesting numbers called "imaginary units", i j and k. 
+Note that this i is not our old friend i from the ordinary complex 
+numbers, sqrt(-1). This is a new i, and he has two friends, j and k.
+
+			     i*i = j*j = k*k = -1
+
+                              i!=j  j!=k  k!=i
+
+They are all, when squared, equal to negative one. But... they are not 
+the square root of negative one.... in fact they are not even equal to 
+each other! Why? Because they don't get multiplied like other numbers 
+do. The order matters. left-to-right is not the same thing as 
+right-to-left. In fact, for our imaginary units i and j and k, we have 
+some interesting rules:
+
+			i*j =  k
+			j*i = -k
+
+			j*k =  i
+			k*j = -i
+
+			k*i =  j
+			i*k = -j
+
+
+How can this be? Normally, when you see three numbers squared that equal 
+each other, it means those three numbers also equal each other. For 
+example.
+
+                             2*2 = 2*2 = 2*2 = 4
+                            
+Then take the square root of each side:
+
+                                  2 = 2 = 2 = 2
+
+2 equals 2. 
+
+But... this doesn't work with i j and k. What happens when we take the 
+square root?
+
+                sqrt(i*i) = sqrt(j*j) = sqrt(k*k) = sqrt(-1)
+
+What is Square Root? It's the two numbers, that when multiplied together,
+generate the square. But how can we do that in this case? How can we
+generate the square (i*i), or (j*j) or (k*k)?
+
+If we take the old fashioned approach, then i = j = k = sqrt(-1). But we
+already said above that i != j != k. So how can their squares be equal
+if the numbers themselves are not? 
+
+It is because what we are doing here is not really 'squaring'. In other 
+words i*i is not really "i times i". It is i on the left "quaternion 
+multiplied" by i on the right.
+
+So the Square Root operation, or function, doesn't actually "work" on 
+our new imaginary units i j and k. It cannot actually process them 
+properly. i j and k cannot really be considered equal to the sqrt(-1).
+If they were, they'd all be equal to each other - but we defined them to
+be unequal to each other. 
+
+                               i != j != k
+
+                 i != sqrt(-1), j != sqrt(-1), k != sqrt(-1)
+
+What, then, could we say about the sqrt(i*i)? It's a lot like trying to 
+take the square root of other mathematical entities that don't have 
+normal multiplication rules. For example consider that you have two 
+Matrices, A and B. Do a "Matrix Multiplication" to get C.
+
+
+                    A     *     B       =      C
+                 [ 1 2 ]     [ 3 0 ]         [ 13 8 ]
+                             [ 5 4 ]            
+
+                                1*3+2*5 = 3+10 = 13
+                                1*0+2*4 = 0+8 = 8
+
+We say A "matrix multiplied" by B equals C. However we cannot say what 
+happens when you try to do B on the left "matrix multiplied" by A on the 
+right. In fact, you cannot multiply BA at all because B has the wrong 
+number of rows versus A's number of columns. Matrix Multiplication for 
+BA is simply 'not defined'.
+
+Our Quaternion imaginary units, i j and k, are kind of like that with 
+Square Roots. We are doing Quaternion Multiplication not 'ordinary' 
+multiplication. Saying that i*i has a 'square root' is kind of like 
+saying that the expression Matrix C above has a 'square root'. It 
+doesn't. Matrices cannot have square roots if the number of rows doesn't 
+equal the number of columns. Imaginary Units, by themselves, cannot
+have square roots at all.
+
+Square Roots on Quaternion Imaginary Units are "Undefined". 
+
+So what then is "j", by itself? If it is not the sqrt(-1), what is it?
+
+Ahh. That's the trick. You don't need to "resolve" it. j is j. Like we 
+do not write sqrt(-1) other than to say it is the square root of 
+negative one. We do not write j other than to say that it is j. 
+If we are ever in a situation where we would like to take the sqrt(j*j), 
+we can almost certainly try to find another way around the problem instead.
+
+
+
+
+
+
+So then. Our Imaginary Units, i j and k are special , and when you 
+multiply two of them, you have to worry about which one is on the left 
+and which one is on the right. You can't switch them. This is called the 
+'non commutative' aspect of this sort of multiplication. Every time you 
+multiply them together, you need to remember the special rules as listed 
+above. i*j becomes k, k*j becomes -i, etc.
+
+One way to remember the quaternion multiplication rules is to think of 
+ijk as an alphabet string repeating over and over.
+
+                     i -> j -> k -> i -> j -> k . . . . .
+
+Now, some of the combinations of two letters will represent a single step in 
+the chain, from left to right in direction. Call it 'forward direction'.  
+For example 'ij' is clearly going one step forward from i to j* 'ki' also goes 
+one step forward. But kj? kj is not 'skipping over i', it is actually
+going 'backwards' by one step, from right to left.
+
+All of the 6 possible combinations of two letters can be thought of as a 
+"one step" along this chain, forward or backwards, depending on the letters.
+                                        
+Now, if you multiply any two 'in forward order', like ij or jk, they 
+equal the 'next letter' in the chain as a positive number. i*j = k, j*k 
+= i, k*i = j*  However if you go 'backwards' in the chain, you get the 
+'next letter' in the chain as a Negative number. 
+j*i = -k, i*k = -j, j*i = -k.
+
+You could also think of them as a triangle, or ring, and when you go 
+'clockwise' you get a positive 'next' letter, but if you go 'counter 
+clockwise' you get a negative 'next' letter.
+
+          <-- counterclockwise         --> clockwise
+                                 i
+               i*k=>-j          / \         i*j => k
+               k*j=>-i         /   \        j*k => i
+               j*i=>-k        /     \       k*i => j
+                             k-------j
+       
+So quaternion numbers do not act like ordinary numbers, nor like 
+ordinary roots. They are a unique thing.
+                         
+What about multiplying i j and k with ordinary numbers? Ahh...
+in that case, they do, in fact, work 'as ordinary'. 
+
+                          i*2 => 2*i
+
+But if you ever mix them with other quaternion numbers it can be confusing. 
+
+                         i*2*j = ?
+                         
+Fortunately, ordinary numbers can move around in a multiplication chain, 
+and do not have to worry about order.
+
+                         i*2*j
+   move 2 to the left
+                         2*i*j
+   rewrite i*j as k
+                          2*k
+   result
+                     i*2*j = 2*k
+
+OK. What about if we have a whole bunch of quaternion numbers at once?
+
+                   i*j*k 
+
+Does it matter which we multiply first? Let's check, by doing it both ways!
+
+                            i*j*k
+     rewrite using i*j=k
+                  
+                             k*k
+
+     rewrite using k*k=-1
+                              
+                              -1
+
+OK. From left-to-right we get the answer of ijk = -1. What about multiplying
+right to left?
+
+                            i*j*k
+
+     rewrite using j*k=i
+                  
+                             i*i
+
+     rewrite using i*i=-1
+                              
+                              -1
+
+The answer is still -1! Apparently it does not matter which 'order' you
+multiply the basis elements together by. As long as you follow the left-hand
+right-hand rules, you should be ok in the end. Let's try a mess just to be safe
+
+          From the Left            From the Right
+
+           ijkjikjijkji            ijkjikjijkji
+            kkjikjijkji            ijkjikjijk*(-k)
+             -jikjijkji           -ijkjikjijkk
+             --kkjijkji           -ijkjikjij*(-1)
+               kkjijkji            ijkjikjij
+                -jijkji            ijkjikjk
+                --kjkji            ijkjiki
+                  kjkji            ijkji*(-j)
+                  -ikji           -ijkjij
+                  --jji            ijkjk
+                    jji            ijk*(-i)
+                     -i           -ijki
+                                  -ij*(-j)
+                                   ijj
+                                   i*-1
+                                   -i 
+
+Wow, it is the same result! Things are looking good for our multiplication
+rules. As long as we keep the left-right order the same, it doesnt matter
+what order-of-operations we use to do the multiplication. 
+
+What about sums? Well, we can treat i j and k a bit like we do complex numbers.
+We take an ordinary number and leave it on the left hand side, as a part,
+and put the root on the right hand side, possibly with a multiplier. 
+
+
+                          1 + k
+
+                          3 + k
+
+                  ( 1 + k ) + ( 3 + k ) = 4 + 2k
+
+The trick is that we can have i j and k all together at once. 
+
+                          1 + k
+                          4 + i
+                          5 + 2j
+
+            ( 1 + k ) + ( 4 + i ) + ( 5 + 2j ) = 10 + k + i + 2j
+
+Now we are getting somewhere. We have all three quaterniones in a single
+number. In fact, this is a special form called a Quaternion. Here is another
+example:
+
+                   Q  = 1  + i*2  + j*3  + k*5
+
+If you want to be more general, you can write it like this:
+
+                   Q = w + i*x + j*y + k*z
+
+Where w, x, y, and z are all ordinary numbers. 
+
+Note how this is somewhat similar to the Complex Numbers, where you 
+describe two numbers as, for example, 6+i*5, 7+i*3. Or generally x+yi. 
+But here we have a full four terms, with three special imaginary units. 
+i j k. (Again, Quaternion i is not the same value as Complex Number i)
+
+As with many mathematical entities, we can also describe Equality, 
+Addition, Subtraction, Multiplication, and Division with Quaternions.
+
+Equality
+
+                   Q  = 1  + i*2  + j*3  + k*5
+
+                   P  = 1  + i*2  + j*3  + k*5
+
+                           Q == P
+
+Addition
+
+                   Q    = 1 + i*2  + j*3  + k*5
+
+                   P    = 7 + i*11 + j*17 + k*19
+
+                   Q+P  = 8 + i*13 + j*20 + k*24
+
+
+Multiplication, or, the Hamilton Product
+
+                   Q    = 1 + i*2  + j*3  + k*5
+                   P    = 7 + i*11 + j*17 + k*19
+
+            Q * P  = (1 + i*2 + j*3 + k*5) * (7 + i*11 + j*17 + k*19)
+
+We can expand this out like with normal multiplication distribution:
+
+            Q * Q' =   1 * (7 + i*11 + j*17 + k*19) + 
+                   (i*2) * (7 + i*11 + j*17 + k*19) +
+                   (j*3) * (7 + i*11 + j*17 + k*19) +
+                   (k*5) * (7 + i*11 + j*17 + k*19) +
+
+            Q * Q' =   1*7 +   1*i*11 +   1*j*17 +   1*k*19  +
+                     i*2*7 + i*2*i*11 + i*2*j*17 + i*2*k*19  +
+                     j*3*7 + j*3*i*11 + j*3*j*17 + j*3*k*19  +
+                     k*5*7 + k*5*i*11 + k*5*j*17 + k*5*k*19
+
+
+Now using the multiplication rules for i, j, and k, we can reduce the
+terms down a little bit.
+
+            Q * P  =     7 +     i*11 +     j*17 +     k*19  +
+                     i*2*7 +    -2*11 +   k*2*17 +  -j*2*19  +
+                     j*3*7 +  -k*3*11 +    -3*17 +   i*3*19  +
+                     k*5*7 +   j*5*11 +  -i*5*17 +    -5*19
+
+If we just collect the 'i' terms on the first row, j on the second row,
+k on the third row, and integers on the fourth row, we get this:
+
+            Q * P =
+                  i*11 +   i*2*7 + -i*5*17 + i*3*19
+                  j*17 + -j*2*19 +   j*3*7 + j*5*11
+                  k*19 +  k*2*17 + -k*3*11 +  k*5*7
+                     7 +   -2*11 +   -3*17 +  -5*19
+
+Rewriting after arithmetic:
+
+            Q * P =
+                  i*( 11 + 2*7  +-5*17 + 3*19 )+
+                  j*( 17 +-2*19 + 3*7  + 5*11 )+
+                  k*( 19 + 2*17 +-3*11 + 5*7  )+
+                    (  7 +-2*11 +-3*17 +-5*19 )
+
+Rewriting again:
+            Q * P =
+                  i*( 11 + 14 +-85 + 57 )+
+                  j*( 17 +-38 + 21 + 55 )+
+                  k*( 19 + 34 +-33 + 35 )+
+                    (  7 +-22 +-51 +-95 )
+
+Again
+            Q * P = i*( -4 )+j*( 55 )+k*( 55 )+( -151 )
+
+Again
+            Q * P = -151 -4i + 55j + 55k
+
+The result, you may notice, is still a Quaternion! In our general
+form,
+             Q = w  + xi  + yj  + zk
+
+             w=-151, x=-4, y=55, z=55
+
+Notice some patterns? 
+
+                   Q    = 1 + i*2  + j*3  + k*5
+                   P    = 7 + i*11 + j*17 + k*19
+
+                  Q * P =
+                     i*( 11 + 2*7  +-5*17 + 3*19 )+
+                     j*( 17 +-2*19 + 3*7  + 5*11 )+
+                     k*( 19 + 2*17 +-3*11 + 5*7  )+
+                       (  7 +-2*11 +-3*17 +-5*19 )
+
+We can write this more generally, using the ' (prime) mark.
+  
+                   Q    = 1  + 2 i  + 3 j  + 5 k
+                   Q    = w  + x i  + y j  + z k   
+
+                   P    = 7  + 11 i + 17 j + 19 k
+                   P    = w' + x' i + y' j + z' k 
+
+        Q * P = ( w  + x i  + y j  + z k ) * ( w' + x' i + y' j + z' k )
+
+            Q * P  =   w w' +   w x' i +   w y' j +   w z' k  +
+                     x i w' + x i x' i + x i y' j + x i z' k  +
+                     y j w' + y j x' i + y j y' j + y j z' k  +
+                     z k w' + z k x' i + z k y' j + z k z' k
+
+rewrite by moving the x y and z to the left.
+
+            Q * P  = ww'   + wx'  i + wy'  j + wz'  k  +
+                     xw' i + xx' ii + xy' ij + xz' ik  +
+                     yw' j + yx' ji + yy' jj + yz' jk  +
+                     zw' k + zx' ki + zy' kj + zz' kk
+
+rewrite by reducing ij->k, etc.
+
+            Q * P  = ww'   + wx'  i + wy'  j + wz'  k  +
+                     xw' i + xx' -1 + xy'  k + xz' -j  +
+                     yw' j + yx' -k + yy' -1 + yz'  i  +
+                     zw' k + zx'  j + zy' -i + zz' -1
+
+group i's j's and k's together
+
+          Q * P = (  ww'   - xx'    - yy'    - zz'  )     + 
+                  (  wx'   + xw'    + yz'    - zy'  )  i  +
+                  (  wy'   - xz'    + yw'    + zx'  )  j  +    
+                  (  wz'   + xy'    - yx'    + zw'  )  k
+
+But wait... Q*P is itself a Quaternion, right? It has the form
+
+
+                        Q = w + xi + yj + zk   
+
+Correct? Then our Q*P is actually of this form too. Lets call it... Q'',
+or "Q Double Prime".
+
+                        Q'' = w'' + x''i + y''j + z''k
+
+Now from above, we can have a general formula for each double-prime constiuent.
+It's an interesting way to write the new Quaterniong Q*P.
+
+                  w'' =  ww'   - xx'    - yy'    - zz'
+                  x'' =  wx'   + xw'    + yz'    - zy'
+                  y'' =  wy'   - xz'    + yw'    + zx'
+                  z'' =  wz'   + xy'    - yx'    + zw'
+
+
+Now. There is a very interesting fact about these primes, double primes,
+and suchlike. 
+
+Take w'' and square it. Then x'', y'', and z'' in turn. Square each.
+
+
+          w''*w'' = ww'ww' - ww'xx' - ww'yy' - ww'zz'
+                   -xx'ww'   xx'xx'   xx'yy'   xx'zz'
+                   -yy'ww'   yy'xx'   yy'yy'   yy'zz'
+                   -zz'ww'   zz'xx'   zz'yy'   zz'zz'
+
+          x''*x'' = wx'wx'   wx'xw'   wx'yz' - wx'zy'
+                    xw'wx'   xw'xw'   xw'yz' - xw'zy'
+                    yz'wx'   yz'xw'   yz'yz' - yz'zy'
+                   -zy'wx' - zy'xw' - zy'yz'   zy'zy'
+
+          y''*y''   wy'wy'  -wy'xz'   wy'yw'   wy'zx'
+                   -xz'wy'   xz'xz'  -xz'yw'  -xz'zx'
+                    yw'wy'  -yw'xz'   yw'yw'   yw'zx'
+                    zx'wy'  -xz'xz'   zx'yw'   zx'zx'
+
+          z''*z''   wz'wz'   wz'xy'  -wz'yx'   wz'zw'
+                    xy'wz'   xy'xy'  -xy'yx'   xy'zw'
+                   -yx'wz'  -yx'xy'   yx'yx'  -yx'zw'
+                    xw'wz'   zw'xy'  -zw'yx'   zw'zw'
+   
+
+Note the interesting patterns. For example, each set has a 
+sort of 'cross' of negatives, where three members of a single row
+will be negative, or three members of a single column will be negative. 
+
+Now there is another interesting pattern... look at only the terms
+that have a square of w in them. 
+
+From each square of double-prime we have a single term where w is squared.
+
+                  w''*w'' we have ww'ww'
+                  x''*x'' we have wx'wx'
+                  y''*y'' we have wy'wy'
+                  z''*z'' we have wz'wz'
+
+Interestingly, these terms are all in the first column, on the first 
+row. Imagine if we added all these terms together.
+                 
+               ww'ww' + wx'wx' + wy'wy' + wz'wz'
+
+Rewrite by rearranging w to the left
+ 
+               ww w'w'  +  ww x'x'  + ww y'y'  + ww z'z'
+
+Rewrite by taking 'ww' out of each term
+
+                ww ( w'w' + x'x' + y'y' + z'z' ) 
+
+That's an interesting pattern. Does the same pattern hold for xx, yy, and
+zz? Let's find out. Let's do xx. From...
+
+                  w''*w'' we have xx'xx'
+                  x''*x'' we have xw'xw'
+                  y''*y'' we have xz'xz'
+                  z''*z'' we have xy'xy'
+
+Note these all came from row two, column two! Intereting. 
+
+Now add the terms
+
+               xx'xx' + xw'xw' + xz'xz' + xy'xy'
+
+Rewrite by rearranging x to the left
+
+               xx x'x' + xx w'w'  + xx z'z' + xx y'y'
+
+Rewrite by taking 'xx' out of each term
+
+                xx ( x'x' + w'w' + z'z' + y'y' ) 
+
+Wow, it does seem to hold... not only does it hold...the term on the right,
+full of the sum of single-primes, appears to be the same!
+
+
+                ww ( w'w' + x'x' + y'y' + z'z' ) 
+                xx ( x'x' + w'w' + z'z' + y'y' ) 
+
+We could even re-write this...
+
+               ( ww + xx ) ( x'x' + w'w' + z'z' + y'y' ) 
+
+
+Wow! Interesting pattern... we have a sum of squares on the left, 
+and a sum of squares on the right. How far does this pattern go?
+
+Let's collect the terms for yy. From...
+
+                  w''*w'' we have yy'yy'
+                  x''*x'' we have yz'yz'
+                  y''*y'' we have yw'yw'
+                  z''*z'' we have yx'yx'
+
+Note they all came from the third column, third row!
+
+Now what happens if we add terms?
+
+               yy'yy' + yz'yz' + yw'yw' + yx'yx'
+
+Let's take out yy
+
+               yy ( y'y' + z'z' + w'w' + x'x' )
+
+Wow, again, we have a sum of squares of the single primes. If we
+bring down our friends from above for xx and ww... we can compare.
+
+               ww ( w'w' + x'x' + y'y' + z'z' ) 
+               xx ( x'x' + w'w' + z'z' + y'y' ) 
+               yy ( y'y' + z'z' + w'w' + x'x' )
+
+Yup. We can do the same trick again, rewriting
+
+             ( ww + xx + yy ) ( x'x' + w'w' + z'z' + y'y' ) 
+
+Can you guess the next step? Best two out of three?  Can you guess
+which column and row the squares of z will be found in?
+
+From
+                  w''*w'' we have zz'zz'
+                  x''*x'' we have zy'zy'
+                  y''*y'' we have zx'zx'
+                  z''*z'' we have zw'zw'
+
+               zz'zz' + zy'zy' + zx'zx' + zw'zw'
+
+rewrite
+            zz z'z'  + zz y'y'  + zz x'x' + zz w'w'
+
+rewrite
+               zz ( z'z' + y'y' + x'x' + w'w' )
+
+
+Combine this with our friends from above...
+
+               ww ( w'w' + x'x' + y'y' + z'z' ) 
+               xx ( x'x' + w'w' + z'z' + y'y' ) 
+               yy ( y'y' + z'z' + w'w' + x'x' )
+               zz ( z'z' + y'y' + x'x' + w'w' )
+
+Or....
+
+          ( xx + ww + yy + zz ) ( x'x' + w'w' + z'z' + y'y' ) 
+
+
+Wow. The sum of all the single-prime squares multiplied by the sum of
+all the 'no prime' squares. What can this mean? Let's look at our
+patterns again from the double prime squares.
+
+          w''*w'' = ww'ww' - ww'xx' - ww'yy' - ww'zz'
+                   -xx'ww'   xx'xx'   xx'yy'   xx'zz'
+                   -yy'ww'   yy'xx'   yy'yy'   yy'zz'
+                   -zz'ww'   zz'xx'   zz'yy'   zz'zz'
+
+          x''*x'' = wx'wx'   wx'xw'   wx'yz' - wx'zy'
+                    xw'wx'   xw'xw'   xw'yz' - xw'zy'
+                    yz'wx'   yz'xw'   yz'yz' - yz'zy'
+                   -zy'wx' - zy'xw' - zy'yz'   zy'zy'
+
+          y''*y''   wy'wy'  -wy'xz'   wy'yw'   wy'zx'
+                   -xz'wy'   xz'xz'  -xz'yw'  -xz'zx'
+                    yw'wy'  -yw'xz'   yw'yw'   yw'zx'
+                    zx'wy'  -xz'xz'   zx'yw'   zx'zx'
+
+          z''*z''   wz'wz'   wz'xy'  -wz'yx'   wz'zw'
+                    xy'wz'   xy'xy'  -xy'yx'   xy'zw'
+                   -yx'wz'  -yx'xy'   yx'yx'  -yx'zw'
+                    xw'wz'   zw'xy'  -zw'yx'   zw'zw'
+
+
+Notice which columns and rows we used to form that cool multiplication?
+
+          ( ww + xx + yy + zz ) ( x'x' + w'w' + z'z' + y'y' ) 
+
+All of the ww terms came from the first row of the first column.
+All of the xx terms came from the second row of the second column. 
+All of the yy terms came from the third row of the third column.
+All of the zz terms came from the fourth row of the fourth column. 
+
+Do you see the pattern? If we add all the double-prime squares together,
+like so:
+
+               x''x'' + w''w'' + z''z'' + y''y''
+
+We have already accounted for every 'cell' on the 'diagonal' of each
+term! In other words,
+
+   x''x''+w''w''+z''z''+y''y'' = (ww+xx+yy+zz)(x'x'+w'w'+z'z'+y'y')+something
+
+But what is that 'something'? It is the sum of all the 'cells' that are
+not on a diagonal! But what can that be? Is it not a mess?
+
+Ahh.. do not worry. Let's find a pattern! Remember, we are adding
+all four double-prime squares together. Let's just look at the first
+two rows of both w'' and x''. 
+
+          w''*w'' = ww'ww' - ww'xx' - ww'yy' - ww'zz'
+                   -xx'ww'   xx'xx'   xx'yy'   xx'zz' + ...
+
+          x''*x'' = wx'wx'   wx'xw'   wx'yz' - wx'zy'
+                    xw'wx'   xw'xw'   xw'yz' - xw'zy' + ...
+
+We already accounted for column1, row1 and column2, row2, so forget them.
+
+What about this term -ww'xx' from the w''*w'' pattern? First row,
+second column. See it?
+
+What if we add that too.... the same column and row from the x''*x'' pattern?
+
+                             -ww'xx'
+
+                              wx'xw'
+
+rewrite
+
+                         -ww'xx' + wx'xw'
+rewrite
+                          -wxw'x' + wxw'x'
+
+The are the same! Well.. the opposite! They cancel each other out!
+In other words, their sum is 0!!
+
+Wait.. so... going back to our little two-row sections..
+
+          w''*w'' = ww'ww' - ww'xx' - ww'yy' - ww'zz'
+                   -xx'ww'   xx'xx'   xx'yy'   xx'zz' + ...
+
+          x''*x'' = wx'wx'   wx'xw'   wx'yz' - wx'zy'
+                    xw'wx'   xw'xw'   xw'yz' - xw'zy' + ...
+
+We have already accounted for the 'diagonals'... and row 1 column 2....
+and what about row 2 column 1? Again...
+
+                         -xx'ww' + xw'wx' 
+rewrite
+                          -xwx'w' + xwx'w'
+
+They are also zero!!! Wow.  Wowee Zowee. What a pattern.
+
+Ok but what about this third column of the first row of w''*w''? -ww'yy' ?
+
+          w''*w'' = ww'ww' - ww'xx' - ww'yy' - ww'zz'
+                   -xx'ww'   xx'xx'   xx'yy'   xx'zz' + ...
+
+          x''*x'' = wx'wx'   wx'xw'   wx'yz' - wx'zy'
+                    xw'wx'   xw'xw'   xw'yz' - xw'zy' + ...
+
+OK. It doesn't have a nice clean match with x''*x''.... but it does have
+a match with y''*y'' !! Can you guess which row and column the match
+will be in?
+
+
+          w''*w'' = ww'ww' - ww'xx' - ww'yy' - ww'zz'
+                   -xx'ww'   xx'xx'   xx'yy'   xx'zz'
+                   -yy'ww'   yy'xx'   yy'yy'   yy'zz'
+                   -zz'ww'   zz'xx'   zz'yy'   zz'zz'
+
+          y''*y''   wy'wy'  -wy'xz'   wy'yw'   wy'zx'
+                   -xz'wy'   xz'xz'  -xz'yw'  -xz'zx'
+                    yw'wy'  -yw'xz'   yw'yw'   yw'zx'
+                    zx'wy'  -xz'xz'   zx'yw'   zx'zx'
+
+See? The third column of the first row, of each pattern, well, they sum to 0!
+And.... the first column of the third row... same thing!!
+
+Wow. Alot of these terms are summing to Zero! Will they all sum to Zero?
+Will we really be left with just the diagonals? Let's find out... but
+first.... maybe there is a trick to speed things up a little? See
+any other patterns? Maybe turn the page 1/8 turn? 
+
+
+In fact... if you look reeeallly close at these patterns, you will see
+that each one is "symmetric" around it's diagonal! It's like a mirror image
+in a strange way. 
+   
+          y''*y''   wy'wy'  -wy'xz'   wy'yw'   wy'zx'
+                   -xz'wy'   xz'xz'  -xz'yw'  -xz'zx'
+                    yw'wy'  -yw'xz'   yw'yw'   yw'zx'
+                    zx'wy'  -xz'xz'   zx'yw'   zx'zx'
+                
+        column 1 row 2     -xz'wy' = -wy'xz'     column 2 row 1
+        column 1 row 3      yw'wy' =  wy'yw'     column 3 row 1
+        column 1 row 4      zx'wy' =  wy'zx'     column 4 row 1
+
+What does this mean in fact? Well. If we can find 'matches' for the 
+'upper right' part of the mirror... we automatically find matches for 
+the 'lower left'. And vice versa.
+
+Let's use this to rewrite out square double prime patterns
+
+          w''*w'' = ww'ww' - ww'xx' - ww'yy' - ww'zz'
+                   -xx'ww'   xx'xx'   xx'yy'   xx'zz'
+                   -yy'ww'   yy'xx'   yy'yy'   yy'zz'
+                   -zz'ww'   zz'xx'   zz'yy'   zz'zz'
+
+          x''*x'' = wx'wx'   wx'xw'   wx'yz' - wx'zy'
+                    xw'wx'   xw'xw'   xw'yz' - xw'zy'
+                    yz'wx'   yz'xw'   yz'yz' - yz'zy'
+                   -zy'wx' - zy'xw' - zy'yz'   zy'zy'
+
+          y''*y''   wy'wy'  -wy'xz'   wy'yw'   wy'zx'
+                   -xz'wy'   xz'xz'  -xz'yw'  -xz'zx'
+                    yw'wy'  -yw'xz'   yw'yw'   yw'zx'
+                    zx'wy'  -xz'xz'   zx'yw'   zx'zx'
+
+          z''*z''   wz'wz'   wz'xy'  -wz'yx'   wz'zw'
+                    xy'wz'   xy'xy'  -xy'yx'   xy'zw'
+                   -yx'wz'  -yx'xy'   yx'yx'  -yx'zw'
+                    xw'wz'   zw'xy'  -zw'yx'   zw'zw'
+
