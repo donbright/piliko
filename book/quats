@@ -336,25 +336,25 @@ Equality
 
                    Q  = 1  + i*2  + j*3  + k*5
 
-                   P  = 1  + i*2  + j*3  + k*5
+                   Q' = 1  + i*2  + j*3  + k*5
 
-                           Q == P
+                           Q == Q'
 
 Addition
 
                    Q    = 1 + i*2  + j*3  + k*5
 
-                   P    = 7 + i*11 + j*17 + k*19
+                   Q'   = 7 + i*11 + j*17 + k*19
 
-                   Q+P  = 8 + i*13 + j*20 + k*24
+                   Q+Q' = 8 + i*13 + j*20 + k*24
 
 
-Multiplication, or, the Hamilton Product
+Multiplication, or, the Hamilton Q'roduct
 
                    Q    = 1 + i*2  + j*3  + k*5
-                   P    = 7 + i*11 + j*17 + k*19
+                   Q'   = 7 + i*11 + j*17 + k*19
 
-            Q * P  = (1 + i*2 + j*3 + k*5) * (7 + i*11 + j*17 + k*19)
+            Q * Q' = (1 + i*2 + j*3 + k*5) * (7 + i*11 + j*17 + k*19)
 
 We can expand this out like with normal multiplication distribution:
 
@@ -372,7 +372,7 @@ We can expand this out like with normal multiplication distribution:
 Now using the multiplication rules for i, j, and k, we can reduce the
 terms down a little bit.
 
-            Q * P  =     7 +     i*11 +     j*17 +     k*19  +
+            Q * Q' =     7 +     i*11 +     j*17 +     k*19  +
                      i*2*7 +    -2*11 +   k*2*17 +  -j*2*19  +
                      j*3*7 +  -k*3*11 +    -3*17 +   i*3*19  +
                      k*5*7 +   j*5*11 +  -i*5*17 +    -5*19
@@ -380,7 +380,7 @@ terms down a little bit.
 If we just collect the 'i' terms on the first row, j on the second row,
 k on the third row, and integers on the fourth row, we get this:
 
-            Q * P =
+            Q * Q'=
                   i*11 +   i*2*7 + -i*5*17 + i*3*19
                   j*17 + -j*2*19 +   j*3*7 + j*5*11
                   k*19 +  k*2*17 + -k*3*11 +  k*5*7
@@ -388,24 +388,24 @@ k on the third row, and integers on the fourth row, we get this:
 
 Rewriting after arithmetic:
 
-            Q * P =
+            Q * Q'=
                   i*( 11 + 2*7  +-5*17 + 3*19 )+
                   j*( 17 +-2*19 + 3*7  + 5*11 )+
                   k*( 19 + 2*17 +-3*11 + 5*7  )+
                     (  7 +-2*11 +-3*17 +-5*19 )
 
 Rewriting again:
-            Q * P =
+            Q * Q'=
                   i*( 11 + 14 +-85 + 57 )+
                   j*( 17 +-38 + 21 + 55 )+
                   k*( 19 + 34 +-33 + 35 )+
                     (  7 +-22 +-51 +-95 )
 
 Again
-            Q * P = i*( -4 )+j*( 55 )+k*( 55 )+( -151 )
+            Q * Q'= i*( -4 )+j*( 55 )+k*( 55 )+( -151 )
 
 Again
-            Q * P = -151 -4i + 55j + 55k
+            Q * Q'= -151 -4i + 55j + 55k
 
 The result, you may notice, is still a Quaternion! In our general
 form,
@@ -416,9 +416,9 @@ form,
 Notice some patterns? 
 
                    Q    = 1 + i*2  + j*3  + k*5
-                   P    = 7 + i*11 + j*17 + k*19
+                   Q'   = 7 + i*11 + j*17 + k*19
 
-                  Q * P =
+                  Q * Q'=
                      i*( 11 + 2*7  +-5*17 + 3*19 )+
                      j*( 17 +-2*19 + 3*7  + 5*11 )+
                      k*( 19 + 2*17 +-3*11 + 5*7  )+
@@ -429,49 +429,49 @@ We can write this more generally, using the ' (prime) mark.
                    Q    = 1  + 2 i  + 3 j  + 5 k
                    Q    = w  + x i  + y j  + z k   
 
-                   P    = 7  + 11 i + 17 j + 19 k
-                   P    = w' + x' i + y' j + z' k 
+                   Q'   = 7  + 11 i + 17 j + 19 k
+                   Q'   = w' + x' i + y' j + z' k 
 
-        Q * P = ( w  + x i  + y j  + z k ) * ( w' + x' i + y' j + z' k )
+        Q * Q'= ( w  + x i  + y j  + z k ) * ( w' + x' i + y' j + z' k )
 
-            Q * P  =   w w' +   w x' i +   w y' j +   w z' k  +
-                     x i w' + x i x' i + x i y' j + x i z' k  +
-                     y j w' + y j x' i + y j y' j + y j z' k  +
-                     z k w' + z k x' i + z k y' j + z k z' k
+            Q * Q' =   w w' +   w x' i +   w y' j +   w z' k  +
+                       x i w' + x i x' i + x i y' j + x i z' k  +
+                       y j w' + y j x' i + y j y' j + y j z' k  +
+                       z k w' + z k x' i + z k y' j + z k z' k
 
 rewrite by moving the x y and z to the left.
 
-            Q * P  = ww'   + wx'  i + wy'  j + wz'  k  +
+            Q * Q' = ww'   + wx'  i + wy'  j + wz'  k  +
                      xw' i + xx' ii + xy' ij + xz' ik  +
                      yw' j + yx' ji + yy' jj + yz' jk  +
                      zw' k + zx' ki + zy' kj + zz' kk
 
 rewrite by reducing ij->k, etc.
 
-            Q * P  = ww'   + wx'  i + wy'  j + wz'  k  +
+            Q * Q' = ww'   + wx'  i + wy'  j + wz'  k  +
                      xw' i + xx' -1 + xy'  k + xz' -j  +
                      yw' j + yx' -k + yy' -1 + yz'  i  +
                      zw' k + zx'  j + zy' -i + zz' -1
 
 group i's j's and k's together
 
-          Q * P = (  ww'   - xx'    - yy'    - zz'  )     + 
+          Q * Q'= (  ww'   - xx'    - yy'    - zz'  )     + 
                   (  wx'   + xw'    + yz'    - zy'  )  i  +
                   (  wy'   - xz'    + yw'    + zx'  )  j  +    
                   (  wz'   + xy'    - yx'    + zw'  )  k
 
-But wait... Q*P is itself a Quaternion, right? It has the form
+But wait... Q*Q' is itself a Quaternion, right? It has the form
 
 
                         Q = w + xi + yj + zk   
 
-Correct? Then our Q*P is actually of this form too. Lets call it... Q'',
+Correct? Then our Q*Q' is actually of this form too. Lets call it... Q'',
 or "Q Double Prime".
 
-                        Q'' = w'' + x''i + y''j + z''k
+                    Q'' = w'' + x''i + y''j + z''k
 
 Now from above, we can have a general formula for each double-prime constiuent.
-It's an interesting way to write the new Quaterniong Q*P.
+It's an interesting way to write the new Quaterniong Q*Q'.
 
                   w'' =  ww'   - xx'    - yy'    - zz'
                   x'' =  wx'   + xw'    + yz'    - zy'
@@ -670,7 +670,7 @@ like so:
 We have already accounted for every 'cell' on the 'diagonal' of each
 term! In other words,
 
-   x''x''+w''w''+z''z''+y''y'' = (ww+xx+yy+zz)(x'x'+w'w'+z'z'+y'y')+something
+   w''w''+x''x''+y''y''+z''z'' = (ww+xx+yy+zz)(w'w'+x'x'+y'y'+z'z')+something
 
 But what is that 'something'? It is the sum of all the 'cells' that are
 not on a diagonal! But what can that be? Is it not a mess?
@@ -771,25 +771,119 @@ What does this mean in fact? Well. If we can find 'matches' for the
 'upper right' part of the mirror... we automatically find matches for 
 the 'lower left'. And vice versa.
 
-Let's use this to rewrite out square double prime patterns
+Let's use this to rewrite out square double prime patterns. Let's take
+out the diagonal terms and the mirrored terms. What are we left with?
 
-          w''*w'' = ww'ww' - ww'xx' - ww'yy' - ww'zz'
-                   -xx'ww'   xx'xx'   xx'yy'   xx'zz'
-                   -yy'ww'   yy'xx'   yy'yy'   yy'zz'
-                   -zz'ww'   zz'xx'   zz'yy'   zz'zz'
+          w''*w'' =  ...    -ww'xx'  -ww'yy'  -ww'zz'
+                                      xx'yy'   xx'zz'
+                                               yy'zz'
 
-          x''*x'' = wx'wx'   wx'xw'   wx'yz' - wx'zy'
-                    xw'wx'   xw'xw'   xw'yz' - xw'zy'
-                    yz'wx'   yz'xw'   yz'yz' - yz'zy'
-                   -zy'wx' - zy'xw' - zy'yz'   zy'zy'
+          x''*x'' =  ...     wx'xw'   wx'yz'  -wx'zy'
+                                      xw'yz'  -xw'zy'
+                                              -yz'zy'
 
-          y''*y''   wy'wy'  -wy'xz'   wy'yw'   wy'zx'
-                   -xz'wy'   xz'xz'  -xz'yw'  -xz'zx'
-                    yw'wy'  -yw'xz'   yw'yw'   yw'zx'
-                    zx'wy'  -xz'xz'   zx'yw'   zx'zx'
+          y''*y'' =  ...    -wy'xz'   wy'yw'   wy'zx'
+                                     -xz'yw'  -xz'zx'
+                                               yw'zx'
 
-          z''*z''   wz'wz'   wz'xy'  -wz'yx'   wz'zw'
-                    xy'wz'   xy'xy'  -xy'yx'   xy'zw'
-                   -yx'wz'  -yx'xy'   yx'yx'  -yx'zw'
-                    xw'wz'   zw'xy'  -zw'yx'   zw'zw'
+          z''*z'' =  ...     wz'xy'  -wz'yx'   wz'zw'
+                                     -xy'yx'   xy'zw'
+                                              -yx'zw'
+
+
+Now.. look at each row by itself. The matches present themselves! 
+Each negative matches with a positive... producing 0! For example
+in the first column, 
+
+                        wx'xw' + -ww'xx' = 0
+
+So what does that mean?
+
+Rememeber way back above, when we were looking at the sum of the double-prime
+suares?
+
+   w''w''+x''x''+y''y''+z''z'' = (ww+xx+yy+zz)(w'w'+x'x'+y'y'+z'z')+something
+
+Well... all of this mirroring and matching means that "Something" is actually
+nothing! It's 0! In fact, the sum of the squares is only influenced by the
+'diagonals' of the resulting patterns above. And so. 
+
+   w''w''+x''x''+y''y''+z''z'' = (ww+xx+yy+zz) (w'w'+x'x'+y'y'+z'z')
+
+The sum of the squares of the double primes is the product of two 
+other sums of squares!
+
+But what does this have to do with Quaternions? 
+ 
+                              Q'' = Q * Q'
+
+                  Q'' =  w'' + x'' i + y'' j + z'' k
+                  Q'  =  w'  + x'  i + y'  j + z'  k
+                  Q   =  w   + x   i + y   j + z   k
+ 
+                  w'' =  ww'   - xx'    - yy'    - zz'
+                  x'' =  wx'   + xw'    + yz'    - zy'
+                  y'' =  wy'   - xz'    + yw'    + zx'
+                  z'' =  wz'   + xy'    - yx'    + zw'
+
+    w''w''+x''x''+y''y''+z''z'' = (ww+xx+yy+zz) (w'w'+x'x'+y'y'+z'z')
+
+There is an interesting kind of pattern here. A sort of echo of the
+constituents in the Quaternion, with the sum of squares and multiplications.
+
+It also gives a 'shortcut' way to calculate the sum of the double-prime
+squares... if you have need of that sum for some reason. 
+
+
+It is interesting to note the pattern of four square integers in history. 
+
+Every integer can be represented as the sum of four perfect squares. 
+This is Legendre's Four Square Theorem. It would seem then, that there 
+is a correspondence between every integer and a Quaternion whose constiuents 
+are the roots of it's squares. 
+
+Furthermore every integer can be factored as a product of two other sums
+of squares, each of which also corresponds to a Quaternion. 
+
+If you continue the chain, though, then every factor has it's own factors
+just as the first did. In fact this is a way to generate the Prime Factorization
+of a number.
+
+
+Another way of looking at it is this... every prime factorization is associated
+with a string of Quaternions, all of which have relationships between their
+constiuents as noted above. 
+
+
+
+
+
+This could lead to some interesting things. For example. Let's imagine 
+multiplying the right hand terms by themsevles, as though we had never 
+heard of Quaternions.
+
+                (ww+xx+yy+zz) (w'w'+x'x'+y'y'+z'z')
+
+           eight squares, 6 additions, one multipliction
+
+Normally that kind of multiplication would require the following calculations.
+
+         eight squares, 12+4 additions, four multiplications
+
+             w'' =  ww'   - xx'    - yy'    - zz'
+             x'' =  wx'   + xw'    + yz'    - zy'
+             y'' =  wy'   - xz'    + yw'    + zx'
+             z'' =  wz'   + xy'    - yx'    + zw'
+ 
+           16 multiplications, 4 squares, 12+4 additions 
+              
+Quaternion multiplication 
+
+Just to follow Mr Hamilton, what if we rewrite it like so?
+
+               μ'' =   w''w''  +  x''x''  +  y''y''  +  z''z''  
+               μ'  =   w' w'   +  x' x'   +  y' y'   +  z' z'  
+               μ   =   w  w    +  x  x    +  y  y    +  z  z   
+ 
+                               μ'' = μ * μ'
 
