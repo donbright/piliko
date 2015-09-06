@@ -1,0 +1,544 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<HTML>
+<HEAD>
+<TITLE>On Quaternions</TITLE>
+<META NAME="description" CONTENT="On Quaternions">
+<META NAME="keywords" CONTENT="Quatern2">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<LINK REL=STYLESHEET HREF="Quatern2.css">
+
+<style type="text/css">
+  @font-face {
+    font-family: "Computer Modern";
+    src: url('http://mirrors.ctan.org/fonts/cm-unicode/fonts/otf/cmunss.otf');
+  }
+  @font-face {
+    font-family: "Computer Modern";
+    src: url('http://mirrors.ctan.org/fonts/cm-unicode/fonts/otf/cmunsx.otf');
+    font-weight: bold;
+  }
+  @font-face {
+    font-family: "Computer Modern";
+    src: url('http://mirrors.ctan.org/fonts/cm-unicode/fonts/otf/cmunsi.otf');
+    font-style: italic, oblique;
+  }
+  @font-face {
+    font-family: "Computer Modern";
+    src: url('http://mirrors.ctan.org/fonts/cm-unicode/fonts/otf/cmunbxo.otf');
+    font-weight: bold;
+    font-style: italic, oblique;
+  }
+
+  body {
+    font-family: "Computer Modern11", serif;
+  }
+</style>
+
+<script type="text/javascript"
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+</HEAD>
+
+<BODY LANG="EN" BGCOLOR="#FFFFFF" TEXT="#000000"
+LINK="#0000BB" VLINK="#440088" ALINK="#FF0000" style="margin:0%;">
+
+<div style="background-color:#040405; float:left;">
+
+<div style="margin: 5% 5% 20% 5%; width:90%; line-height:170%; float:left; background-color:#FEFEFE;">
+<div style="margin:10%; width:80%; line-height:170%; float:left; background-color:#FEFEFE;">
+<div align=center style="font-size:20pt";>
+
+ <i>On Quaternions. By</i> Sir William R. Hamilton.
+</div>
+<P>
+<P ALIGN=CENTER>
+ [<i>Proceedings of the Royal Irish Academy, Nov.&nbsp;11, 1844,</i>vol.&nbsp;3 (1847), 1-16]
+</P>
+<P>
+<P>
+In the theory which Sir William Hamilton submitted to the Academy in
+November, 1843, the name <I>quaternion</I> was employed to denote a
+certain quadrinomial expression, of which one term was called (by
+analogy to the language of ordinary algebra) the <I>real part</I>,
+while the three other terms made up together a trinomial, which
+(by the same analogy) was called the <I>imaginary part</I> of the
+quaternion: the square of the former part (or term) being always a
+positive, but the square of the latter part (or trinomial) being
+always a negative quantity.  More particularly, this imaginary
+trinomial was of the form <I>ix</I> + <I>jy</I> + <I>kz</I>, in which <I>x</I>, <I>y</I>, <I>z</I> were
+three real and independent coefficients, or <I>constituents</I>, and
+were, in several applications of the theory, constructed or
+represented by three rectangular coordinates; while <I>i</I>, <I>j</I>, <I>k</I> were
+certain <I>imaginary units</I>, or symbols, subject to the following
+<I>laws of combination</I> as regards their <I>squares and
+products</I>,
+$$i^2 = j^2 = k^2 = -1 \tag{A}$$
+$$ij = k,\quad jk = i,\quad ki = j, \tag{B}$$
+$$ji = -k,\quad kj = -i,\quad ik = -j, \tag{C}$$
+but were entirely <I>free from any linear relation</I> among
+themselves; in such a manner, that to establish an equation between two
+such imaginary trinomials was to equate <I>each</I> of the three
+constituents, \(xyz\)</I>, of the one to the corresponding constituent of
+the other; and to equate two quaternions was (in general) to establish
+FOUR separate and distinct equations between real quantities.
+<I>Operations</I> on such quaternions were performed, as far as
+possible, according to the analogies of ordinary algebra; the
+<I>distributive</I> property of multiplication, and another,
+which may be called the <I>associative</I> property of that
+operation, being, for example, retained: with one important departure,
+however, from the received rules of calculation, arising from the
+abandonment of the <I>commutative</I> property of multiplication, as
+<I>not</I> in general holding good for the <I>mixture</I> of the new
+imaginaries; since the product \(ji\)</I> (for example) has, by its
+definition, a different sign from \(ij\)</I>.  And several constructions and
+conclusions, especially as respected the geometry of the sphere, were
+drawn from these principles, of which some have since been printed
+among the Proceedings of the Academy for the date already referred to.
+<P>
+The author has not seen cause, in his subsequent reflections on the
+subject, to abandon any of the principles which have been thus briefly
+recapitulated; but he conceives that he has been enabled to present
+some of them in a clearer view, as regards their bearings on
+geometrical questions; and also to improve the algebraical method of
+applying them, or what may be called the CALCULUS OF QUATERNIONS.
+<P>
+Thus he has found it useful, in many applications, to dismiss the
+<I>separate</I> consideration of the three real constituents, <I>x</I>, <I>y</I>,
+<I>z</I>, of the imaginary trinomial <I>ix</I> + <I>jy</I> + <I>kz</I>, and to denote that
+trinomial by some <I>single</I> letter (taken often from the Greek
+alphabet).  And on account of the facility with which this so called
+<I>imaginary</I> expression, or square root of a negative quantity,
+is constructed by a <I>right line having direction in space</I>, and
+having <I>x</I>, <I>y</I>, <I>z</I> for its three rectangular components, or
+projections on three rectangular axes, he has been induced to call the
+trinomial expression itself, as well as the line which it represents,
+a VECTOR.  A <I>quaternion</I> may thus be said to consist
+generally of a <I>real</I> part and a <I>vector</I>.  The fixing a
+special attention on this part, or element, of a quaternion, by giving
+it a special name, and denoting it in many calculations by a single
+and special sign, appears to the author to have been an improvement in
+his method of dealing with the subject: although the general notion of
+treating the constituents of the imaginary part as coordinates had
+occurred to him in his first researches.
+<P>
+Regarded from a geometrical point of view, this algebraically
+imaginary part of a quaternion has thus so natural and simple a
+signification or representation in space, that the difficulty is
+transferred to the algebraically real part; and we are tempted to ask
+what this last can denote in geometry, or what in space might have
+suggested it.
+<P>
+By the fundamental equations of definition for the squares and
+products of the symbols <I>i</I>, <I>j</I>, <I>k</I>, it is easy to see that any
+(so-called) real and positive quantity is to any vector whatever, as
+that vector is to a certain real and negative quantity; this being
+indeed only another mode of saying that, in this theory, <I>every
+vector has a negative square</I>.  Again, the product of any two
+rectangular vectors is a third vector at right angles to both the
+factors (but having one or other of two opposite directions, according
+to the order in which those factors are taken); a relation which may
+be expressed by saying, that the fourth proportional to the real unit
+and to any two rectangular vectors is a third vector rectangular to
+both; or, conversely, that the <I>fourth proportional to any three
+rectangular vectors</I> is a quantity <I>distinct from every vector</I>,
+and of the kind called <I>real</I> in this theory, as contrasted with
+the kind called <I>imaginary</I>.
+<P>
+Now, in fact, what originally led the author of the present communication
+to conceive (in 1843) his theory of quaternions (though he had, at a
+date earlier by several years, speculated on
+<A HREF="note1.html"><I>triplets</I> and <I>sets</I></A>
+of numbers, as an extension of the theory of <I>couples</I>, or of the
+ordinary imaginaries of algebra, and also as an additional
+illustration of his view respecting the Science of Pure Time), was a
+desire to form to himself a distinct conception, and to find a
+manageable algebraical expression, of a <I>fourth proportional to
+three rectangular lines</I>, when the DIRECTIONS of those lines
+were taken into account; as
+<A HREF="note2.html">Mr. Warren</A>
+and
+<A HREF="note3.html">Mr. Peacock</A>
+had shewn how to conceive and express the fourth proportional to any
+three lines having direction, but situated <I>in one common plane</I>.
+And it has since appeared to Sir William Hamilton that the subject of
+quaternions may be illustrated by considering more closely, though
+briefly, this question of the determination of a fourth proportional
+to three rectangular directions in space, rather in a geometrical than
+in an algebraical point of view.
+<P>
+Adopting the known results above referred to, for proportions between
+lines having direction in a single plane (though varying a little the
+known manner of speaking on the subject), it may be said that, in the
+horizontal plane, ``West is to South as South is to East,'' and
+generally as any direction is to one less advanced than itself in
+azimuth by ninety degrees.  Let it be now assumed, as an extension of
+this view, that in <I>some analogous sense</I> there exists a fourth
+proportional to the three rectangular directions, West, South, and Up;
+and let this be called, provisionally, <I>Forward</I>, by contrast to
+the opposite direction, <I>Backward</I>, which must be assumed to be
+(in the same general sense) a fourth proportional to the directions of
+West, South and Down.  We shall then have, inversely, Forward to Up as
+South to West, and therefore, as West to North: if we admit, as it
+seems natural and almost necessary to do, that (for directions, as for
+lengths) the inverses of equal ratios are equal; and that ratios equal
+to the same ratio are equal to each other.  But again, Up is to South
+as South to Down, and also as North to Up: and we can scarcely avoid
+admitting, or defining, that (in the present comparison of directions)
+ratios similarly compounded of equal ratios are to be considered as
+being themselves equal ratios.  Compounding, therefore, on the one
+hand, the ratios of Forward to Up, and of Up to South; and on the
+other hand the respectively equal (or similar) ratios of West to
+North, and of North to Up, we are conducted to admit that Forward is
+to South as West to Up.  By a reasoning exactly similar, we find that
+Forward is to West as Up to South; and generally that if <I>X</I>, <I>Y</I>, <I>Z</I>
+denote any three rectangular directions such that <I>A</I>:<I>X</I>::<I>Y</I>:<I>Z</I>, <I>A</I> here
+denoting what we have expressed by the word Forward, then also
+<I>A</I>:<I>Y</I>::<I>Z</I>:<I>X</I> (and of course, for the same reason <I>A</I>:<I>Z</I>::<I>X</I>:<I>Y</I>); so that
+the <I>three</I> directions  <IMG WIDTH=53 HEIGHT=13 ALIGN=BOTTOM ALT="tex2html_wrap_inline342" SRC="img4.gif"  >  may be <I>all changed
+together</I> by advancing them in a <I>ternary cycle</I>, according to
+the formula just written, without disturbing the proportionality
+assumed.  But also, by the principle respecting proportions of
+directions in one plane, we may cause <I>any two</I> of the three
+rectangular directions <I>XYZ</I> to revolve together round the third, as
+round an axis, without altering their ratio to each other.  And by
+combining these two principles, it is not difficult to see that
+<I>because</I> Forward has been supposed to be to Up as South to
+West, <I>therefore</I> the same (as yet unknown) direction
+``Forward'' must be supposed to be <I>to any direction <I>X</I>
+whatever</I>, as <I>any</I> direction <I>Y</I>, perpendicular to <I>X</I>,
+is to <I>that third</I> direction&nbsp;<I>Z</I> which is perpendicular to
+both <I>X</I> and <I>Y</I>, and which is obtained from <I>Y</I> by a right-handed
+(and not by a left-handed) rotation, through a right angle, round <I>X</I>;
+in the same manner as (and because) the direction West was so chosen
+as to be to the right of South, with reference to Up as an axis of
+rotation.  Conversely we must suppose that if <I>any three
+rectangular directions</I>,  <IMG WIDTH=53 HEIGHT=13 ALIGN=BOTTOM ALT="tex2html_wrap_inline342" SRC="img4.gif"  > , be arranged, as to order of
+rotation, in the manner just now stated, then <I>Z</I>:<I>Y</I>::<I>X</I>:<I>A</I>; or in other
+words, we must admit, if we reason in this way at all, that the
+direction called already Forward, will be the fourth proportional to
+ <IMG WIDTH=51 HEIGHT=13 ALIGN=BOTTOM ALT="tex2html_wrap_inline366" SRC="img5.gif"  > .  And if we vary the order, so as to have <I>Z</I> to the left,
+and not to the right of <I>Y</I>, with reference to <I>X</I>, then will the
+fourth proportional to  <IMG WIDTH=51 HEIGHT=13 ALIGN=BOTTOM ALT="tex2html_wrap_inline366" SRC="img5.gif"  >  become the direction which we have
+lately called Backward, as being the opposite to that named Forward.
+<P>
+Again, since Forward is to Up as South to West, that is in a ratio
+compounded of the ratios of South to East and of East to West, or in
+one compounded of the ratios of West to South, and of any direction to
+its own opposite; or, finally, in a ratio compounded of the ratios of
+Up to Forward and of Forward to Backward, that is, in the ratio of Up
+to Backward, we see that the third proportional to the directions
+Forward and Up is in the direction Backward: and by an exactly
+similar reasoning, with the help of the conclusions recently obtained,
+we see that if <I>X</I> be ANY <I>direction in tridimensional
+space</I>, then <I>A</I>:<I>X</I>::<I>X</I>:<I>B</I>; <I>B</I> here denoting, for shortness, the
+direction which has been above called Backward.
+<P>
+The geometrical study of the relations between directions in space,
+combined with a few very simple and guiding principles respecting the
+composition of relations generally, might therefore have led to the
+conception or assumption of a certain <I>pair of contrasted
+directions</I>, namely, those which we have called Forward and Backward,
+and denoted by the letters <I>A</I> and <I>B</I>.  And these are such that if we
+conceive a quantitative element to be combined with each, and give the
+name of POSITIVE UNITY to the unit of magnitude measured in the
+direction of <I>Forward</I>, but that of <I>Negative Unity</I> to the
+same magnitude measured backward; and if we extend to <I>this</I>
+positive unity and to lines having direction in space the received
+definitions of multiplication, that ``Positive Unity is to Multiplier
+as Multiplicand is to Product,'' and that ``the product of two equal
+factors is the square of either;'' we may then consistently and
+naturally be led to assert the same results as those already
+enunciated from the theory of quaternions respecting the product of
+two vectors, in the two principal cases, first, where those two
+vectors are rectangular, and second, where they are coincident with
+each other.  And thus may we justify, or at least interpret and
+explain, the fundamental definitions (A) (B) (C) of this theory, by
+regarding the symbols  <IMG WIDTH=31 HEIGHT=27 ALIGN=MIDDLE ALT="tex2html_wrap_inline386" SRC="img6.gif"  >  as denoting three vector-units having
+three rectangular directions in space.
+<P>
+But, farther, we derive from this view of the whole subject an
+illustration (if not a confirmation) of the remarkable conclusion that
+the so-called <I>real and positive unit</I> +1 is not (in this
+theory) to be confounded with <I>any</I> vector unit whatever, but is
+to be regarded as of a kind essentially distinct from every vector.
+For this positive unit +1 is in the direction above called Forward,
+and denoted by <I>A</I>.  Now if this could coincide with a direction <I>X</I>
+in tridimensional space, then, whatever this latter direction might be
+supposed to be, we could always, by the general formula <I>A</I>:<I>X</I>::<I>Y</I>:<I>Z</I>
+(where <I>X</I> is arbitrary), deduce the inadmissible proportion
+<I>X</I>:<I>X</I>::<I>Y</I>:<I>Z</I>, in which the two directions in one ratio are identical,
+but those in the other are rectangular to each other.  If then we
+resolve to retain the assumption of the existence of a fourth
+proportional <I>A</I> to three rectangular directions in space, as subject
+to be reasoned on at all in the way already described, and as
+determined in direction by its contrast to its own opposite <I>B</I>
+(corresponding to an opposite order of rotation in the system
+ <IMG WIDTH=53 HEIGHT=13 ALIGN=BOTTOM ALT="tex2html_wrap_inline342" SRC="img4.gif"  > ), we must think of these two opposite directions <I>A</I> and <I>B</I>
+as merely <I>laid down upon a scale</I>, but must abstain from
+attributing to this SCALE any one direction rather than another
+in tridimensional space, as having such or such a zenith distance, or
+such or such an azimuth, rather than such or such another.  And the
+progression <I>on this scale</I> from negative to positive infinity,
+obtained by combining a quantitative element with the contrast between
+two opposite directions, corresponds less to the conception of <I>
+space</I> itself (though we have seen that considerations of space
+might have suggested it) than to the conception of <I>time</I>; the
+variety which it admits is not <I>tri-</I> by <I>uni-</I>
+dimensional; and it would, in the language of some philosophical
+systems, be said to appertain rather to the notion of <I>
+intensive</I> than of <I>extensive</I> magnitude.  Though answering
+precisely to the progression of the quantities called <I>real</I> in
+algebra, it has, when viewed from the geometrical side, somewhat the
+same sort of <I>imaginariness</I>, and yet (it is believed) of <I>
+utility</I>, as compared with lines in space, which the square root of an
+ordinary negative has, when compared with positive and negative
+quantities.  This analogy becomes still more complete when we observe
+that (in this theory) the fourth proportional to any direction&nbsp;<I>X</I> in
+space, and either of the two directions <I>A</I> or <I>B</I> upon the scale, is
+the direction opposite to <I>X</I>; so that, <I>if a vector-unit</I> in
+any determined direction <I>X</I> <I>had been taken for positive unity</I>,
+then each of the two <I>scalar</I> units in the directions <I>A</I> and
+<I>B</I> (in common, it is true, with every vector-unit perpendicular to
+<I>X</I>) <I>might have been called</I>, by the general nomenclature of
+multiplication, <I>a square root of negative one</I>.
+<P>
+It is, however, a peculiarity of the calculus of quaternions, at least
+as lately modified by the author, and one which seems to him
+important, that it select <I>no one direction in space as eminent</I>
+above another, but treats them as all equally related to that
+<I>extra-spatial</I>, or simply SCALAR direction, which has been
+recently called ``Forward.''  In this respect it differs in its
+processes from the Cartesian method of coordinates, and seems often to
+admit of being more simply and directly applied to the treatment of
+geometrical problems, because it requires no previous selection of
+axes, rectangular or other.  The author is, indeed, aware that the
+cooperation of other and better analysts will be necessary in order to
+bring the method of quaternions to anything approaching to perfection.
+But he hopes that an instance or two of the facility with which
+<I>some</I> questions at least allow themselves to be treated by this
+method, even in its present state, may not be without interest to the
+Academy.  And he conceives that two examples in particular, one
+relating to the composition of translations, and the other to the
+composition of rotations in space, may usefully be selected for
+statement on the present occasion.
+<P>
+As preliminary illustrations of the operations employed, it may be
+remarked that for any system of lines having direction in space, it is
+required by many analogies (and is, for lines in one plane included
+among the definitions or results of the theories of Mr. Warren and
+Mr. Peacock), that the <I>sum</I> should be regarded as being equal
+to that one line which constructs or represents the <I>total
+effect</I> of all the different rectilinear motions which are expressed
+by the different summands.  <I>Vectors</I> are therefore to be
+<I>added</I> to each other by a certain geometrical composition,
+exactly analogous to the composition of motions, or of forces, and
+following the same known rules.  <I>Scalars</I>, on the other hand
+(that is to say, the so-called real parts of any proposed
+quaternions), admitting only of a progression in quantity, and of a
+change of sign, without any other changes of direction, are to be
+added among themselves by the known rules of algebra, for the addition
+of positive and negative numbers.  The addition of a scalar and a
+vector to each other can be no otherwise performed, or rather
+indicated, than by writing their symbols with the + sign
+interposed; each being, as we have seen, in some sense, imaginary
+with respect to the other.  These operations of addition are all of
+the commutative, and also of the associative kind; that is to say, the
+order of all the summands may be changed, and any group of them may be
+collected or associated into one partial sum.
+<P>
+<I>Scalars</I> are <I>multiplied</I>, as well as added, by the known
+rules of ordinary algebra, for the multiplication of real numbers,
+positive or negative; because the positive unity of the system has
+been assumed to be itself a scalar, and not a vector unit.
+<P>
+For the same reason, <I>to multiply any vector by any scalar</I>&nbsp;<I>a</I>,
+is in general to change its length in a known ratio, and to preserve
+or reverse its direction, according as <I>a</I> is &gt; or &lt; 0; the
+product is therefore a new vector, which may be denoted by  <IMG WIDTH=21 HEIGHT=9 ALIGN=BOTTOM ALT="tex2html_wrap_inline438" SRC="img7.gif"  > .
+The same new vector is obtained, under the form  <IMG WIDTH=20 HEIGHT=9 ALIGN=BOTTOM ALT="tex2html_wrap_inline440" SRC="img8.gif"  > , when we
+multiply the scalar&nbsp;<I>a</I> by the vector  <IMG WIDTH=11 HEIGHT=9 ALIGN=BOTTOM ALT="tex2html_wrap_inline444" SRC="img9.gif"  > .  If  <IMG WIDTH=44 HEIGHT=23 ALIGN=MIDDLE ALT="tex2html_wrap_inline446" SRC="img10.gif"  >  and
+ <IMG WIDTH=41 HEIGHT=29 ALIGN=MIDDLE ALT="tex2html_wrap_inline448" SRC="img11.gif"  >  be two quaternion factors, of which <I>a</I> and <I>b</I> are the
+scalar parts, and  <IMG WIDTH=11 HEIGHT=9 ALIGN=BOTTOM ALT="tex2html_wrap_inline444" SRC="img9.gif"  > ,  <IMG WIDTH=11 HEIGHT=29 ALIGN=MIDDLE ALT="tex2html_wrap_inline456" SRC="img12.gif"  >  the vectors, then with a view to
+preserving the distributive character of multiplication, it is natural
+to define that the product may be distributed into the four following
+parts:
+<P> <IMG WIDTH=398 HEIGHT=20 ALIGN=BOTTOM ALT="displaymath272" SRC="img13.gif"  > <P>
+
+And if the multiplicand vector  <IMG WIDTH=11 HEIGHT=29 ALIGN=MIDDLE ALT="tex2html_wrap_inline456" SRC="img12.gif"  >  be decomposed into two parts,
+or summands, one  <IMG WIDTH=36 HEIGHT=29 ALIGN=MIDDLE ALT="tex2html_wrap_inline460" SRC="img14.gif"  >  and in the direction of the multiplier
+ <IMG WIDTH=11 HEIGHT=9 ALIGN=BOTTOM ALT="tex2html_wrap_inline444" SRC="img9.gif"  > , or in the direction exactly opposite thereto, and the other
+ <IMG WIDTH=36 HEIGHT=29 ALIGN=MIDDLE ALT="tex2html_wrap_inline464" SRC="img15.gif"  > , and in a direction perpendicular to the former (so that
+ <IMG WIDTH=17 HEIGHT=29 ALIGN=MIDDLE ALT="tex2html_wrap_inline466" SRC="img16.gif"  >  and  <IMG WIDTH=17 HEIGHT=29 ALIGN=MIDDLE ALT="tex2html_wrap_inline468" SRC="img17.gif"  >  are the projections of  <IMG WIDTH=11 HEIGHT=29 ALIGN=MIDDLE ALT="tex2html_wrap_inline456" SRC="img12.gif"  >  on  <IMG WIDTH=11 HEIGHT=9 ALIGN=BOTTOM ALT="tex2html_wrap_inline444" SRC="img9.gif"  > 
+itself, and on the plane perpendicular to  <IMG WIDTH=11 HEIGHT=9 ALIGN=BOTTOM ALT="tex2html_wrap_inline444" SRC="img9.gif"  > ), then it may be
+farther defined that the <I>multiplication of any one
+vector</I>&nbsp; <IMG WIDTH=11 HEIGHT=29 ALIGN=MIDDLE ALT="tex2html_wrap_inline456" SRC="img12.gif"  >  <I>by any other vector</I>&nbsp; <IMG WIDTH=11 HEIGHT=9 ALIGN=BOTTOM ALT="tex2html_wrap_inline444" SRC="img9.gif"  >  may be
+accomplished by the formula
+<P> <IMG WIDTH=373 HEIGHT=20 ALIGN=BOTTOM ALT="displaymath273" SRC="img18.gif"  > <P>
+in which, by what has been shewn, the partial product
+ <IMG WIDTH=28 HEIGHT=29 ALIGN=MIDDLE ALT="tex2html_wrap_inline480" SRC="img19.gif"  >  is to be considered as equal to a scalar, namely, the
+product of the lengths of  <IMG WIDTH=11 HEIGHT=9 ALIGN=BOTTOM ALT="tex2html_wrap_inline444" SRC="img9.gif"  >  and  <IMG WIDTH=17 HEIGHT=29 ALIGN=MIDDLE ALT="tex2html_wrap_inline466" SRC="img16.gif"  > , taken with the sign
+- or +, according as the direction of  <IMG WIDTH=17 HEIGHT=29 ALIGN=MIDDLE ALT="tex2html_wrap_inline466" SRC="img16.gif"  >  coincides with, or
+is opposite to that of  <IMG WIDTH=11 HEIGHT=9 ALIGN=BOTTOM ALT="tex2html_wrap_inline444" SRC="img9.gif"  > ; while the other partial product
+ <IMG WIDTH=28 HEIGHT=29 ALIGN=MIDDLE ALT="tex2html_wrap_inline494" SRC="img20.gif"  >  is a vector, of which the length is the product of
+the lengths of  <IMG WIDTH=11 HEIGHT=9 ALIGN=BOTTOM ALT="tex2html_wrap_inline444" SRC="img9.gif"  >  and  <IMG WIDTH=17 HEIGHT=29 ALIGN=MIDDLE ALT="tex2html_wrap_inline468" SRC="img17.gif"  > , while its direction is
+perpendicular to both of their's, being obtained from that of
+ <IMG WIDTH=17 HEIGHT=29 ALIGN=MIDDLE ALT="tex2html_wrap_inline468" SRC="img17.gif"  > , by making it revolve right-handedly through a right angle
+round  <IMG WIDTH=11 HEIGHT=9 ALIGN=BOTTOM ALT="tex2html_wrap_inline444" SRC="img9.gif"  >  as an axis.  These definitions, which are compatible
+with the formul&#230; (A), (B), (C), and may serve to replace them,
+will be found sufficient to prove generally, and perhaps with somewhat
+greater geometrical clearness than those formul&#230;, the distributive
+and associative properties of quaternion multiplication, which have
+already been stated to exist.  They give easily the following
+corollaries, which are of very frequent use in this calculus:
+<P> <IMG WIDTH=500 HEIGHT=20 ALIGN=BOTTOM ALT="equation110" SRC="img21.gif"  > <P>
+<P> <IMG WIDTH=500 HEIGHT=20 ALIGN=BOTTOM ALT="equation113" SRC="img22.gif"  > <P>
+<I>A</I> and <I>B</I> denoting here the <I>lengths</I> of the lines  <IMG WIDTH=11 HEIGHT=9 ALIGN=BOTTOM ALT="tex2html_wrap_inline444" SRC="img9.gif"  > 
+and  <IMG WIDTH=11 HEIGHT=29 ALIGN=MIDDLE ALT="tex2html_wrap_inline456" SRC="img12.gif"  > , and (<I>A</I>,<I>B</I>) the <I>angle</I> between them; while
+ <IMG WIDTH=10 HEIGHT=18 ALIGN=MIDDLE ALT="tex2html_wrap_inline514" SRC="img23.gif"  >  is a vector-unit perpendicular to their plane, and such that
+a right-handed rotation, equal to the angle (<I>A</I>,<I>B</I>), performed round
+ <IMG WIDTH=10 HEIGHT=18 ALIGN=MIDDLE ALT="tex2html_wrap_inline514" SRC="img23.gif"  > , would bring the direction of  <IMG WIDTH=11 HEIGHT=9 ALIGN=BOTTOM ALT="tex2html_wrap_inline444" SRC="img9.gif"  >  to coincide with that
+of  <IMG WIDTH=11 HEIGHT=29 ALIGN=MIDDLE ALT="tex2html_wrap_inline456" SRC="img12.gif"  > .  For example, when  <IMG WIDTH=49 HEIGHT=29 ALIGN=MIDDLE ALT="tex2html_wrap_inline524" SRC="img24.gif"  > , then <I>B</I> = <I>A</I>,
+(<I>A</I>,<I>B</I>) = 0, and
+<P> <IMG WIDTH=340 HEIGHT=21 ALIGN=BOTTOM ALT="displaymath274" SRC="img25.gif"  > <P>
+so that the length&nbsp;<I>A</I> of any vector&nbsp; <IMG WIDTH=11 HEIGHT=9 ALIGN=BOTTOM ALT="tex2html_wrap_inline444" SRC="img9.gif"  > , in this theory, may be
+expressed under the form
+<P> <IMG WIDTH=500 HEIGHT=23 ALIGN=BOTTOM ALT="equation118" SRC="img26.gif"  > <P>
+More generally we have the equation
+<P> <IMG WIDTH=500 HEIGHT=20 ALIGN=BOTTOM ALT="equation122" SRC="img27.gif"  > <P>
+when the lines  <IMG WIDTH=11 HEIGHT=9 ALIGN=BOTTOM ALT="tex2html_wrap_inline444" SRC="img9.gif"  >  and  <IMG WIDTH=11 HEIGHT=29 ALIGN=MIDDLE ALT="tex2html_wrap_inline456" SRC="img12.gif"  >  are coincident or opposite in
+direction; while, on the contrary, the condition for their being at
+right angles to each other is expressed by the formula
+<P> <IMG WIDTH=500 HEIGHT=20 ALIGN=BOTTOM ALT="equation125" SRC="img28.gif"  > <P>
+<P>
+These simple principles suffice to give, in a new way, algebraical
+solutions of many geometrical problems, of various degrees of
+difficulty and importance.  Thus, if it be required, as an easy
+instance, to determine the length of the resultant of several
+successive rectilinear motions, or the magnitude of the statical sum
+of several forces acting together at one point, as a function of the
+amounts of those successive motions, or of those component forces, and
+of their inclinations to each other, we have only to denote the
+components by the vectors  <IMG WIDTH=100 HEIGHT=18 ALIGN=MIDDLE ALT="tex2html_wrap_inline538" SRC="img29.gif"  > , and
+their sum by  <IMG WIDTH=11 HEIGHT=9 ALIGN=BOTTOM ALT="tex2html_wrap_inline444" SRC="img9.gif"  > , the corresponding magnitudes being
+ <IMG WIDTH=107 HEIGHT=29 ALIGN=MIDDLE ALT="tex2html_wrap_inline542" SRC="img30.gif"  > , and <I>A</I>; and the equation
+<P> <IMG WIDTH=343 HEIGHT=14 ALIGN=BOTTOM ALT="displaymath275" SRC="img31.gif"  > <P>
+will give, by being squared,
+<P> <IMG WIDTH=500 HEIGHT=49 ALIGN=BOTTOM ALT="eqnarray128" SRC="img32.gif"  > <P>
+that is, by the foregoing principles (after changing all the signs),
+<P> <IMG WIDTH=502 HEIGHT=50 ALIGN=BOTTOM ALT="eqnarray130" SRC="img33.gif"  > <P>
+a known result, it is true, but one which can scarcely be derived in
+any other way by so very short a process of <I>calculation</I>.  For it
+is not <I>quite</I> so easy, on the <I>algebraical</I> side of the
+question, to see that
+<P> <IMG WIDTH=550 HEIGHT=22 ALIGN=BOTTOM ALT="displaymath276" SRC="img34.gif"  > <P>
+however easy this may be, as it is to see that
+<P> <IMG WIDTH=500 HEIGHT=22 ALIGN=BOTTOM ALT="equation140" SRC="img35.gif"  > <P>
+although the <I>geometrical interpretation</I> of the first of these
+two formul&#230; is of course more obvious than that of the latter, to
+those who are familiar with the method of coordinates, and not with
+the method of quaternions.
+<P>
+Again, let us consider the more difficult problem of the composition
+of any number os successive rotations of a body, or, at first, of any
+one line thereof, round several successive axes, through any angles,
+small or large.  Let the axis of the first of these rotations have the
+direction of the vector-unit  <IMG WIDTH=11 HEIGHT=9 ALIGN=BOTTOM ALT="tex2html_wrap_inline444" SRC="img9.gif"  > , ( <IMG WIDTH=67 HEIGHT=29 ALIGN=MIDDLE ALT="tex2html_wrap_inline548" SRC="img36.gif"  > ), and let the
+amount of the positive rotation round this axis be denoted by <I>a</I>,
+which letter here represents still a scalar or real number.  Let
+ <IMG WIDTH=11 HEIGHT=29 ALIGN=MIDDLE ALT="tex2html_wrap_inline456" SRC="img12.gif"  >  be the revolving line, considered in its original position;
+ <IMG WIDTH=16 HEIGHT=29 ALIGN=MIDDLE ALT="tex2html_wrap_inline554" SRC="img37.gif"  >  the same line, after it has revolved through the angle&nbsp;<I>a</I>
+round the axis&nbsp; <IMG WIDTH=11 HEIGHT=9 ALIGN=BOTTOM ALT="tex2html_wrap_inline444" SRC="img9.gif"  > .  The part, or component, of  <IMG WIDTH=11 HEIGHT=29 ALIGN=MIDDLE ALT="tex2html_wrap_inline456" SRC="img12.gif"  > , which is
+in the direction of this axis, is that which was denoted lately by
+ <IMG WIDTH=17 HEIGHT=29 ALIGN=MIDDLE ALT="tex2html_wrap_inline466" SRC="img16.gif"  > ; and the formula (a), when multiplied by
+ <IMG WIDTH=37 HEIGHT=33 ALIGN=MIDDLE ALT="tex2html_wrap_inline564" SRC="img38.gif"  > , gives, as an expression for this part,
+<P> <IMG WIDTH=500 HEIGHT=23 ALIGN=BOTTOM ALT="equation150" SRC="img39.gif"  > <P>
+because it has been supposed that  <IMG WIDTH=67 HEIGHT=29 ALIGN=MIDDLE ALT="tex2html_wrap_inline548" SRC="img36.gif"  > .  This part of
+ <IMG WIDTH=11 HEIGHT=29 ALIGN=MIDDLE ALT="tex2html_wrap_inline456" SRC="img12.gif"  >  remains unaltered by the rotation.  The other part, or
+component of  <IMG WIDTH=11 HEIGHT=29 ALIGN=MIDDLE ALT="tex2html_wrap_inline456" SRC="img12.gif"  > , is, in like manner, by (b),
+<P> <IMG WIDTH=500 HEIGHT=23 ALIGN=BOTTOM ALT="equation155" SRC="img40.gif"  > <P>
+and this part is to be multiplied by  <IMG WIDTH=38 HEIGHT=9 ALIGN=BOTTOM ALT="tex2html_wrap_inline572" SRC="img41.gif"  > , in order to find the
+part of  <IMG WIDTH=16 HEIGHT=29 ALIGN=MIDDLE ALT="tex2html_wrap_inline554" SRC="img37.gif"  > , which is perpendicular to  <IMG WIDTH=11 HEIGHT=9 ALIGN=BOTTOM ALT="tex2html_wrap_inline444" SRC="img9.gif"  > , but in the plane
+of  <IMG WIDTH=11 HEIGHT=9 ALIGN=BOTTOM ALT="tex2html_wrap_inline444" SRC="img9.gif"  >  and  <IMG WIDTH=11 HEIGHT=29 ALIGN=MIDDLE ALT="tex2html_wrap_inline456" SRC="img12.gif"  > .  Again, multiplying by  <IMG WIDTH=11 HEIGHT=9 ALIGN=BOTTOM ALT="tex2html_wrap_inline444" SRC="img9.gif"  > , we cause
+ <IMG WIDTH=17 HEIGHT=29 ALIGN=MIDDLE ALT="tex2html_wrap_inline468" SRC="img17.gif"  >  to turn through a right angle in the positive direction
+round&nbsp; <IMG WIDTH=11 HEIGHT=9 ALIGN=BOTTOM ALT="tex2html_wrap_inline444" SRC="img9.gif"  > , and obtain, for the result of <I>this</I> rotation,
+<P> <IMG WIDTH=327 HEIGHT=23 ALIGN=BOTTOM ALT="displaymath277" SRC="img42.gif"  > <P>
+an expression which is the half of that marked (b), and which is to be
+multiplied by  <IMG WIDTH=36 HEIGHT=13 ALIGN=BOTTOM ALT="tex2html_wrap_inline588" SRC="img43.gif"  > , in order to arrive at the remaining part of
+the sought line  <IMG WIDTH=16 HEIGHT=29 ALIGN=MIDDLE ALT="tex2html_wrap_inline554" SRC="img37.gif"  > , namely, the part which is perpendicular to
+the plane of  <IMG WIDTH=11 HEIGHT=9 ALIGN=BOTTOM ALT="tex2html_wrap_inline444" SRC="img9.gif"  >  and  <IMG WIDTH=11 HEIGHT=29 ALIGN=MIDDLE ALT="tex2html_wrap_inline456" SRC="img12.gif"  > .  Collecting, therefore, the three
+parts, or terms, which have been thus separately obtained, we find,
+<P> <IMG WIDTH=500 HEIGHT=94 ALIGN=BOTTOM ALT="eqnarray163" SRC="img44.gif"  > <P>
+that is,
+<P> <IMG WIDTH=500 HEIGHT=35 ALIGN=BOTTOM ALT="equation179" SRC="img45.gif"  > <P>
+<P ALIGN=RIGHT>
+<A HREF="note4.html">[Note added during printing.]</A>
+<P>
+the operations here indicated being thus sure to make no change in the
+part  <IMG WIDTH=17 HEIGHT=29 ALIGN=MIDDLE ALT="tex2html_wrap_inline466" SRC="img16.gif"  > , which is in the direction of the axis of rotation, but
+to cause the other part  <IMG WIDTH=17 HEIGHT=29 ALIGN=MIDDLE ALT="tex2html_wrap_inline468" SRC="img17.gif"  >  to revolve round that axis&nbsp; <IMG WIDTH=11 HEIGHT=9 ALIGN=BOTTOM ALT="tex2html_wrap_inline444" SRC="img9.gif"  > 
+through an angle = <I>a</I>.  Again, let the same line  <IMG WIDTH=16 HEIGHT=29 ALIGN=MIDDLE ALT="tex2html_wrap_inline554" SRC="img37.gif"  >  revolve
+round a new axis of rotation denoted by a new vector unit  <IMG WIDTH=15 HEIGHT=14 ALIGN=BOTTOM ALT="tex2html_wrap_inline636" SRC="img52.gif"  > ,
+through a new angle <I>a</I>', into a new position  <IMG WIDTH=20 HEIGHT=29 ALIGN=MIDDLE ALT="tex2html_wrap_inline640" SRC="img53.gif"  > ; we shall have,
+in like manner,
+<P> <IMG WIDTH=509 HEIGHT=46 ALIGN=BOTTOM ALT="equation198" SRC="img54.gif"  > <P>
+and so on, for any number&nbsp;<I>n</I> of rotations.  Let the last position of
+ <IMG WIDTH=11 HEIGHT=29 ALIGN=MIDDLE ALT="tex2html_wrap_inline456" SRC="img12.gif"  >  be denoted by  <IMG WIDTH=19 HEIGHT=29 ALIGN=MIDDLE ALT="tex2html_wrap_inline646" SRC="img55.gif"  > ; and since it can easily be proved, by
+the theory of multiplication of quaternions, that the continued
+products which present themselves admit of being thus transformed:
+<P> <IMG WIDTH=538 HEIGHT=187 ALIGN=BOTTOM ALT="equation209" SRC="img56.gif"  > <P>
+in which  <IMG WIDTH=19 HEIGHT=18 ALIGN=MIDDLE ALT="tex2html_wrap_inline648" SRC="img57.gif"  >  is a new vector unit, and  <IMG WIDTH=17 HEIGHT=18 ALIGN=MIDDLE ALT="tex2html_wrap_inline650" SRC="img58.gif"  >  a new real angle,
+we find that the result of all the <I>n</I> rotations is of the form
+<P> <IMG WIDTH=514 HEIGHT=35 ALIGN=BOTTOM ALT="equation245" SRC="img59.gif"  > <P>
+It conducts, therefore to the same final position which would have
+been attained from the initial position&nbsp; <IMG WIDTH=11 HEIGHT=29 ALIGN=MIDDLE ALT="tex2html_wrap_inline456" SRC="img12.gif"  > , by a <I>single
+rotation</I>  <IMG WIDTH=37 HEIGHT=18 ALIGN=MIDDLE ALT="tex2html_wrap_inline656" SRC="img60.gif"  > , round the <I>single axis</I>&nbsp; <IMG WIDTH=19 HEIGHT=18 ALIGN=MIDDLE ALT="tex2html_wrap_inline648" SRC="img57.gif"  > ; the
+amount and axis of this resultant rotation being determined by either
+of the two equations of transformation (k), and being independent of
+the direction of the line&nbsp; <IMG WIDTH=11 HEIGHT=29 ALIGN=MIDDLE ALT="tex2html_wrap_inline456" SRC="img12.gif"  >  which was operated on, so that they
+are the same for all lines of the body.
+<P>
+If the present results be combined with the theorem marked (R), in the
+account, printed in the Proceedings of the Academy, of the remarks
+made by the Author in November, 1843, it will at once be seen that if
+the several axes of rotation be considered as terminating in the
+points of a spherical polygon, and if the angles of rotation be equal
+respectively to the doubles of the angles of this polygon (and be
+taken with proper signs or directions, determined by those angles),
+then the total effects of all these rotations will vanish; or, in
+other words, the body will at last be brought back to the position
+from which it set out.
+<P>
+Finally, it may be mentioned that the author is in possession of a
+general method for expressing by quaternions the tangent planes and
+normals to curved surfaces, and that in applying this method to find
+the cone of tangents enveloping a given sphere, and drawn from a given
+point, the geometrical impossibility of the problem, when the point is
+an internal one, is expressed by the square of a vector becoming in
+this case positive.
+<P>
+<BR> <HR>
+
+<P>
+Links:
+<UL>
+<LI><A HREF="http://www.maths.tcd.ie/pub/HistMath/People/Hamilton/">Sir William Rowan Hamilton (1805-1865)</A></LI>
+<LI><A HREF="http://www.maths.tcd.ie/pub/HistMath/">History of Mathematics</A></LI>
+</UL>
+</P>
+
+<ADDRESS>
+<A HREF="http://www.maths.tcd.ie/~dwilkins/">
+D.R. Wilkins</A><BR>
+(<A HREF="mailto:dwilkins@maths.tcd.ie"><KBD>dwilkins@maths.tcd.ie</KBD></A>)<BR>
+<A HREF="http://www.maths.tcd.ie/">School of Mathematics</A><BR>
+<A HREF="http://www.tcd.ie/">Trinity College, Dublin</A>
+</ADDRESS>
+
+</div>
+</div>
+</div>
+
+</BODY>
+</HTML>

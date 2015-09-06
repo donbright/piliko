@@ -858,32 +858,21 @@ constiuents as noted above.
 
 
 
-This could lead to some interesting things. For example. Let's imagine 
-multiplying the right hand terms by themsevles, as though we had never 
-heard of Quaternions.
+Just to follow Mr Hamilton's notation a bit, what if we rewrite it like so?
 
-                (ww+xx+yy+zz) (w'w'+x'x'+y'y'+z'z')
+                  Q'' =  w'' + x'' i + y'' j + z'' k
+                  Q'  =  w'  + x'  i + y'  j + z'  k
+                  Q   =  w   + x   i + y   j + z   k
 
-           eight squares, 6 additions, one multipliction
-
-Normally that kind of multiplication would require the following calculations.
-
-         eight squares, 12+4 additions, four multiplications
-
-             w'' =  ww'   - xx'    - yy'    - zz'
-             x'' =  wx'   + xw'    + yz'    - zy'
-             y'' =  wy'   - xz'    + yw'    + zx'
-             z'' =  wz'   + xy'    - yx'    + zw'
+           μ''*μ'' =   w''w''  +  x''x''  +  y''y''  +  z''z''  
+           μ' *μ'  =   w' w'   +  x' x'   +  y' y'   +  z' z'  
+           μ  *μ   =   w  w    +  x  x    +  y  y    +  z  z   
  
-           16 multiplications, 4 squares, 12+4 additions 
-              
-Quaternion multiplication 
+    w''w''+x''x''+y''y''+z''z'' = (ww+xx+yy+zz) (w'w'+x'x'+y'y'+z'z')
 
-Just to follow Mr Hamilton, what if we rewrite it like so?
+                        μ'' μ'' = μ μ * μ' μ'
 
-               μ'' =   w''w''  +  x''x''  +  y''y''  +  z''z''  
-               μ'  =   w' w'   +  x' x'   +  y' y'   +  z' z'  
-               μ   =   w  w    +  x  x    +  y  y    +  z  z   
- 
-                               μ'' = μ * μ'
+Then we call μ (greek 'mu') the 'Modulus' of Q. 
+
+
 
