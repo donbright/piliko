@@ -4,7 +4,7 @@ var fs = require('fs');
 infile = 'Quatern2.tex';
 outfile = infile + '.js';
 
-console.log('Hello World');
+console.log('<!-- Generated from ' + infile + ' by tex2js.js -->');
 
 fs.readFile(infile,'utf-8',function(err,text) {
  if (err) throw err;
