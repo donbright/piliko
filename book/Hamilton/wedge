@@ -1,0 +1,30 @@
+==Quaternions==
+
+
+In other news, I found a fun relationship between the "Wedge" function and Quaternion multiplication. In the last post I was pondering how to deal with Quaternions that have only an X and Y component, and are basically vectors on a 2 dimensional plane. 
+
+
+Q = w + xi + yj + zk 
+
+
+if w = 0 and z = 0 then Q = xi + yj
+
+
+For example the 3-4-5 triangle could be described as Q = 4x+3j
+
+
+Q * Q' = (xi+yj)(x'i+y'j)
+
+
+This results in something like this:
+
+
+  Q*Q' = k(xy'-yx') - (xx'+yy')
+
+
+You may recognize the 'k' term as ... the wedge!  (OK did I get it backwards? well, its still wedgy). It is the area of a paraellologram described by the two vectors x,y and x',y'.    xy'-yx'. Used in a lot of other places in mathematics and geometry. 
+
+ 
+
+What is the xx'+yy' thing though? Haven't figured it out yet.
+
