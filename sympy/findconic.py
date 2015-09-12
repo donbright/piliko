@@ -45,21 +45,19 @@ def self_test():
 	print 'test OK:',repr(coniceq)==repr(expected)
 	pprint( repr(coniceq) )
 
-ax,ay,bx,by,cx,cy,l = symbols("ax ay bx by cx cy l")
-dx,dy,ex,ey,fx,fy,l = symbols("dx dy ex ey fx fy l")
-l=1
-h,v = symbols("h,v")
-ax,ay,cx,cy=bx-h,by+v,bx+h,by+v
-implicit_form = find_conic( ax,ay,bx,by,cx,cy,l )
-pprint( implicit_form )
-dx,dy,ex,ey,fx,fy=cx,cy,cx+v,cy-h,cx+v+v,cy
-implicit_form = find_conic( dx,dy,ex,ey,fx,fy,l )
-pprint( implicit_form )
+def misc():
+	# miscellaneous interesting stuff
+	ax,ay,bx,by,cx,cy,l = symbols("ax ay bx by cx cy l")
+	dx,dy,ex,ey,fx,fy,l = symbols("dx dy ex ey fx fy l")
+	l=1
+	h,v = symbols("h,v")
+	ax,ay,cx,cy=bx-h,by+v,bx+h,by+v
+	implicit_form = find_conic( ax,ay,bx,by,cx,cy,l )
+	pprint( implicit_form )
+	dx,dy,ex,ey,fx,fy=cx,cy,cx+v,cy-h,cx+v+v,cy
+	implicit_form = find_conic( dx,dy,ex,ey,fx,fy,l )
+	pprint( implicit_form )
 
-#ax,ay,bx,by,cx,cy,l = symbols("cx cy dx dy ex ey l")
-#l=1
-#implicit_form = find_conic( ax,ay,bx,by,cx,cy,l )
-#pprint( implicit_form )
 
 ax,ay,bx,by,cx,cy,l = -1,1,0,0,1,1,Rational(2)
-print(latex(find_conic( ax,ay,bx,by,cx,cy,l )))
+pprint(find_conic( ax,ay,bx,by,cx,cy,l ))
