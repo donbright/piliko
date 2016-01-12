@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="640">
+<!-- pixels per unit 210 --><rect x="0" y="0" width="640" height="640" style="fill:gray;stroke:black"/>
+<rect x="5" y="5" width="630" height="630" style="fill:white;stroke:black"/>
+<rect x="5" y="425" width="210" height="210" style="fill:white;stroke:black"/>
+<rect x="215" y="5" width="420" height="420" style="fill:white;stroke:black"/>
+
+ </svg>
+
