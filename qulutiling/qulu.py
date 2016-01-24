@@ -39,6 +39,7 @@
 # https://chinese.yabla.com/chinese-english-pinyin-dictionary.php?define=%E6%9B%B2%E7%8E%87
 
 from fractions import Fraction
+import sys
 
 square_roots={}
 
@@ -74,6 +75,34 @@ def triplesquare(q1,q2,q3):
 	return s
 
 
+def fordnewcircle( x1, x2 ):
+	a = x1.numerator
+	b = x1.denominator
+	c = x2.numerator
+	d = x2.denominator
+	new = Fraction(a+c,b+d)
+	return new
+
+def fordnewlayer( xcoords ):
+	print xcoords
+	newcoords = []
+	for i in range(0,len( xcoords )-1 ):
+		one = xcoords[i]
+		two = fordnewcircle( xcoords[i], xcoords[i+1] )
+		newcoords += [one,two]
+	newcoords += [xcoords[-1]]
+	return newcoords
+
+def testlayers():
+	c1=Fraction(0,1)
+	c2=Fraction(1,1)
+	layer0 = [c1,c2]
+	layer1 = fordnewlayer( layer0 )
+	layer2 = fordnewlayer( layer1 )
+	print layer0
+	print layer1
+	print layer2
+
 # find chain of Ford Circles back up from circle at given x coordinate.
 # a / b  = la + ra / lb + rb
 # b(la+ra) = a(lb+rb)
@@ -82,10 +111,13 @@ def triplesquare(q1,q2,q3):
 def findchain( xcoord ):
 	a = xcoord.numerator
 	b = xcoord.denominator
-	print a,b
 	radius = Fraction(1,2*b*b)
 	curvature = Fraction(1, radius)
-	print a,b,radius,curvature
+	print xcoord,a,b,radius,curvature
+	layer = [Fraction(0,1),Fraction(1,1)]
+	while xcoord not in layer:
+		layer = fordnewlayer( layer )
+		print layer
 
 picsize = 640
 border = 5
@@ -100,4 +132,4 @@ s+= triplesquare(1*1,2*2,3*3)
 s+= '\n </svg>\n'
 print s
 
-findchain(Fraction(1,3))
+findchain(Fraction(2,5))
