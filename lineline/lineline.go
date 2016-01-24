@@ -35,9 +35,8 @@ How?
   Now, through various algebraic manipulations, it can be shown that the point
   q of intersection an be described as follows:
 
-  qx = vx * ( V ^ W ) / ( V ^ U )
-  qy = vy * ( V ^ W ) / ( V ^ U )
-
+  qx = ux * ( V ^ W ) / ( V ^ U )
+  qy = uy * ( V ^ W ) / ( V ^ U )
 
   Output is svg graphics file (text based graphics format)
 
