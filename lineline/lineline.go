@@ -22,7 +22,7 @@ find it's value!
 How?
 
   First, consider V, a vector between w and s, or s minus w.
-  vx is the x distance between points w and s. vy is the y distance.
+  vx is the x-distance between points w and s. vy is the y-distance.
   Consider W a vector from 0,0 to point w
   Consider U a vector from 0,0 to point u
 
@@ -39,6 +39,96 @@ How?
   qy = uy * ( V ^ W ) / ( V ^ U )
 
   Output is svg graphics file (text based graphics format)
+
+Fun Fact
+ If you only need to 'scale' the vector u so that it's head rests on the
+ intersection point, then you can just do this
+
+  scale factor = V^W / V^U
+
+ Why? because Intersection vector = scale factor * u vector
+ This is interesting to me... the simplicity of the scale factor could be
+ useful in some situations.
+
+ In this method, if modified for the situation where one is given 4 general
+ points, two lying on line1 and two on line2... in such case as one needs
+ to subtract the highest from lowest points and find wx,wy,ux,uy relative
+ to the 'lowest' point which will become the origin, translated as such,
+ it is interesting that you don't need to do this translation for the 'higher'
+ point on line1, the "head" of v. You only need v's head as it relates
+ to it's tail, not as it relates to origin.
+
+ Computation
+
+ wedge between two vectors described by rational-number coordinates are
+ intesting.
+
+ V ^ W
+
+ becomes
+
+ Vx Wy - Wx Vy
+
+ which becomes, splitting numerator and denominator,
+
+ Vxa   Wyc     Wxa   Vyc
+ --- * ---  -  --- * ---
+ Vxb   Wyd     Wxb   Vyd
+
+ This in turn becomes
+
+ Wxb * Vyd * Vxa * Wyc  -  Vxb * Wyd * Wxa * Vyc
+ -----------------------------------------------
+             Vxb * Wyd * Wxb * Vyd
+
+ And the other wedge, V^U is similar
+
+ Vx Uy - Ux Vy
+
+ Uxb * Vyd * Vxa * Uyc - Vxb * Uyd * Uxa * Vyc
+ ---------------------------------------------
+             Vxb * Uyd * Uxb * Vyd
+
+ But this second is divded from the first, which is the same thing
+ as to multiply it by it's inverse. So.
+
+ (Wxb*Vyd*Vxa*Wyc - Vxb*Wyd*Wxa*Vyc)              Vxb*Uyd*Uxb*Vyd
+ ----------------------------------- * -------------------------------------
+             Vxb*Wyd*Wxb*Vyd           ( Uxb*Vyd*Vxa*Uyc - Vxb*Uyd*Uxa*Vyc )
+
+ Already there is something to cancel
+
+ (Wxb*Vyd*Vxa*Wyc - Vxb*Wyd*Wxa*Vyc)                  Uyd*Uxb
+ ----------------------------------- * -------------------------------------
+                 Wyd*Wxb               ( Uxb*Vyd*Vxa*Uyc - Vxb*Uyd*Uxa*Vyc )
+
+ And to regroup
+
+ [ (Vyd*Vxa)(Wxb*Vyd) - (Vxb*Vyc)(Wyd*Wxa) ]   Uyd*Uxb
+ -----------------------------------------------------
+ [ (Vyd*Vxa)(Uxb*Uyc) - (Vxb*Vyc)(Uyd*Uxa) ]   Wyd*Wxb
+
+ Notice anything strange? Yes!
+
+ Vyd*Vxa - appears twice
+ Vxb*Vyc - appears twice
+
+ This means we have boiled the transactio down to the following operations
+ integer multiplication: 8 initial, all paralellizable
+ integer subtraction: 2
+ integer multiplication: 2 final
+
+ Now, I know in Traditional Rational Number implementations, like GNU
+ gmp, they run a greatest common divisor algorithm to reduce the fraction
+ after every calculation. But we don't need to do that.
+
+ We don't necessarily need to do anything. We could, if we wanted to draw
+ a point, do a division... then again... didn't Bresenham prove that
+ division is overrated when drawing stuff on a pixel screen? Not saying
+ I have an algorithm here... I'm just saying. What if?
+
+ What this program actually does is just do a conversion to Floating Point
+ and then does a division, without any of these above optimizations.
 
 Number Type
 
