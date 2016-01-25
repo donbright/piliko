@@ -194,12 +194,17 @@ Bernoulli lemniscate, rotated around an axis in 3d (all rational points)
 ![rational bernoulli 3d rotation](pics/dumbbell.png)
 
 Ellipson, a 3d shape from Wildberger's Divine Geometry, rendered with
-Meshlab and the render setting of the "glass" Shader
+Meshlab from http://meshlab.sourceforge.net and the Renderer set to the "glass" Shader
 ![ellipson](pics/ellipson2.png)
+
+And again in antiview from http://antiprism.com 
 ![ellipson again](pics/ellipson.png)
 
+Ford circles.. but using hyperbolas instead of circles. ("Red Circles")
+Note they are still tangent in some interesting places.
+![hyperbola version of Ford circles](pics/fordhyp.png)
+
 Hyperbolic sheet, rational points
-![hyperbolic sheet, rational points](pics/fordhyp.png)
 ![another hyperbollic sheet](pics/hypsheet.png)
 
 Various Pythagorean Triple patterns
