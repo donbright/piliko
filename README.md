@@ -173,9 +173,10 @@ Tangents exist at every point      Tangents exist at rational points
 
 # Pictures
 
-Reproducing Wildberger's Chromogeometry paper, 2008, pic from the end pages:
-https://www.researchgate.net/publication/225963299_Chromogeometry
-using python functions to generate circle centers, etc. 
+Reproducing a graph from Wildberger's Chromogeometry paper, 2008
+* https://www.researchgate.net/publication/225963299_Chromogeometry
+This is program generated, using python functions to generate circle centers, 
+hyperbolas, etc.
 
 ![chromogeometry](pics/chromo.png)
 
