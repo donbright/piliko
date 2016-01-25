@@ -1,6 +1,7 @@
 from piliko import *
 
 # Replicate a picture from one of NJ Wildberger's chromogeometry papers
+# Chromogeometry, 2008, https://www.researchgate.net/publication/225963299_Chromogeometry
 
 #t=triangle([2,7],[25,12],[9,20])
 t=random_triangle(-10,10) # uncomment for some fun
