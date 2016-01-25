@@ -176,8 +176,9 @@ Tangents exist at every point      Tangents exist at rational points
 Reproducing a graph from Wildberger's Chromogeometry paper, 2008
 * https://www.researchgate.net/publication/225963299_Chromogeometry
 
-This is program generated, using python functions to generate circle centers, 
-hyperbolas, etc.
+This is program generated, using python functions to generate circle 
+centers, hyperbolas, etc, using antisymmetric polynomials & other ideas 
+from Wildberger's videos, papers, etc.
 
 ![chromogeometry](pics/chromo.png)
 
