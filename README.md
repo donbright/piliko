@@ -21,21 +21,21 @@ unimplemented. Tests have not been created.
 There are also a lot of random tidbits not related to the main piliko 
 package, for example, some experiments:
 
-*Make rational number types that allow 0 as a denominator, in the Go language
-*Generate Sphere, Torus, tessellations of disks, Bernoulli 
+* Make rational number types that allow 0 as a denominator, in the Go language
+* Generate Sphere, Torus, tessellations of disks, Bernoulli 
   Leminscate, etc, using only rational points, and also using Blue,Red,Green
   quadrance as short-hand notation for generation formulas.
-*Draw patterns of pythagorean triples
-*Find line-line intersection using the Wedge function of Geometric Algebra
-*Find conic equation of a spline, given 3 points, using
+* Draw patterns of pythagorean triples
+* Find line-line intersection using the Wedge function of Geometric Algebra
+* Find conic equation of a spline, given 3 points, using
  Rob Johnsons "Conic Splines" paper of 1991, from Apple
  and http://sympy.org , a symbolic python mathematics package
-*Draw Ford Circles
-*Show non-obvious facts about using floating-point IEEE numbers
+* Draw Ford Circles
+* Show non-obvious facts about using floating-point IEEE numbers
  to model geometry, like the fact that the length of an object varies
  depending on its position in space
-*Generate 3d OFF files of Ellipson shape (from Wildberger's Divine Proportions)
-*Geodesic sphere based on Icosahedron
+* Generate 3d OFF files of Ellipson shape (from Wildberger's Divine Proportions)
+* Geodesic sphere based on Icosahedron
 
 #Disclaimer 
 
