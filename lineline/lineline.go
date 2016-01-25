@@ -180,7 +180,6 @@ func add( a,b Rational ) ( r Rational ) {
 }
 
 func sub(a, b Rational ) ( r Rational ) {
-	fmt.Println("sub",a,b,neg(b),add(a,neg(b)))
 	r = add( a, neg(b) )
 	return
 }
@@ -188,6 +187,12 @@ func sub(a, b Rational ) ( r Rational ) {
 func mul(a, b Rational) (c Rational) {
 	c.num = a.num * b.num
 	c.denom = a.denom * b.denom
+	return
+}
+
+func subpts( p2, p1 Point ) ( v Vector ) {
+	v.x = sub( p2.x, p1.x )
+	v.y = sub( p2.y, p1.y )
 	return
 }
 
@@ -223,6 +228,20 @@ func svglines() (s string) {
 	return
 }
 
+func find_intersect(w,v,u Vector) (q Point) {
+	wedger := div(wedge(v,w),wedge(v,u))
+	//fmt.Println("wedge vw", wedge(v,w), "wedge vu", wedge(v,u))
+	qx := mul(u.x, wedger)
+	qy := mul(u.y, wedger)
+	return Point{qx,qy}
+}
+
+func raw_intersect( p1, p2, p3, p4 Point ) (q Point) {
+	w := subpts(p1,p3)
+	u := subpts(p4,p3)
+	v := subpts(p2,p1)
+	return find_intersect( w, u, v )
+}
 
 func main() {
 	fmt.Println(svgbegin(400,400))
@@ -236,11 +255,8 @@ func main() {
 	w := Vector{wx,wy}
 	v := Vector{vx,vy}
 	u := Vector{ux,uy}
-	wedger := div(wedge(v,w),wedge(v,u))
-	fmt.Println("wedge vw", wedge(v,w), "wedge vu", wedge(v,u))
-	qx := mul(ux, wedger)
-	qy := mul(uy, wedger)
-	q := Point{qx,qy}
+
+	q := find_intersect( w,v,u )
 
 	fmt.Println("<!--",w,v,u,q,"-->")
 	fmt.Println(svgpoint(q))
