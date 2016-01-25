@@ -193,7 +193,8 @@ And again... this time with the liberty of using top-bottom hyperbolas
 Bernoulli lemniscate, rotated around an axis in 3d (all rational points)
 ![rational bernoulli 3d rotation](pics/dumbbell.png)
 
-Ellipson, a 3d shape from Wildberger's Divine Geometry, rendered with
+Ellipson, a 3d shape from Wildberger's Divine Geometry, created with
+the help of "Convex Hull" from http://antiprism.com and 
 Meshlab from http://meshlab.sourceforge.net and the Renderer set to the "glass" Shader
 ![ellipson](pics/ellipson2.png)
 
