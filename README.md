@@ -13,10 +13,11 @@ This code is 'alpha' level. It is highly experimental. It may or may not
 work at any time. 
 
 The main 'piliko' python code contains experimental implementations of 
-rational geometry functions like spread, red, blue and green quadrance, 
-circumcenters of a triangle, etc. The whole type system has not been 
-thought out very carefully and many functions are partially or wholly 
-unimplemented. Tests have not been created.
+Rational Geometry functions like spread, red, blue and green quadrance, 
+and associated stuff like circumcenters of a triangle, antisymmetric 
+polynomial, etc. The whole type system has not been thought out very 
+carefully and many functions are partially or wholly unimplemented. 
+Tests have not been created.
 
 There are also a lot of random tidbits not related to the main piliko 
 package, for example, some experiments:
@@ -30,12 +31,12 @@ package, for example, some experiments:
 * Find conic equation of a spline, given 3 points, using
  Rob Johnsons "Conic Splines" paper of 1991, from Apple
  and http://sympy.org , a symbolic python mathematics package
-* Draw Ford Circles
+* Draw Ford Circles, using Circles, then also Hyperbolas (red circles)
 * Show non-obvious facts about using floating-point IEEE numbers
  to model geometry, like the fact that the length of an object varies
- depending on its position in space
+ depending on its position in space, or that sometimes x+1.0 != x+1
 * Generate 3d OFF files of Ellipson shape (from Wildberger's Divine Proportions)
-* Geodesic sphere based on Icosahedron
+* Geodesic sphere based on Icosahedron, using unusual algorithm
 
 #Disclaimer 
 
@@ -95,6 +96,57 @@ some basic plotting of pictures. For example:
 	plot_points( oc,cc,nc )
 	plot_triangle( t )
 	plotshow()
+
+# Pictures
+
+Reproducing a graph from Wildberger's Chromogeometry paper, 2008
+* https://www.researchgate.net/publication/225963299_Chromogeometry
+
+This is program generated, using python functions to generate circle 
+centers, hyperbolas, etc, using antisymmetric polynomials & other ideas 
+from Wildberger's videos, papers, etc.
+
+![chromogeometry](pics/chromo.png)
+
+Now, doing it again with random triangles (to show it works)
+
+![chromogeometry 2](pics/figure_1.png)
+![chromogeometry 3](pics/figure_2.png)
+
+And again... this time with the liberty of using top-bottom hyperbolas
+
+![chromogeometry 4](pics/figure_3.png)
+
+Bernoulli lemniscate, rotated around an axis in 3d (all rational points)
+![rational bernoulli 3d rotation](pics/dumbbell.png)
+
+Ellipson, a 3d shape from Wildberger's Divine Geometry, created with
+the help of "Convex Hull" from http://antiprism.com and 
+Meshlab from http://meshlab.sourceforge.net and the Renderer set to the "glass" Shader
+![ellipson](pics/ellipson2.png)
+
+And again in antiview from http://antiprism.com 
+![ellipson again](pics/ellipson.png)
+
+Ford circles.. but using hyperbolas instead of circles. ("Red Circles")
+Note they are still tangent in some interesting places.
+![hyperbola version of Ford circles](pics/fordhyp.png)
+
+Hyperbolic sheet, rational points
+![another hyperbollic sheet](pics/hypsheet.png)
+
+Various Pythagorean Triple patterns
+![pythagorean triples pattern](pics/pythpattern9.png)
+![pythagorean triples pattern 2](pics/pythpatterna.png)
+![pythagorean triples pattern 3](pics/pythpatternb.png)
+![pythagorean triples pattern 4](pics/pythpatternc.png)
+
+Sphere, Torus, rational points
+![rational points on a sphere](pics/sphere.png)
+![torus with rational points](pics/torus.png)
+
+Warped torus, created by slightly altering the rational parameterization
+![different shape of toroid, rational points](pics/torusodd.png)
 
 #Differences with real-number geometry
 
@@ -171,59 +223,7 @@ Tangents exist at every point      Tangents exist at rational points
 
 ```
 
-# Pictures
-
-Reproducing a graph from Wildberger's Chromogeometry paper, 2008
-* https://www.researchgate.net/publication/225963299_Chromogeometry
-
-This is program generated, using python functions to generate circle 
-centers, hyperbolas, etc, using antisymmetric polynomials & other ideas 
-from Wildberger's videos, papers, etc.
-
-![chromogeometry](pics/chromo.png)
-
-Now, doing it again with random triangles (to show it works)
-
-![chromogeometry 2](pics/figure_1.png)
-![chromogeometry 3](pics/figure_2.png)
-
-And again... this time with the liberty of using top-bottom hyperbolas
-
-![chromogeometry 4](pics/figure_3.png)
-
-Bernoulli lemniscate, rotated around an axis in 3d (all rational points)
-![rational bernoulli 3d rotation](pics/dumbbell.png)
-
-Ellipson, a 3d shape from Wildberger's Divine Geometry, created with
-the help of "Convex Hull" from http://antiprism.com and 
-Meshlab from http://meshlab.sourceforge.net and the Renderer set to the "glass" Shader
-![ellipson](pics/ellipson2.png)
-
-And again in antiview from http://antiprism.com 
-![ellipson again](pics/ellipson.png)
-
-Ford circles.. but using hyperbolas instead of circles. ("Red Circles")
-Note they are still tangent in some interesting places.
-![hyperbola version of Ford circles](pics/fordhyp.png)
-
-Hyperbolic sheet, rational points
-![another hyperbollic sheet](pics/hypsheet.png)
-
-Various Pythagorean Triple patterns
-![pythagorean triples pattern](pics/pythpattern9.png)
-![pythagorean triples pattern 2](pics/pythpatterna.png)
-![pythagorean triples pattern 3](pics/pythpatternb.png)
-![pythagorean triples pattern 4](pics/pythpatternc.png)
-
-Sphere, Torus, rational points
-![rational points on a sphere](pics/sphere.png)
-![torus with rational points](pics/torus.png)
-
-Warped torus, created by slightly altering the rational parameterization
-![different shape of toroid, rational points](pics/torusodd.png)
-
 # Copyright License
-=================
 
 All computer code here is as of writing by Don Bright, 
 github.com/donbright 2013-2016. Many formulas have been taken from other 
