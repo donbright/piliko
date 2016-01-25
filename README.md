@@ -172,7 +172,23 @@ Tangents exist at every point      Tangents exist at rational points
 
 ```
 
-Copyright License
+# Pictures
+
+![chromogeometry](pics/chromo.png)
+![rational bernoulli 3d rotation](pics/dumbbell.png)
+![ellipson](pics/ellipson2.png)
+![ellipson again](pics/ellipson.png)
+![hyperbolic sheet, rational points](pics/fordhyp.png)
+![another hyperbollic sheet](pics/hypsheet.png)
+![pythagorean triples pattern](pics/pythpattern9.png)
+![pythagorean triples pattern 2](pics/pythpatterna.png)
+![pythagorean triples pattern 3](pics/pythpatternb.png)
+![pythagorean triples pattern 4](pics/pythpatternc.png)
+![rational points on a sphere](pics/sphere.png)
+![torus with rational points](pics/torus.png)
+![different shape of toroid, rational points](pics/torusodd.png)
+
+# Copyright License
 =================
 
 All computer code here is as of writing by Don Bright, 
