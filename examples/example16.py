@@ -2,8 +2,8 @@ from piliko import *
 
 # Replicate a picture from one of NJ Wildberger's chromogeometry papers
 
-t=triangle([2,7],[25,12],[9,20])
-# t=random_triangle(-10,10) # uncomment for some fun
+#t=triangle([2,7],[25,12],[9,20])
+t=random_triangle(-10,10) # uncomment for some fun
 cb,cr,cg=blue_circumcenter(t),red_circumcenter(t),green_circumcenter(t)
 nb,nr,ng=blue_ninepoint_center(t),red_ninepoint_center(t),green_ninepoint_center(t)
 Ob,Or,Og=blue_orthocenter(t),red_orthocenter(t),green_orthocenter(t)

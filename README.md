@@ -80,11 +80,10 @@ from a web search. Then do this
 	bq,rq,gq=blue_quadrance(p),red_quadrance(p),green_quadrance(p)
 	print p,' ',bq,rq,gq,' ',sqr(bq),sqr(rq),sqr(gq)
 
-Several examples are in the files named "example..py". Even more 
-examples are under the 'experiment' folder.
+To run files under example folder:
 
-
-#Plotting pictures
+        export PYTHONPATH=. # linux only, not sure how to do on Windows
+        python examples/example02.py
 
 When the add-on 'matplotlib' package is installed on your system, you can do
 some basic plotting of pictures. For example:
@@ -174,18 +173,44 @@ Tangents exist at every point      Tangents exist at rational points
 
 # Pictures
 
+Reproducing Wildberger's Chromogeometry paper, 2008, pic from the end pages:
+https://www.researchgate.net/publication/225963299_Chromogeometry
+using python functions to generate circle centers, etc. 
+
 ![chromogeometry](pics/chromo.png)
+
+Now, doing it again with random triangles (to show it works)
+
+![chromogeometry 2](pics/figure_1.png)
+![chromogeometry 3](pics/figure_2.png)
+
+And again... this time with the liberty of using top-bottom hyperbolas
+
+![chromogeometry 4](pics/figure_3.png)
+
+Bernoulli lemniscate, rotated around an axis in 3d (all rational points)
 ![rational bernoulli 3d rotation](pics/dumbbell.png)
+
+Ellipson, a 3d shape from Wildberger's Divine Geometry, rendered with
+Meshlab and the render setting of the "glass" Shader
 ![ellipson](pics/ellipson2.png)
 ![ellipson again](pics/ellipson.png)
+
+Hyperbolic sheet, rational points
 ![hyperbolic sheet, rational points](pics/fordhyp.png)
 ![another hyperbollic sheet](pics/hypsheet.png)
+
+Various Pythagorean Triple patterns
 ![pythagorean triples pattern](pics/pythpattern9.png)
 ![pythagorean triples pattern 2](pics/pythpatterna.png)
 ![pythagorean triples pattern 3](pics/pythpatternb.png)
 ![pythagorean triples pattern 4](pics/pythpatternc.png)
+
+Sphere, Torus, rational points
 ![rational points on a sphere](pics/sphere.png)
 ![torus with rational points](pics/torus.png)
+
+Warped torus, created by slightly altering the rational parameterization
 ![different shape of toroid, rational points](pics/torusodd.png)
 
 # Copyright License
