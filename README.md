@@ -12,33 +12,38 @@ The code is bits and pieces, like a workshop or notebook, of various things.
 This code is 'alpha' level. It is highly experimental. It may or may not 
 work at any time. 
 
-The main 'piliko' python code contains rational geometry functions like 
-spread and red, blue and green quadrance, circumcenters of a triangle, 
-etc. The whole type system has not been thought out very carefully and 
-many functions are partially or wholly unimplemented. Tests have not 
-been created.
+The main 'piliko' python code contains experimental implementations of 
+rational geometry functions like spread, red, blue and green quadrance, 
+circumcenters of a triangle, etc. The whole type system has not been 
+thought out very carefully and many functions are partially or wholly 
+unimplemented. Tests have not been created.
 
-There are also a lot of random tidbits not related to the main package, for
-example
+There are also a lot of random tidbits not related to the main piliko 
+package, for example, some experiments:
 
-*Experiments with rational number types that allow 0 as a denominator,
-  In the Go language
-*Experiment to generate Sphere, Torus, tessellations of disks, Bernoulli 
+*Make rational number types that allow 0 as a denominator, in the Go language
+*Generate Sphere, Torus, tessellations of disks, Bernoulli 
   Leminscate, etc, using only rational points, and also using Blue,Red,Green
-  quadrance as short-hand notation.
-*Experiment with line-line intersection using the Wedge function of 
-  Geometric Algebra
+  quadrance as short-hand notation for generation formulas.
+*Draw patterns of pythagorean triples
+*Find line-line intersection using the Wedge function of Geometric Algebra
 *Find conic equation of a spline, given 3 points, using
  Rob Johnsons "Conic Splines" paper of 1991, from Apple
  and http://sympy.org , a symbolic python mathematics package
-*Experiments with Ford Circles and Descartes Kissing Circles
+*Draw Ford Circles
+*Show non-obvious facts about using floating-point IEEE numbers
+ to model geometry, like the fact that the length of an object varies
+ depending on its position in space
+*Generate 3d OFF files of Ellipson shape (from Wildberger's Divine Proportions)
+*Geodesic sphere based on Icosahedron
 
 #Disclaimer 
 
 Rational Trigonometry was discovered and developed by Dr. Norman J 
 Wildberger. His concepts and terminology are used here without 
 permission and the use of these ideas/terms doesn't imply his 
-endorsement nor his affiliation. All apologies if there are mistakes. 
+endorsement nor his affiliation. All apologies if there are mistakes
+which are entirely this authors and not his. 
 Please see these sites for more information:
 
 * https://www.youtube.com/user/njwildberger
@@ -78,6 +83,7 @@ from a web search. Then do this
 Several examples are in the files named "example..py". Even more 
 examples are under the 'experiment' folder.
 
+
 #Plotting pictures
 
 When the add-on 'matplotlib' package is installed on your system, you can do
@@ -94,7 +100,7 @@ some basic plotting of pictures. For example:
 #Differences with real-number geometry
 
 Geometry under rational numbers is different than 'ordinary' geometry using
-the real numbers. Here are some key points.
+the real numbers. Here are some interesting and fun comparisons.
 
 ```
 Real                               Rational
@@ -108,24 +114,24 @@ Points can have any                Points can only have Rational
 coordinates                        coordinates
 
 Distances are fundamental          Quadratic Forms (Quadrance)
-sqrt(x^2+y^2)                      are fundamental. x^2+y^2
-                                   Distance = square root of Quadrance.
-
-Circles are specified              Circles are specified by rational 
-by radius & center                 center and by radius squared.
+sqrt(x^2+y^2)                      are fundamental. x^2+y^2.
+                                   Distance is derived from Quadrance by 
+                                   finding a square root, which is not
+                                   always possible if it's not a perfect square
 
 The point 1,1 is on                There is no circle centered at
-a circle with center 0,0           0,0 containing the point 1,1
+a circle with center 0,0           0,0 containing the point 1,1 with a rational
+                                   radius
 
 Any line with points inside        Some lines with points inside
-the circle intersects the          the circle won't intersect it.
-circle
+the circle intersects the          the circle won't intersect it
+circle                             at rational points in x,y coordinates
 
-Infinite series approximations     Only finite numbers are used.
-are used in calculations.
+Infinite series approximations     Finite bit-width numbers are 
+are used in calculations.          considered the base of calculations
 
-e + pi might be rational           e and pi are both infinite 
-or might not be                    series, so the question is moot.
+e + pi is considered as            e and pi are both infinite series
+a number (of unknown nature)       so an attempt is made to avoid them
 
 Angles are used to measure         Spread is used (sin squared)
 line separation
@@ -138,50 +144,40 @@ The basic right triangles are      Basic right triangles are the Pythagorean
 (angle based) with irrational      Many angle-based triangles have irrational 
 lengths.                           points.
 
-Wedge between vectors can be       Wedge between vectors is 
-expressed with 'sin'               x1*y2-x2*y1
+Wedge between vectors can be       Wedge between vectors is focused on
+expressed with 'sin'               the rational calculation, x1*y2-x2*y1
 
-Regular polygons are specified    Many regular polygons have irrational
-by angles added.                  points and so are not representable.
+Regular polygons are specified     Many regular polygons have irrational
+by angles added.                   points and so can only be approximated
 
-Hyperbolic, Elliptical,           Hyperbolic, Elliptic, and Spherical
-Spherical are special cases       geometry share many of the same formulas
-with very different formulas      and ideas.
+Hyperbolic, Elliptical,            Hyperbolic, Elliptic, and Spherical
+Spherical are special cases        geometry share many of the same formulas
+with very different formulas       and ideas.
 
-Circles are described with        Circles are described exactly using
-sine and cosine approximations    rational paramterizations
+Circles are described with         Circles are described using
+sine and cosine approximations     rational paramterizations
 
-Infinite series and sets are      Infinite series and sets are avoided
+Infinite series and sets are       Infinite series and sets are avoided
 commonplace
 
-Infinity is something we cant     Infinity can be dealt with using
-deal with concretely              projective geometry (points-at-infinity map
-                                  to finite points in 'ordinary' space, perhaps
-                                  of a lower dimension)
+Infinity is something we cant      Infinity can be dealt with using
+deal with concretely               projective geometry (points-at-infinity map
+                                   to finite points in 'ordinary' space, perhaps
+                                   of a lower dimension)
 
-Tangents can have any slope       Tangents have rational slope.
+Tangents can have any slope        Tangents have rational slope
+                                   
+Tangents exist at every point      Tangents exist at rational points
 
-Tangents exist at every point     Tangents exist at rational points
 
+```
 
-```                               
+Copyright License
+=================
 
-Chromogeometry
-==============
-
-The package also contains several items of Chromogeometry, which is 
-Wildberger's approach to changing the concept of 'square distance'
-to include x^2-y^2 and 2*x*y in addition to the 'normal' x^2+y^2.
-
-Red quadrance = x^2-y^2 and Green Quadrance = 2*x*y Red Circles are 
-hyperboals and Green Circles are also hyperbolas but 'rotated' 45 
-degrees. The concept of spread also has a 'red' and 'green' version, as 
-well as perpendicularity.
-
-Author and Copyright License
-============================
-
-Piliko is written by Don Bright, <hugh.m.bright at gmail.com>, 2013.
+All computer code here is as of writing by Don Bright, 
+github.com/donbright 2013-2016. Many formulas have been taken from other 
+places, with attirbution in the code.
 
 This code is free for use under a basic BSD-style Open Source Software 
 license as described in the LICENSE file. You can freely copy and use it
