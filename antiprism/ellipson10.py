@@ -12,7 +12,7 @@ from pytools import generate_permutations
 from fractions import Fraction
 from random import randint
 depth=1000000
-numpoints = 2000
+numpoints = 12000
 class point2d:
 	def __init__( self,x,y ): self.x,self.y=x,y
 def sqr(x): return x*x

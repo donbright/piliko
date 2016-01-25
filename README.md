@@ -1,20 +1,37 @@
 piliko
 ======
 
-Piliko is a very, very, experimenral mishmash of Rational Geometry computer 
-codes in the computer language called Python. It follows, roughly,
-Rational Trigonometry in that it avoids irrational and transcendental 
-numbers and functions, and the concepts of angle and distance are 
-avoided.
+Piliko is a mish mash collection of highly experimental Geometry codes, 
+mostly inspired by Rational Geometry. Most of the code tries to avoid 
+irrational and transcendental numbers and functions as the basis of 
+calculations.
 
 #Current status
 
+The code is bits and pieces, like a workshop or notebook, of various things.
 This code is 'alpha' level. It is highly experimental. It may or may not 
-work at any time, as I am constantly tinkering with it. It can do basic 
-calculations, but the whole type system has not been thought out very 
-carefully and many functions are partially or wholly unimplemented. 
-Tests have not been created. There are no actual users at this time so 
-debugging, as you might imagine, has been minimal.
+work at any time. 
+
+The main 'piliko' python code contains rational geometry functions like 
+spread and red, blue and green quadrance, circumcenters of a triangle, 
+etc. The whole type system has not been thought out very carefully and 
+many functions are partially or wholly unimplemented. Tests have not 
+been created.
+
+There are also a lot of random tidbits not related to the main package, for
+example
+
+*Experiments with rational number types that allow 0 as a denominator,
+  In the Go language
+*Experiment to generate Sphere, Torus, tessellations of disks, Bernoulli 
+  Leminscate, etc, using only rational points, and also using Blue,Red,Green
+  quadrance as short-hand notation.
+*Experiment with line-line intersection using the Wedge function of 
+  Geometric Algebra
+*Find conic equation of a spline, given 3 points, using
+ Rob Johnsons "Conic Splines" paper of 1991, from Apple
+ and http://sympy.org , a symbolic python mathematics package
+*Experiments with Ford Circles and Descartes Kissing Circles
 
 #Disclaimer 
 
@@ -30,89 +47,36 @@ Please see these sites for more information:
 * http://www.cut-the-knot.org/pythagoras/RationalTrig/CutTheKnot.shtml
 * http://farside.ph.utexas.edu/euclid.html
 
-The statements below are probably somewhat accurate, but of course I am 
-not an expert so there you have it.
+The author of this code is not an expert.
 
-#But I don't know the computer language Python
+#Piliko Examples
 
-You don't need to know Python to do basic calculations. The syntax is
-designed to be somewhat simple. Please see the examples. As long as you can
-start up a python interpreter on your machine, you should be OK. See
-http://www.python.org to download a python interpreter for your computer. 
-Once you can get to the screen where you type 
-	
-	print 'hello world'
-
-and get a 'hello world' to appear, then you will almost be ready to use 
-piliko. The next step is to put the 'piliko.py' file in a folder where 
-your python interpreter can find it. Then you can load piliko with this 
-command in python:
+First, get python up and running, using any of the hundreds of tutorials
+from a web search. Then do this
 
 	from piliko import *
 
-#Examples
-
-Example A:
-
-	from piliko import *
-
-	p1 = point(0,0)
-	p2 = point(3,0)
-	p3 = point(0,4)
-	print p1,p2,p3
-
+	p1,p2,p3 = point(0,0),point(3,0),p3 = point(0,4)
 	print quadrance(p1, p2)
-
 	L1 = line( p1, p2 )
 	L2 = line( p1, p3 )
 	s = spread( L1, L2 )
 	print s
-
-Result:
-
-	[0,0] [3,0] [0,4]
-	9
-	1
-
-Example B:
 
 	t = triangle(point(0,0),point(4,3),point(2,5))
 	oc,cc,nc = orthocenter(t),circumcenter(t),ninepointcenter(t)
 	print oc,cc,nc
 	print collinear( oc, cc, nc )
 	
-Result:
-
-	[23/7,23/7] [19/14,33/14] [65/28,79/28]
-	True
-
-Example C:
-
 	p1,p2,p3,p4 = point(0,0),point(3,0),point(2,0),point(6,0)
 	print is_harmonic_range( p1, p2, p3, p4 )
-	
-Result:
-
-	True
-
-Example D:
 
 	p=point(3,4)
 	bq,rq,gq=blue_quadrance(p),red_quadrance(p),green_quadrance(p)
 	print p,' ',bq,rq,gq,' ',sqr(bq),sqr(rq),sqr(gq)
 
-Result:
-
-	[3,4]   25 -7 24   625 49 576
-
-More examples can be found in the files named example01.py, example02.py, etc
-To run them:
-
-	python example01.py
-	python example02.py
-	etc etc
-
-Even more examples are under the 'experiment' folder of this bundle.
+Several examples are in the files named "example..py". Even more 
+examples are under the 'experiment' folder.
 
 #Plotting pictures
 
