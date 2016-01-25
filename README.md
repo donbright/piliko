@@ -31,7 +31,8 @@ package, for example, some experiments:
 * Find conic equation of a spline, given 3 points, using
  Rob Johnsons "Conic Splines" paper of 1991, from Apple
  and http://sympy.org , a symbolic python mathematics package
-* Draw Ford Circles, using Circles, then also Hyperbolas (red circles)
+* Draw Ford Circles and Descarte's Kissing Circles, using Circles, 
+  then also Hyperbolas (red circles/green circles)
 * Show non-obvious facts about using floating-point IEEE numbers
  to model geometry, like the fact that the length of an object varies
  depending on its position in space, or that sometimes x+1.0 != x+1
@@ -128,7 +129,7 @@ Meshlab from http://meshlab.sourceforge.net and the Renderer set to the "glass" 
 And again in antiview from http://antiprism.com 
 ![ellipson again](pics/ellipson.png)
 
-Ford circles.. but using hyperbolas instead of circles. ("Red Circles")
+Descartes Kissing Circles.. but using hyperbolas instead of circles. ("Green Circles")
 Note they are still tangent in some interesting places.
 ![hyperbola version of Ford circles](pics/fordhyp.png)
 
