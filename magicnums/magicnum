@@ -1,0 +1,100 @@
+from fractions import *
+
+magicfactorized="""
+2
+2 2 2
+2 2 5
+2 2 7
+2 5 5
+2 41
+2 3 19
+2 3 3 7
+2 2 2 23
+"""
+
+magicfactors=[]
+for line in magicfactorized.split('\n'):
+	newfactors = []
+	for chunk in line.split():
+		newfactors += [int(chunk)]
+	if len(newfactors):
+		magicfactors += [newfactors]
+for i in magicfactors: print i
+
+magicnums=[]
+for i in range(0,3):
+	factors = magicfactors[i]
+	tmp = 1
+	for j in range(0,len(factors)):
+		tmp *= factors[j]
+	magicnums+=[tmp]
+
+for i in range(len(magicnums)): print magicnums[i]
+
+magicdoubles=[]
+for i in range(len(magicnums)):
+	for j in range(len(magicnums)):
+		magicdoubles+=[[magicnums[i],magicnums[j]]]
+
+#for i in range(len(magicdoubles)):
+#	print magicdoubles[i]
+
+total = reduce(lambda x, y: x*y, magicnums)
+
+# http://stackoverflow.com/questions/15347174/python-finding-prime-factors
+def prime_factors(n):
+    i = 2
+    factors = []
+    while i * i <= n:
+        if n % i:
+            i += 1
+        else:
+            n //= i
+            factors.append(i)
+    if n > 1:
+        factors.append(n)
+    return factors
+
+def prime_factorsd(n):
+    i = 2
+    factors = {}
+    while i * i <= n:
+        if n % i:
+            i += 1
+        else:
+            n //= i
+            if factors.has_key(i): factors[i]+=1
+            else: factors[i]=1          
+    if n > 1:
+        if factors.has_key(n): factors[n]+=1
+        else: factors[n]=1
+    return factors
+
+magicfracs=[]
+magicnumers=[]
+for i in range(len(magicdoubles)):
+	numerator = magicdoubles[i][0]
+	denom = magicdoubles[i][1]
+	multiplier = total / denom
+	numerator *= multiplier
+	denom *= multiplier
+	print '%10s %10i %10i' % (str(magicdoubles[i]),numerator,denom)
+	magicfracs+=[numerator,denom]
+	magicnumers+=[numerator]
+print total
+magicnumers.sort()
+magicprimes=[]
+for i in range(len(magicnumers)):
+	factors = prime_factorsd(magicnumers[i])
+	if not factors.has_key(5): factors[5]=0
+	if not factors.has_key(7): factors[7]=0
+	if not factors.has_key(41): factors[41]=0
+	magicprimes += [factors]
+	
+for i in range(len(magicprimes)):
+	sum=0
+	for j in sorted(magicprimes[i].keys()):
+		print '%2i^%-2i' % (j,magicprimes[i][j]),
+		sum += magicprimes[i][j]
+	print sum,
+	print
