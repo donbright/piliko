@@ -37,43 +37,23 @@
 from sympy import *
 import math
 from fractions import Fraction
-P,J,K,M,N,L=symbols('P,K,J,M,N,L')
+P,J,K,M,N,L,s=symbols('P,K,J,M,N,L,s')
 
-J=16-P
-K=Fraction(9,16)*P
+P=16*s
+K=9*s
+J=16*(1-s)
 eq=2*(J**2+K**2+P**2)-(J+K+P)**2
+s1,s2=solve(eq,s)
 
-Pa,Pb=solve(eq,P)
-
-
-J=16-Pb
-K=Fraction(9,16)*Pb
-M=9-K
-N=25-Pb
-L=Pb
-New16=J+Pb
-New9=M+K
-New25=N+Pb
-legsa=[Pb,J,K,M,N,L,New16,New9,New25]
-print legsa
-print 'P,J=16-P,K=P*9/16,M=9-K,N=25-P,L=P'
-print map(lambda x:float(math.sqrt(x)),legsa)
-
-
-
-# for the other solution, J is the long side
-Pa=Pa
-J=16-Pa
-K=Fraction(9,16)*Pa
-M=9-K
-L=J
-N=symbols('N')
-eq2=2*(M**2+N**2+J**2)-(M+N+J)**2
-print 'eq2',eq2
-Na,Nb=solve(eq2,N)
-legsa=[Pa,J,K,M,Na,L]
-print legsa
-print 'Pa,J,K,M,N,L'
-print map(lambda x:float(math.sqrt(x)),legsa)
-print 'N+J',Na+J
+print s1,s2
+P1=16*s1
+K1=9*s1
+J1=16*(1-s1)
+P2=16*s2
+K2=9*s2
+J2=16*(1-s2)
+print 's1,P1,K1,J1',s1,P1,K1,J1
+print map(lambda x:float(math.sqrt(x)),[s1,P1,K1,J1])
+print 's2,P2,K2,J2',s2,P2,K2,J2
+print map(lambda x:float(math.sqrt(x)),[s2,P2,K2,J2])
 

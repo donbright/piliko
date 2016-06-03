@@ -38,12 +38,24 @@ from sympy import *
 import math
 from fractions import Fraction
 P,J,K,M,N,L=symbols('P,K,J,M,N,L')
+import sys
 
-J=16-P
-K=Fraction(9,16)*P
-eq=2*(J**2+K**2+P**2)-(J+K+P)**2
+geometry='blue' # or green or red. see Quadrance()
 
+def Quadrance(x,y):
+	if geometry=='blue': return x**2+y**2
+	if geometry=='green': return 2*x*y
+	if geometry=='red': return x**2-y**2
+#blue
+#J=16-P
+#K=Fraction(9,16)*P
+#eq=2*(J**2+K**2+P**2)-(J+K+P)**2
+
+#green
+#
 Pa,Pb=solve(eq,P)
+print J,K,Pa,Pb
+sys.exit
 
 
 J=16-Pb
