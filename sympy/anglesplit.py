@@ -45,25 +45,44 @@ def spread_poly(n):
 	spoly = Rational(1,4)*(2 - C**n - D**n)
 	return factor(spoly)
 
-def anglefy(sympyspread):
-	spreadvalue = complex(sympyspread.evalf()).real
-	sinus = math.sqrt( spreadvalue )
-	# ignore the negative root, it's ok
-	angle1 = 180*(math.asin(sinus))/3.14159
-	return angle1 #,angle2
+# give the first n angles associated with a given spread.
+# for example 3/4 is associated with 60, 120, 180+60 (240), 180+120 (300), etc.
+def associated_angles(spread,n):
+	sinus = sqrt(spread).evalf()
+	angle_in_radians = asin(sinus)
+	angle_in_degrees = 180.0*angle_in_radians/math.pi
+	supplement = 180.0 - angle_in_degrees
+	tmp,tmp2 = angle_in_degrees,supplement
+	angles = ()
+	while len(angles)<n:
+		angles += (tmp,)
+		if len(angles)<n:
+			angles += (tmp2,)
+		tmp += 180.0
+		tmp2 += 180.0
+	return angles
 
-n=5
-spreadpoly=spread_poly(n)
+n=17
+spreadpoly = spread_poly(n)
+startspread = Rational(3,4)
+#startspread = Rational(1,1)
+startspread = Rational(1,144)
+startspread = Rational(0,1)
 
-spread=Rational(3,4)
-print('Solving ',spreadpoly,'=',spread)
-spreads=solve(spreadpoly-spread,s)
-print(spreads)
-print(anglefy(spread),end=' -> ')
-newangles = []
-for sp in spreads: newangles += [anglefy(sp)]
-for m in newangles: print(m,end=' ')
-print()
-print('             ',end=' ')
-for m in newangles: print(m*n,end=' ')
-print()
+print('Starting spread =',startspread)
+print('Associated angles: ' + '%4.1f° '*n % associated_angles(startspread,n)+'...')
+print('Spread polynomial S_'+str(n)+' =',spreadpoly)
+print('Solving equation',spreadpoly,'=',startspread)
+spreads=[]
+#spreads=solve(spreadpoly-spread,s)
+#for i in range(len(spreads)): print(i,spreads[i])
+roots=Poly(spreadpoly-startspread).all_roots(multiple=True)
+for i in range(len(roots)):
+	rootspread = roots[i]
+	print( 'root',str(i+1)+': s  =',rootspread )
+	print( 'root',str(i+1)+': s ~=',rootspread.evalf() )
+	angles = associated_angles( rootspread,1 )
+	print( 'associated angle: '+ '%4.1f° ' % angles,end=' ')
+	print( 'x %i:' %n , '%4.1f°' % (angles[0]*n))
+	#angle1 = 180*(math.asin(+sinus))/math.pi
+
