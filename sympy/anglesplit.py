@@ -43,7 +43,7 @@ def spread_poly(n):
 	C=1-2*s+I*r
 	D=1-2*s-I*r
 	spoly = Rational(1,4)*(2 - C**n - D**n)
-	return factor(spoly)
+	return spoly
 
 # give the first n angles associated with a given spread.
 # for example 3/4 is associated with 60, 120, 180+60 (240), 180+120 (300), etc.
@@ -62,7 +62,7 @@ def associated_angles(spread,n):
 		tmp2 += 180.0
 	return angles
 
-n=17
+n=36
 spreadpoly = spread_poly(n)
 startspread = Rational(3,4)
 #startspread = Rational(1,1)
@@ -71,7 +71,8 @@ startspread = Rational(0,1)
 
 print('Starting spread =',startspread)
 print('Associated angles: ' + '%4.1f° '*n % associated_angles(startspread,n)+'...')
-print('Spread polynomial S_'+str(n)+' =',spreadpoly)
+print('Spread polynomial (factored): S_ '+str(n)+' =',factor(spreadpoly))
+print('Spread polynomial (plain   ): S_ '+str(n)+' =',expand(spreadpoly))
 print('Solving equation',spreadpoly,'=',startspread)
 spreads=[]
 #spreads=solve(spreadpoly-spread,s)
