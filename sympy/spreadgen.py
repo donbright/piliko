@@ -16,23 +16,25 @@ def spread_poly(n):
 	spoly = Rational(1,4)*(2 - C**n - D**n)
 	return spoly
 
+def slatex(x):
+	return x
+#	return latex(x)
+
 for i in range(0,32):
 	sp = spread_poly(i)
-	print( i,latex(simplify(sp)) )
+	print( 'S_'+str(i),'=',slatex(simplify(sp)) )
+	print( 'S_'+str(i),'=',slatex(factor(sp)) )
 	fl = factor_list(sp)
 	for j in range(len(fl[1])):
 		afactor = fl[1][j][0]
 		repeats = fl[1][j][1]
 		factors[str(afactor)]=factors.get(str(afactor),0)+repeats
-		print( str(i) + 'f' + str(j),latex(afactor), ',',repeats,',',factors[str(afactor)])
+		print( str(i) + 'f' + str(j),slatex(afactor), ',',repeats,',',factors[str(afactor)])
 	if i==0: roots=[]
 	else: roots=Poly(sp).all_roots(multiple=False)
 	for j in range(len(roots)):
 		r = roots[j]
-		if type(r[0])==RootOf:
-			print( str(i)+'r'+str(j),'  too big for sympy')
-		else:
-			print( str(i)+'r'+str(j),' ',latex(r[0]),',',latex(r[1]) )
+		print( str(i)+'r'+str(j),' ',slatex(r[0]),',',slatex(r[1]) )
 		#	print ( r[0].expr )
 	print()
 
