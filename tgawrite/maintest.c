@@ -55,6 +55,7 @@ int main() {
 	for (int i=0;i<7;i++) {
 		char fname[20];
 		sprintf(fname,"thismachine%02d.tga",patterns[i]);
+		//sprintf(fname,"testmodel%02d.tga",patterns[i]);//gen models
 		FILE *f = fopen( fname ,"wb");
 		makepattern(pixels,w,h,patterns[i]);
 		int32_t result = tgawrite(pixels,w,h,f);
