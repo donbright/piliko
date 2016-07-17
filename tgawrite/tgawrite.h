@@ -1,7 +1,7 @@
 #ifndef __tgawrite_h__
 #define __tgawrite_h__
 /*
-Copyright (c) 2016 Don Bright
+Copyright (c) 2016 Don Bright http://github.com/donbright
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  this is designed to be small, simple, easy to understand, and easy to modify.
  splitting colors using the union allows modification for various pixel formats
  and endianness. just switch the order in the union and you can use a different
- rgba order. FILE *F must be open in binary mode ('wb').
+ rgba order as input. FILE *F must be open in binary mode ('wb').
  return is -1 on failure, # of pixel bytes+18 on success
 */
 
@@ -52,7 +52,8 @@ int32_t tgawrite( uint32_t *pixels, uint16_t w, uint16_t h, FILE *f )
 	} pixel;
 	uint8_t tgaheader[18] = {0,0,2,0,0,0,0,0,0,0,0,0,w,w>>8,h,h>>8,32,0};
 	if ( fwrite( tgaheader, 1, 18, f ) != 18 ) return -1;
-	for ( uint32_t i=0; i<w*h; pixel.data32 = pixels[i], i++ ) {
+	for ( uint32_t i=0; i<w*h; i++ ) {
+			pixel.data32 = pixels[i];
 			// printf("%u %u %hhu %hhu %hhu %hhu\n",i,pixel.data32,pixel.data8.blue,pixel.data8.green,pixel.data8.red,pixel.data8.alpha);
 			if (putc( pixel.data8.blue, f )==EOF) return -1;
 			if (putc( pixel.data8.green, f )==EOF) return -1;
