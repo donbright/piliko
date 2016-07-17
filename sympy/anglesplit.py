@@ -66,8 +66,8 @@ n=3
 spreadpoly = spread_poly(n)
 startspread = Rational(3,4)
 #startspread = Rational(1,1)
-startspread = Rational(1,144)
-#startspread = Rational(0,1)
+#startspread = Rational(1,144)
+startspread = Rational(0,1)
 
 print('Starting spread =',startspread)
 print('Associated angles: ' + '%4.1f° '*n % associated_angles(startspread,n)+'...')
