@@ -1,5 +1,6 @@
-// test of tgawrite.h
+// test of tgawrite.h, copyright don bright 2016
 // see license.txt for license
+// see also http://paulbourke.net/fractals/circlesquares/index.html
 
 #include "tgawrite.h"
 
