@@ -24,7 +24,6 @@ void makepattern(uint32_t *pixels,uint16_t w,uint16_t h,int color) {
 }
 
 // test results(actual on this machine) against models (ideal)
-// 
 void tests()
 {
 	for (int i=0;i<7;i++) {
