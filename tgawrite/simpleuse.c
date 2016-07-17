@@ -1,5 +1,8 @@
 // test of tgawrite.h, copyright don bright 2016
 // see license.txt for license
+// pattern -
+// see also http://paulbourke.net/fractals/circlesquares/index.html
+// see also https://www.youtube.com/watch?v=kRHKbJMm6xE
 
 #include "tgawrite.h"
 
@@ -22,8 +25,4 @@ int main() {
 	fclose(f);
 	printf("wrote %u bytes to simple.tga\n",result);
 }
-
-// pattern -
-// see also http://paulbourke.net/fractals/circlesquares/index.html
-// see also https://www.youtube.com/watch?v=kRHKbJMm6xE
 
