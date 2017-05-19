@@ -46,10 +46,12 @@
 # 0 | 1 | 1 => 1
 # 0 ^ 1 ^ 1 => 0
 
-import uuid
+import uuid, sys, string, html
+
+debugger=False
 
 def debug(x):
-	print(x)
+	if debugger: print(x)
 
 def debugToken(t):
 	debug(token2str(t))
@@ -63,11 +65,12 @@ def token2str(t):
 
 def debugTree(tree):
 	debug('tree')
-	debugTreenodes(tree.rootnode)
-	debug(' numnodes:'+str(findnumnodes(tree.rootnode)))
-	debug(' numleaves:'+str(findnumleaves(tree.rootnode)))
-	debug(' maxdepth:'+str(findmaxdepth(tree.rootnode)))
-	debug(' name:')
+	debugTreenodes(tree.root)
+	debug(' root:'+str(tree.root.id))
+	debug(' numnodes:'+str(findnumnodes(tree.root)))
+	debug(' numleaves:'+str(findnumleaves(tree.root)))
+	debug(' maxdepth:'+str(findmaxdepth(tree.root)))
+	debug(' name:'+str(tree.name))
 
 def debugTreenode(node):
 	debug(' treenode')
@@ -81,6 +84,36 @@ def debugTreenode(node):
 	debug('  left:'+ltext)
 	debug('  right:'+rtext)
 
+def svgTree(tree):
+	s='<?xml version="1.0" encoding="utf-8" standalone="no"?>\n'
+	s+='<svg width="1024" height="1024" xmlns="http://www.w3.org/2000/svg"  xmlns:xlink="http://www.w3.org/1999/xlink">\n'
+	s+='<title>bool0 tree</title>\n'
+	s+=svgTreenode(tree.root,512,10)+'\n'
+	s+='</svg>'
+	return s
+
+def svgTreenode(node,x,y):
+	label = '{0.data},{0.toktype},{0.origin}'.format(node.data)
+	label = html.escape(label)
+	s=''
+	s+='<rect x="{0}" y="{1}"'.format(x,y)
+	s+=' width="140" height="40" style="fill:none;stroke:rgb(0,0,0)" />\n'
+	s+='<text x="{0}" y="{1}">{2}</text>\n'.format(x+5,y+20,label)
+	if node.left:
+		s += '<line x1="{0}" y1="{1}" x2="{2}" y2="{3}" style="stroke:black;"/>\n'.format(x+70,y+40,x-75+70,y+55)
+		s += svgTreenode(node.left,x-75,y+55)
+	if node.right:
+		s += '<line x1="{0}" y1="{1}" x2="{2}" y2="{3}" style="stroke:black;"/>\n'.format(x+140-70,y+40,x+75+70,y+55)
+		s += svgTreenode(node.right,x+75,y+55)
+	return s
+	#debug('  id:'+str(node.id))
+	#debug('  data:'+token2str(node.data))
+	#ltext,rtext,utext = 'None','None','None'
+	#if node.up: utext = str(node.up.id)
+	#debug('  up:'+utext)
+	#debug('  left:'+ltext)
+	#debug('  right:'+rtext)
+
 def debugTreenodes(node):
 	if node.left: debugTreenodes(node.left)
 	if node.right: debugTreenodes(node.right)
@@ -91,10 +124,12 @@ class Treenode:
 	def __init__(self):
 		self.id = uuid.uuid4()
 class Tree:
-	rootnode = None
-	def __init__(self,rootnode):
-		self.rootnode = rootnode
-	name = ''
+	root = None
+	name = None
+	nodetable = {}
+	def __init__(self,root):
+		self.root = root
+		self.name = uuid.uuid4()
 
 class Token:
 	data = ''
@@ -120,10 +155,8 @@ def findnumleaves(node):
 
 def findmaxdepth(node):
 	右=左=1
-	if node.left:
-		左 += findmaxdepth(node.left)
-	if node.right:
-		右 += findmaxdepth(node.right)
+	if node.left: 左 += findmaxdepth(node.left)
+	if node.right: 右 += findmaxdepth(node.right)
 	if node.left==node.right==None: return 1
 	return max(右,左)
 
@@ -173,10 +206,30 @@ def tokens_to_tree( tokens ):
 		debugTreenode(newnode)
 	return Tree(currentnode)
 
-if __name__=='__main__':
+def runtest(s):
+	return [s,eval(s)]
+
+def test1():
 	expression = '0 | 0 | 1'
+	tokens = expression_to_tokens( expression )
+	tree = tokens_to_tree( tokens )
+	tests = '''
+len(tokens)==9
+findnumnodes(tree.root)==5
+findnumleaves(tree.root)==3
+findmaxdepth(tree.root)==3
+'''
+	for line in tests.split('\n'):
+		if line and not eval(line): print('test fail',line)
+
+if __name__=='__main__':
+	if '--debug' in str(sys.argv): debugger=True
+
+	test1()
+	expression = '0 | 0 | 1 & 2 | 3'
 	debug('input '+expression)
 	tokens = expression_to_tokens( expression )
 	tree = tokens_to_tree( tokens )
 	debug('--- tree built')
 	debugTree(tree)
+	if '--svg' in str(sys.argv): print(svgTree(tree))
