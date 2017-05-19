@@ -88,23 +88,25 @@ def svgTree(tree):
 	s='<?xml version="1.0" encoding="utf-8" standalone="no"?>\n'
 	s+='<svg width="1024" height="1024" xmlns="http://www.w3.org/2000/svg"  xmlns:xlink="http://www.w3.org/1999/xlink">\n'
 	s+='<title>bool0 tree</title>\n'
-	s+=svgTreenode(tree.root,512,10)+'\n'
+	s+='<rect x="{0}" y="{1}" width="{2}" height="{3}" fill="none" stroke="black"/>\n'.format(1,1,1023,1023)
+	s+=svgTreenode(tree.root,512,10,0)+'\n'
 	s+='</svg>'
 	return s
 
-def svgTreenode(node,x,y):
+def svgTreenode(node,x,y,depth):
+	nwidth,nheight=1024/(2**(depth)),40
 	label = '{0.data},{0.toktype},{0.origin}'.format(node.data)
 	label = html.escape(label)
-	s=''
-	s+='<rect x="{0}" y="{1}"'.format(x,y)
-	s+=' width="140" height="40" style="fill:none;stroke:rgb(0,0,0)" />\n'
+	s='<!-- {0} {1} {2} -->\n'.format(depth,nwidth,2**0)
+	s+='<rect x="{0}" y="{1}" width="{2}" height="{3}"'.format(x-nwidth/4,y,nwidth/2,nheight)
+	s+=' style="fill:none;stroke:rgb(0,0,0)" />\n'
 	s+='<text x="{0}" y="{1}">{2}</text>\n'.format(x+5,y+20,label)
 	if node.left:
-		s += '<line x1="{0}" y1="{1}" x2="{2}" y2="{3}" style="stroke:black;"/>\n'.format(x+70,y+40,x-75+70,y+55)
-		s += svgTreenode(node.left,x-75,y+55)
+		s += '<line x1="{0}" y1="{1}" x2="{2}" y2="{3}" style="stroke:black;"/>\n'.format(x,y+nheight,x-nwidth/4,y+55)
+		s += svgTreenode(node.left,x-nwidth/4,y+55,depth+1)
 	if node.right:
-		s += '<line x1="{0}" y1="{1}" x2="{2}" y2="{3}" style="stroke:black;"/>\n'.format(x+140-70,y+40,x+75+70,y+55)
-		s += svgTreenode(node.right,x+75,y+55)
+		s += '<line x1="{0}" y1="{1}" x2="{2}" y2="{3}" style="stroke:black;"/>\n'.format(x,y+nheight,x+nwidth/4,y+55)
+		s += svgTreenode(node.right,x+nwidth/4,y+55,depth+1)
 	return s
 	#debug('  id:'+str(node.id))
 	#debug('  data:'+token2str(node.data))
