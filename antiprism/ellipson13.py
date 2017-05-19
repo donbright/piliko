@@ -8,11 +8,10 @@
 #
 # Strategy. 
 # Spread triples are the spreads of triangles. 
-from pytools import generate_permutations
 from fractions import Fraction
 from random import randint
 depth=100
-numpoints = 2000
+numpoints = 20000
 class point2d:
 	def __init__( self,x,y ): self.x,self.y=x,y
 def sqr(x): return x*x
