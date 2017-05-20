@@ -85,28 +85,31 @@ def debugTreenode(node):
 	debug('  right:'+rtext)
 
 def svgTree(tree):
+	maxdepth = findmaxdepth(tree.root)
 	s='<?xml version="1.0" encoding="utf-8" standalone="no"?>\n'
 	s+='<svg width="1024" height="1024" xmlns="http://www.w3.org/2000/svg"  xmlns:xlink="http://www.w3.org/1999/xlink">\n'
 	s+='<title>bool0 tree</title>\n'
 	s+='<rect x="{0}" y="{1}" width="{2}" height="{3}" fill="none" stroke="black"/>\n'.format(1,1,1023,1023)
-	s+=svgTreenode(tree.root,512,10,0)+'\n'
+	s+=svgTreenode(tree.root,512,10,0,maxdepth)+'\n'
 	s+='</svg>'
 	return s
 
-def svgTreenode(node,x,y,depth):
+def svgTreenode(node,x,y,depth,maxdepth):
 	nwidth,nheight=1024/(2**(depth)),40
-	label = '{0.data},{0.toktype},{0.origin}'.format(node.data)
+	boxw = 1024 / 2**maxdepth
+	#label = '{0.data},{0.toktype},{0.origin}'.format(node.data)
+	label = '{0}'.format(node.data.data)
 	label = html.escape(label)
 	s='<!-- {0} {1} {2} -->\n'.format(depth,nwidth,2**0)
-	s+='<rect x="{0}" y="{1}" width="{2}" height="{3}"'.format(x-nwidth/4,y,nwidth/2,nheight)
+	s+='<circle cx="{0}" cy="{1}" r="{2}" stroke="black" fill="none"'.format(x,y+boxw/2,boxw*3/4)
 	s+=' style="fill:none;stroke:rgb(0,0,0)" />\n'
-	s+='<text x="{0}" y="{1}">{2}</text>\n'.format(x+5,y+20,label)
+	s+='<text x="{0}" y="{1}">{2}</text>\n'.format(x-5,y+22,label)
 	if node.left:
 		s += '<line x1="{0}" y1="{1}" x2="{2}" y2="{3}" style="stroke:black;"/>\n'.format(x,y+nheight,x-nwidth/4,y+55)
-		s += svgTreenode(node.left,x-nwidth/4,y+55,depth+1)
+		s += svgTreenode(node.left,x-nwidth/4,y+boxw*2,depth+1,maxdepth)
 	if node.right:
 		s += '<line x1="{0}" y1="{1}" x2="{2}" y2="{3}" style="stroke:black;"/>\n'.format(x,y+nheight,x+nwidth/4,y+55)
-		s += svgTreenode(node.right,x+nwidth/4,y+55,depth+1)
+		s += svgTreenode(node.right,x+nwidth/4,y+boxw*2,depth+1,maxdepth)
 	return s
 	#debug('  id:'+str(node.id))
 	#debug('  data:'+token2str(node.data))
@@ -189,6 +192,7 @@ def token_to_node( token ):
 
 def tokens_to_tree( tokens ):
 	currentnode = None
+	leftmost = None
 	for token in tokens:
 		debugToken( token )
 		newnode = token_to_node( token )
@@ -196,20 +200,32 @@ def tokens_to_tree( tokens ):
 			if currentnode:
 				currentnode.up = newnode
 				newnode.left = currentnode
+			else:
+				leftmost = newnode
 			currentnode = newnode
-		elif token.toktype == 'number':
-			if currentnode==None: currentnode = newnode
-			elif currentnode.left==None: currentnode.left = newnode
-			elif currentnode.right==None: currentnode.right = newnode
-			else: print('unknown'+token2str(token))
-		debug('current')
-		debugTreenode(currentnode)
-		debug('new')
-		debugTreenode(newnode)
+	inserter = leftmost
+	for token in tokens:
+		newnode = token_to_node( token )
+		if token.toktype == 'number':
+			done = False
+			while not done:
+				if not inserter.left:
+					inserter.left = newnode
+					done = True
+				elif not inserter.right:
+					inserter.right = newnode
+					done = True
+				else:
+					inserter = inserter.up
 	return Tree(currentnode)
 
 def runtest(s):
 	return [s,eval(s)]
+
+def expression_to_tree(s):
+	tokens = expression_to_tokens( s )
+	tree = tokens_to_tree( tokens )
+	return tree
 
 def test1():
 	expression = '0 | 0 | 1'
@@ -224,10 +240,20 @@ findmaxdepth(tree.root)==3
 	for line in tests.split('\n'):
 		if line and not eval(line): print('test fail',line)
 
+def test2():
+	tree = expression_to_tree( '0 | 0 | 1 & 2 | 3' )
+	tests='''
+findnumnodes(tree.root)==9
+findnumleaves(tree.root)==5
+findmaxdepth(tree.root)==5
+'''
+	for line in tests.split('\n'):
+		if line and not eval(line): print('test fail',line)
+
 if __name__=='__main__':
 	if '--debug' in str(sys.argv): debugger=True
-
 	test1()
+	test2()
 	expression = '0 | 0 | 1 & 2 | 3'
 	debug('input '+expression)
 	tokens = expression_to_tokens( expression )
